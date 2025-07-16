@@ -1,5 +1,12 @@
 #!/bin/bash
 
+LOG="/var/log/cuentas.log"
+
+if [ ! -f "$LOG" ]; then
+  sudo touch "$LOG"
+  sudo chmod 644 "$LOG"
+  sudo chown root:root "$LOG"
+fi 
 
 while [ "$opcion" != "0" ]; do
 
@@ -7,7 +14,8 @@ while [ "$opcion" != "0" ]; do
   echo "2 - Eliminar usuario"
   echo "3 - Modificar usuario"
   echo "4 - Lista de usuarios"
-  echo "5 - Consultar usuario"
+  echo "5 - Lista de grupos"
+  echo "6 - Consultar usuario"
   echo "0 - Salir"
   echo ""
   read -p "Seleccione una opción: " opcion
@@ -25,6 +33,7 @@ while [ "$opcion" != "0" ]; do
         fi
         useradd -m -g "$grupo" "$user"
         echo " Usuario '$user' creado y asignado al grupo '$grupo'."
+	echo "[CREADO] '$user' - $(date '+%d-%m-%Y')" >> "$LOG"
         passwd "$user"
       fi
       ;;
@@ -34,6 +43,7 @@ while [ "$opcion" != "0" ]; do
       if id "$user" &>/dev/null; then
         userdel -r "$user"
         echo " Usuario '$user' eliminado."
+	echo "[ELIMINADO] '$user' - $(date '+%d-%m%Y')" >> "$LOG"
       else
         echo " El usuario '$user' no existe."
       fi
@@ -60,6 +70,11 @@ while [ "$opcion" != "0" ]; do
       ;;
 
     5)
+      echo " Lista de grupos:"
+      cut -d: -f1 /etc/group
+      ;;
+
+    6)
       read -p "Ingrese nombre de usuario a consultar: " user
       if id "$user" &>/dev/null; then
         echo " Información del usuario '$user':"

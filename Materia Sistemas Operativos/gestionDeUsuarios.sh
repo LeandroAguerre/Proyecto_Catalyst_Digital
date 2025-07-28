@@ -8,6 +8,12 @@ if [ ! -f "$LOG" ]; then
   sudo chown root:root "$LOG"
 fi 
 
+if passwd -S root | grep -q 'L' && grep -q '^root:.*:/usr/sbin/nologin' /etc/passwd && grep -q '^PermitRootLogin no' /etc/ssh/sshd_config; then
+  rootOff=1
+else
+  rootOff=0
+fi
+
 rutaBase="/etc/skel"
 carpetas=("adminweb" "desarrollador" "srvweb" "mysql" "backup")
 for carpeta in "${carpetas[@]}"; do
@@ -17,8 +23,23 @@ for carpeta in "${carpetas[@]}"; do
   fi
 done
 
+if [ ! -f /etc/sudoers.d/administradores ]; then
+  echo "%administradores ALL=(ALL) ALL" > /etc/sudoers.d/administradores
+  chmod 440 /etc/sudoers.d/administradores
+  chown root:root /etc/sudoers.d/administradores
+  echo "[PERMISOS] Grupo 'administradores' agregado a sudoers - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG"
+fi
+
+# Aplicar permisos seguros a los skel
+for carpeta in "${carpetas[@]}"; do
+  rutaCompleta="$rutaBase/$carpeta"
+  find "$rutaCompleta" -type d -exec chmod 755 {} \;
+  find "$rutaCompleta" -type f -exec chmod 644 {} \;
+done
+
 while [ "$opcion" != "0" ]; do
 
+  echo ""
   echo "1 - Crear usuario"
   echo "2 - Eliminar usuario"
   echo "3 - Lista de usuarios"
@@ -48,7 +69,7 @@ while [ "$opcion" != "0" ]; do
           grupo="mysql"
           ;;  
         5)
-          skel="/etc/skel_backup"
+          skel="/etc/skel/backup"
           grupo="backup"
           ;;
         *)
@@ -75,6 +96,10 @@ while [ "$opcion" != "0" ]; do
             echo " Usuario '$user' creado y asignado al grupo '$grupo'."
             echo "[CREADO] El usuario '$user' fue creado - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LOG"
             passwd "$user"
+            if [[ "$grupo" == "administradores" && "$rootOff" -eq 0 ]]; then
+              echo ""
+              echo "[RECORDATORIO] Desactivar login root en la opcion 5"
+            fi  
           fi
         else
           echo "El nombre de usuario no puede estar vacio"  
@@ -109,6 +134,25 @@ while [ "$opcion" != "0" ]; do
       fi
       ;;
 
+    5)
+      userAdmin=$(getent group administradores | cut -d: -f4)
+      echo "[RECORDATORIO] Recuerda tener un usuario aministrador antes de usar esta opcion."
+      read -p "Desea desactivar el login root? si/no" loginOpcion
+      if [[ "$loginOpcion" = "si" ]]; then 
+        if [[ -n "$userAdmin" ]]; then
+          sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+          systemctl restart sshd
+          passwd -l root
+          usermod -s /usr/sbin/nologin root
+          echo "Usuario root desactivado completamente"
+          echo "[DESACTIVADO] Usuario root - $(date '+%Y-%m-%d %H:%M:%S')" >> /var/log/cuentas.log
+          rootOff=1
+        else
+          echo "" 
+          echo "[RECORDATORIO] Recuerda tener un usuario aministrador antes de usar esta opcion."
+        fi  
+      fi
+      ;;
     0)
       echo " Saliendo..."
       ;;

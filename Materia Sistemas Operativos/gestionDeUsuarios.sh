@@ -2,6 +2,7 @@
 
 LOG="/var/log/cuentas.log"
 LogErrores="/var/log/errores.log"
+regex='^[a-z_][a-z0-9_-]*[$]?$' 
 
 #Verifica si existe el archivo de cuentas.log, si no existe, lo crea y configura permisos.
 if [ ! -f "$LOG" ]; then
@@ -70,6 +71,7 @@ while [ "$opcion" != "0" ]; do
   echo "3 - Lista de usuarios"
   echo "4 - Consultar usuario"
   echo "5 - Desactivar login root"
+  echo "6 - Ver logs"
   echo "0 - Salir"
   echo ""
   read -p "Seleccione una opcion: " opcion
@@ -112,8 +114,8 @@ while [ "$opcion" != "0" ]; do
 
       if [[ "$tipo" != "novalido" ]]; then
 
-        read -p "Ingrese nombre de usuario: " user
-        if [ -n "$user" ]; then
+        read -p "Ingrese nombre de usuario [a-z-0-9]: " user
+        if [ -n "$user" && "$user" =~ $regex ]; then
           #Verifica si el usuario ya existe
           if id "$user" &>/dev/null; then
             echo "El usuario '$user' ya existe."
@@ -138,8 +140,8 @@ while [ "$opcion" != "0" ]; do
             fi  
           fi
         else
-          echo "El nombre de usuario no puede estar vacio"  
-          echo "[ERROR] El nombre usuario no puede estar vacio - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LogErrores"
+          echo "El nombre de usuario es invalido"  
+          echo "[ERROR] El nombre usuario no es valido - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LogErrores"
         fi  
       fi
       ;;
@@ -147,7 +149,7 @@ while [ "$opcion" != "0" ]; do
     2)
       #Elimina un usuario
       read -p "Ingrese el nombre de usuario a eliminar: " user
-      if id "$user" &>/dev/null; then
+      if id "$user" &>/dev/null && [[ "$user" =~ $regex ]]; then
         userdel -r "$user"
         echo " Usuario '$user' eliminado."
 	      echo "[ELIMINADO] El usuario '$user' fue eliminado - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LOG"
@@ -166,7 +168,7 @@ while [ "$opcion" != "0" ]; do
     4)
       #Muestra si existe informacion del usuario 
       read -p "Ingrese nombre de usuario a consultar: " user
-      if id "$user" &>/dev/null; then
+      if id "$user" &>/dev/null && [[ "$user" =~ $regex ]]; then
         echo " Informacion del usuario '$user':"
         id "$user"
         groups "$user"
@@ -199,9 +201,35 @@ while [ "$opcion" != "0" ]; do
           echo "[RECORDATORIO] Recuerda tener un usuario aministrador antes de usar esta opcion."
           echo "[ERROR] Se intento desactivar al usuario root sin un administrador - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
         fi  
+      else
+        echo "Opcion incorrecta."
       fi
       ;;
+    6)
+      echo "A que archivo desea acceder?"
+      echo "1- Alta y baja de cuentas de usuario"
+      echo "2- Errores y modificaciones importantes"
+      echo "0- Salir"
+      read -p "Elija una opcion: " opcion
 
+      case $tipo in
+        1)
+          cat "$LogErrores"
+          echo "[ADVERTENCIA] Se ingreso al archivo errores.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+          ;;
+        2)
+          cat "$LOG"
+          echo "[ADVERTENCIA] Se ingreso al archivo cuentas.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+          ;;
+        0) 
+          echo "Saliendo.."
+          ;;
+        *)
+          echo ""
+          echo "[ERROR] Se ingreso una opcion no valida en ver logs - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+          echo ""
+          continue
+      ;;
     0)
       echo " Saliendo..."
       echo "[CIERRE] Se cerro el programa - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"

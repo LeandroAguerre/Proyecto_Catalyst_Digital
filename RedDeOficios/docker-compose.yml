@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    image: php:8.3.23-apache
+    container_name: reddeoficios_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+      - ./docker/apache-conf.conf:/etc/apache2/sites-enabled/000-default.conf
+    restart: always
+    command: >
+      bash -c "docker-php-ext-install pdo_mysql && apache2-foreground"
+  db:
+    image: mariadb:10.11.13
+    container_name: reddeoficios_db
+    environment:
+      MYSQL_ROOT_PASSWORD: catalystdigital05
+      MYSQL_DATABASE: reddeoficios
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  db_data:

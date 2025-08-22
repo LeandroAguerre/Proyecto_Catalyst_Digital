@@ -1,0 +1,13 @@
+Docker:
+
+Levantar el servidor -> docker-compose up -d
+Bajar el servidor -> docker-compose down (si queres borrar los datos usamos el -v al final)
+docker ps -a -> muestra el estado de los contenedores si sacamos el -a solo muestra los activos 
+docker ps -f name=(nombre del contenedor) -> mostramos el estado de ese unico contenedor
+docker inspect (nombre del contenedor) -> vemos info muy detallada del contenedor
+Ver logs de un contenedor -> docker logs (nombre del contenedor)
+docker exec -it (nombre del contenedor) bash -> abre una terminal interactiva dentro del contenedor, osea que entramos dentro del contenedor para modificar o ejecutar comandos
+
+mysql:
+
+mysql -u root -p -> dentro del contenedor de la db, sirve para conectarse como root a la base de datos y poder usar comandos libremente, por ej use tabla

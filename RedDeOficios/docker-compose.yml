@@ -1,20 +1,27 @@
-version: '3.8'
-
 services:
   web:
-    image: php:8.3.23-apache
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
     container_name: reddeoficios_web
     ports:
-      - "8080:80"
+      - "8081:80"
+      #- "9003:9003"  # Puerto de Xdebug
     volumes:
       - ./app:/var/www/html
       - ./docker/apache-conf.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./docker/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+      
     restart: always
     command: >
       bash -c "docker-php-ext-install pdo_mysql && apache2-foreground"
+
   db:
     image: mariadb:10.11.13
     container_name: reddeoficios_db
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: catalystdigital05
       MYSQL_DATABASE: reddeoficios
@@ -24,3 +31,4 @@ services:
 
 volumes:
   db_data:
+

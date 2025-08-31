@@ -1,0 +1,283 @@
+
+
+:root {
+    --primary-color: #007BFF;
+    --primary-hover-color: #0056b3;
+    --light-gray-color: #f8f9fa;
+    --medium-gray-color: #e9ecef;
+    --dark-gray-color: #6c757d;
+    --text-color: #343a40;
+    --white-color: #fff;
+    --sidebar-width: 260px;
+    --border-radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    background: linear-gradient(135deg, #ffdfb9, #ffffff);
+    color: white;
+    color: var(--text-color);
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color:#b8f0ff;
+    padding: 25px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--medium-gray-color);
+    transition: width 0.3s ease;
+    overflow-y: auto; 
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+.logo .azul {
+  color: rgb(4, 4, 154) !important;
+}
+
+.logo .naranja {
+  color: orange !important;
+}
+
+.navigation ul {
+    list-style: none;
+    list-style: none;
+    display: flex;
+    flex-direction: column; /* si querés que sigan en columna */
+    align-items: center;    /* centra horizontalmente todos los botones */
+    padding: 0;
+    margin: 0;
+}
+
+.navigation .nav-button {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    margin-bottom: 5px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    text-align: center;
+    display: block;
+    width: 120px; /* todos tiene el mismo tama;o*/
+    text-align: center;
+     padding: 12px 25px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+}
+
+.navigation .nav-button:hover {
+    background-color: var(--medium-gray-color);
+    transform: scale(1.05); /* agranda 5% */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* sombra suave */
+    
+}
+
+.navigation .nav-button.active {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.content {
+    margin-left: var(--sidebar-width);
+    flex-grow: 1;
+    padding: 40px;
+}
+
+.content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.service-card {
+    background-color: var(--white-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--medium-gray-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid var(--medium-gray-color);
+}
+
+.service-card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+}
+
+.service-card .specialty {
+    color: var(--dark-gray-color);
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.service-card button {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.service-card button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.service-card.hidden {
+    display: none;
+}
+.carousel-inner img {
+  height: 400px;
+  object-fit: cover;
+}
+.auth-buttons {
+  display: flex;
+  flex-direction: column; /* Los acomoda en columna */
+  align-items: stretch;   /* Que ocupen el mismo ancho */
+  gap: 10px;              /* Espacio entre ellos */
+  margin-bottom: 25px;      
+}
+
+.auth-buttons .btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: flex;         /* para centrar el texto dentro del botón */
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-buttons .btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-color: var(--primary-color);
+}
+
+.auth-buttons .btn-primary:hover {
+    background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);
+}
+
+.auth-buttons .btn-secondary {
+   background-color: var(--primary-color);
+    color: var(--white-color);
+    border-color: var(--primary-color);
+}
+
+.auth-buttons .btn-secondary:hover {
+     background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);   
+}
+.search-bar-unified {
+    position: sticky; 
+    top: 0;           
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    background-color: white; /* barra completa blanca */
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* opcional, para efecto moderno */
+}
+
+.search-bar-unified input {
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    flex: 1;
+    text-align: center; /* centra el placeholder */
+    background-color: white; /* aseguramos fondo blanco */
+    font-size: 1rem;
+}
+
+.search-bar-unified .divider {
+    padding: 0 10px;
+    color: #888;
+    font-weight: bold;
+    background-color: white; /* fondo blanco detrás del | */
+}
+
+.search-bar-unified button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-bar-unified button:hover {
+    background-color: #0056b3;
+}
+
+
+

@@ -1,0 +1,2 @@
+Como los formatos internamente son diferentes, si usas windows o linux se debe usar un archivo u otro.
+El actual es de linux, copiar el nombre, cambiarlo y luego pegar el nombre en el archivo .lala antes de levantar el servidor.

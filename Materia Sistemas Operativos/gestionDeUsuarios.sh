@@ -229,6 +229,7 @@ while [ "$opcion" != "0" ]; do
           echo "[ERROR] Se ingreso una opcion no valida en ver logs - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
           echo ""
           continue
+        esac
       ;;
     0)
       echo " Saliendo..."

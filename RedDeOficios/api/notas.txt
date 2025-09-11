@@ -1,0 +1,31 @@
+Explicación de conceptos clave
+🔄 Router
+El router es el archivo que recibe todas las peticiones (en tu caso, index.php) y decide qué controlador ejecutar según la URL. Es como el recepcionista que dice: “¿Venís por /api/test? Te paso con TestController.”
+
+🧠 Controller
+El controlador es el que procesa la lógica de la petición. Recibe los datos, valida, llama al modelo si hace falta, y devuelve una respuesta. Es como el operador que atiende la llamada y resuelve el problema.
+
+Ejemplo: RegistroController::procesar() recibe los datos del formulario y los guarda.
+
+🗄️ Model
+El modelo representa la lógica de acceso a datos. Se conecta con la base de datos, guarda, consulta, actualiza. Es como el archivador que guarda y recupera la información.
+
+Ejemplo: RegistroModel::guardar() toma los datos y los inserta en la base.
+
+🌐 CORS (Cross-Origin Resource Sharing)
+CORS es un mecanismo de seguridad que controla quién puede acceder a tu API desde otro dominio. Por defecto, los navegadores bloquean peticiones entre orígenes distintos.
+
+Ejemplo:
+
+Tu frontend está en http://localhost:8081
+
+Tu API está en http://api.reddeoficios.com
+
+Si no configurás CORS, el navegador bloquea la petición.
+
+Para permitirlo, agregás en tu API:
+php
+header("Access-Control-Allow-Origin: *"); // Permite cualquier origen
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+🔒 En producción, en lugar de *, deberías poner el dominio específico de tu frontend.

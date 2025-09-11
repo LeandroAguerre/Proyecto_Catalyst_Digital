@@ -11,9 +11,3 @@ docker exec -it (nombre del contenedor) bash -> abre una terminal interactiva de
 mysql:
 
 mysql -u root -p -> dentro del contenedor de la db, sirve para conectarse como root a la base de datos y poder usar comandos libremente, por ej use tabla
-
-
-
-hacer una build y probar que encuentre el dockerfile antes de copiar por si da error con la ruta
-sudo docker build -f docker/Dockerfile -t reddeoficios-test .
-

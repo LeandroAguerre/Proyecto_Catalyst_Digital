@@ -62,7 +62,7 @@ document.getElementById('btnLogin').onclick = () => {
   estado.textContent = '⏳ Validando credenciales...';
 
   try {
-    const res = await fetch('index.php?accion=login', {
+    const res = await fetch('http://localhost:8081/index.php?accion=registro', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({usuario, pass})

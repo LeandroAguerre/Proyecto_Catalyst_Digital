@@ -1,5 +1,6 @@
 <?php
-require_once '../model/loginModel.php';
+require_once ROOT_PATH . 'api/config/database.php';
+require_once ROOT_PATH . 'api/model/registroModel.php';
 
 class LoginController {
   public function login() {

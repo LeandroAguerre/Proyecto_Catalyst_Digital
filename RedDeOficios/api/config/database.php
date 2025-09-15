@@ -1,14 +1,22 @@
 <?php
-//Conexion a BD
-$host = 'db'; 
-$db_name = 'reddeoficios';
-$username = 'root';
-$password = 'catalystdigital05'; 
 
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+class Database {
+    private $host = 'db';
+    private $db_name = 'reddeoficios';
+    private $username = 'root';
+    private $password = 'catalystdigital05';
+    public $conn;
+
+    public function getConnection() {
+        $this->conn = null;
+
+        try {
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $exception) {
+            error_log("Error de conexión a la base de datos: " . $exception->getMessage());
+            die("Error de conexión a la base de datos.");
+        }
+        return $this->conn;
+    }
 }

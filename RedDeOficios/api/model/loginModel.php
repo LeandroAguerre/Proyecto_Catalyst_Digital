@@ -1,5 +1,6 @@
 <?php
-require_once '../config/database.php';
+require_once ROOT_PATH . 'api/config/database.php';
+require_once ROOT_PATH . 'api/model/registroModel.php';
 
 class LoginModel {
   public function obtenerHash($usuario) {

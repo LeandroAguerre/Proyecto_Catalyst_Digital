@@ -17,3 +17,4 @@ mysql -u root -p -> dentro del contenedor de la db, sirve para conectarse como r
 hacer una build y probar que encuentre el dockerfile antes de copiar por si da error con la ruta
 sudo docker build -f docker/Dockerfile -t reddeoficios-test .
 
+

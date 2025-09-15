@@ -1,25 +1,35 @@
 <?php
 require_once ROOT_PATH . 'api/config/database.php';
-require_once ROOT_PATH . 'api/model/registroModel.php';
+require_once ROOT_PATH . 'api/model/loginModel.php';
 
 class LoginController {
-  public function login() {
-    $data = json_decode(file_get_contents("php://input"), true);
-    $usuario = trim($data['usuario'] ?? '');
-    $pass = trim($data['pass'] ?? '');
+    public function login() {
+        // Lee el cuerpo de la solicitud JSON
+        $data = json_decode(file_get_contents('php://input'));
 
-    if (!$usuario || !$pass) {
-      echo json_encode(['mensaje' => 'Campos vacíos']);
-      return;
+        if (!isset($data->usuario) || !isset($data->pass)) {
+            http_response_code(400); // Bad Request
+            echo json_encode(['mensaje' => 'Datos incompletos.']);
+            return;
+        }
+
+        $usuario = $data->usuario;
+        $contrasena = $data->pass;
+
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $loginModel = new LoginModel($db);
+
+        $hashGuardado = $loginModel->obtenerHash($usuario);
+
+        // Verifica si se encontró el usuario y si la contraseña es correcta
+        if ($hashGuardado && password_verify($contrasena, $hashGuardado)) {
+            http_response_code(200);
+            echo json_encode(['mensaje' => 'Inicio de sesión exitoso.']);
+        } else {
+            http_response_code(401); // Unauthorized
+            echo json_encode(['mensaje' => 'Usuario o contraseña incorrectos.']);
+        }
     }
-
-    $modelo = new LoginModel();
-    $hash = $modelo->obtenerHash($usuario);
-
-    if ($hash && password_verify($pass, $hash)) {
-      echo json_encode(['exito' => true, 'mensaje' => 'Login exitoso']);
-    } else {
-      echo json_encode(['exito' => false, 'mensaje' => 'Credenciales inválidas']);
-    }
-  }
 }

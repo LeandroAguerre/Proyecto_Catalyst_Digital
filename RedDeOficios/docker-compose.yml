@@ -1,26 +1,44 @@
-version: '3.8'
-
 services:
-  web:
-    image: php:8.3.23-apache
-    container_name: reddeoficios_web
+  web:  # Servicio principal: servidor Apache + PHP
+    build:
+      context: .  # Usa la raíz del proyecto como contexto de construcción
+      dockerfile: ./docker/Dockerfile  # Dockerfile personalizado con Xdebug y mod_rewrite
+
+    container_name: reddeoficios_web  # Nombre del contenedor para identificarlo fácilmente
+
     ports:
-      - "8080:80"
+      - "8081:80"  # Expone el puerto 80 del contenedor en el puerto 8081 del host
+
     volumes:
-      - ./app:/var/www/html
-      - ./docker/apache-conf.conf:/etc/apache2/sites-enabled/000-default.conf
-    restart: always
+      - ./public:/var/www/html/public  # Monta la carpeta pública como DocumentRoot
+      - ./api:/var/www/html/api        # Monta la API PHP (no accesible desde navegador)
+      - ./config:/var/www/html/config  # Monta configuración (como DB, constantes)
+      - ./docker/apache-conf.conf:/etc/apache2/sites-available/000-default.conf  # Configuración personalizada de Apache
+      - ./docker/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini  # Configuración de Xdebug
+
+    restart: always  # Reinicia el contenedor automáticamente si se detiene
+
     command: >
       bash -c "docker-php-ext-install pdo_mysql && apache2-foreground"
-  db:
-    image: mariadb:10.11.13
-    container_name: reddeoficios_db
+      # Instala la extensión PDO para MySQL y arranca Apache en primer plano
+
+  db:  # Servicio de base de datos: MariaDB
+    image: mariadb:10.11.13  # Imagen oficial de MariaDB con versión específica
+    container_name: reddeoficios_db  # Nombre del contenedor de la base de datos
+
+    ports:
+      - "3306:3306"  # Expone el puerto de MySQL para conexión externa
+
     environment:
-      MYSQL_ROOT_PASSWORD: catalystdigital05
-      MYSQL_DATABASE: reddeoficios
+      MYSQL_ROOT_PASSWORD: catalystdigital05  # Contraseña del usuario root
+      MYSQL_DATABASE: reddeoficios            # Base de datos inicial
+
     volumes:
-      - db_data:/var/lib/mysql
-    restart: always
+      - db_data:/var/lib/mysql  # Volumen persistente para los datos de la base
+
+    restart: always  # Reinicia el contenedor automáticamente si se detiene
 
 volumes:
-  db_data:
+  db_data:  # Define el volumen persistente para la base de datos
+
+

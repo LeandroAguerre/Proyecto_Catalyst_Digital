@@ -1,12 +1,14 @@
 <?php
-$host = 'db'; // nombre del servicio en docker-compose
-$dbname = 'reddeoficios';
-$user = 'root';
-$pass = 'catalystdigital05';
+//Conexion a BD
+$host = 'db'; 
+$db_name = 'reddeoficios';
+$username = 'root';
+$password = 'catalystdigital05'; 
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die(json_encode(['error' => 'Error de conexión a la base de datos']));
+    die("Error de conexión: " . $e->getMessage());
 }

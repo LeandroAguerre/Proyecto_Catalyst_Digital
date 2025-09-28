@@ -62,7 +62,7 @@ document.getElementById('btnLogin').onclick = () => {
   estado.textContent = '⏳ Validando credenciales...';
 
   try {
-    const res = await fetch('http://localhost:8081/index.php?accion=registro', {
+    const res = await fetch('http://localhost:8081/index.php?accion=login', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({usuario, pass})
@@ -72,10 +72,10 @@ document.getElementById('btnLogin').onclick = () => {
     if (data.exito) {
       localStorage.setItem('usuario', usuario);
       estado.textContent = '✅ Login con éxito';
-      container.innerHTML = `
-        <a href="pergil.html" class="btn btn-info m-2">Perfil</a>
-        <a href="publicacion.html" class="btn btn-secondary m-2">Publicación</a>
-      `;
+      document.getElementById('botonesAcceso').style.display = 'block';
+
+      // Limpiar el formulario
+      container.innerHTML = '';
     } else {
       estado.textContent = data.mensaje || '❌ Credenciales inválidas';
     }

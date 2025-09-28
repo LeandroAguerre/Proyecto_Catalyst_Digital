@@ -4,7 +4,7 @@ header('Content-Type: application/json'); //Indica que la respuesta será JSON
 
 //Asume que este archivo esta en el mismo directorio.
 require_once __DIR__ . '/database.php';
-
+Index
 //Verifica si la petición es de tipo POST.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 

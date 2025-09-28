@@ -26,7 +26,8 @@ class LoginController {
         // Verifica si se encontró el usuario y si la contraseña es correcta
         if ($hashGuardado && password_verify($contrasena, $hashGuardado)) {
             http_response_code(200);
-            echo json_encode(['mensaje' => 'Inicio de sesión exitoso.']);
+            echo json_encode(['exito' => true, 'mensaje' => 'Inicio de sesión exitoso.']);
+
         } else {
             http_response_code(401); // Unauthorized
             echo json_encode(['mensaje' => 'Usuario o contraseña incorrectos.']);

@@ -1,25 +1,251 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Red de Oficios</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="text-center p-5">
-  <h1>Bienvenido a Red de Oficios</h1>
-  <button id="btnRegistro" class="btn btn-primary m-2">Registrarse</button>
-  <button id="btnLogin" class="btn btn-success m-2">Iniciar sesión</button>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedDeOficio</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-  <div id="formularioContainer" class="mt-4"></div>
-  <!-- Contenedor fijo para los botones -->
-<div id="botonesAcceso" class="mt-4" style="display: none;">
-  <a href="perfil.html" class="btn btn-info m-2">Perfil</a>
-  <a href="publicacion.html" class="btn btn-secondary m-2">Publicación</a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles/style.css">
+    
+</head>
+<script>
+  console.log('Script embebido cargado correctamente');
+</script>
+<script src="js/script.js"></script>
+<body>
+    
+    <header class="sidebar">
+        <div class="logo">
+           <span class="azul">RedDe</span><span class="naranja">Oficios</span>
+        </div>
+         <div class="auth-buttons">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Ingresar
+            </button>
+            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#registroModal">
+              Registrarse
+            </button>
+        </div>
+        
+        <!-- <div id="welcomeMessage" class="welcome-message" style="display:none;">
+               Bienvenido, <span id="username"></span>
+        </div> -->
+        <div id="welcomeMessage" class="welcome-message" style="display:none;">
+          <div class="mb-2">Bienvenido, <span id="username"></span></div>
+            <button id="btnSalir" class="btn btn-danger btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Salir
+            </button>
+        </div>
+
+        <nav class="navigation">
+            <ul>
+                <li><a href="#" class="btn nav-btn">Servicios</a></li>
+                <li><a href="#" class="btn nav-btn">Destacados</a></li>
+                <li><a href="#" class="btn nav-btn">Soporte</a></li>
+                <!-- <li><a href="#" class="nav-button">Stripper</a></li> -->
+                <!-- <li><a href="#" class="nav-button">Configuracion</a></li> -->
+                <!-- <li><a href="#" class="nav-button">Salir</a></li> -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="content">
+<div id="carouselExampleIndicators" class="carousel slide mb-5" data-bs-ride="carousel">
+
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
+  </div>
+
+ 
+  <div class="carousel-inner rounded-3 shadow">
+    <div class="carousel-item active">
+      <img src="imagenes/herrero.png"class="d-block w-100" alt="Banner 1">
+    </div>
+    <div class="carousel-item">
+      <img src="imagenes/dentista.png" class="d-block w-100" alt="Banner 2">
+    </div>
+    <div class="carousel-item">
+      <img src="imagenes/constructor.png" class="d-block w-100" alt="Banner 3">
+    </div>
+  </div>
+
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
 </div>
 
-<div id="estado" class="mt-3 text-info fw-bold"></div>
-  <div id="estado" class="mt-3 text-info fw-bold"></div>
+<div class="search-bar-unified">
+    <input type="text" class="search-left" placeholder="Tipo de servicio">
+    <span class="divider">|</span>
+    <input type="text" class="search-right" placeholder="Región, Ciudad, Código Postal">
+    <button class="search-button"><i class="bi bi-search"></i></button>
+</div>
+</div>
 
-  <script src="js/index.js"></script>
+        <h1>Servicios mejores valorados</h1>
+        <div class="services-grid">
+            <div class="service-card" data-keywords="juan perez fontaneria plomeria">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Juan Pérez</h2>
+                <p class="specialty">Sanitario</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+            <div class="service-card" data-keywords="maria garcia electricidad electricista">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>María García</h2>
+                <p class="specialty">Electricidad</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+            <div class="service-card" data-keywords="carlos rodriguez carpinteria carpintero">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Carlos Rodríguez</h2>
+                <p class="specialty">Carpintería</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i><i class="bi bi-star-"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+            <div class="service-card" data-keywords="ana martinez jardineria jardinero">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Ana Martínez</h2>
+                <p class="specialty">Jardinería</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+            <div class="service-card" data-keywords="luis hernandez pintura pintor">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Luis Hernández</h2>
+                <p class="specialty">Pintura</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+            <div class="service-card" data-keywords="laura lopez limpieza">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Laura López</h2>
+                <p class="specialty">Limpieza</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+             <div class="service-card" data-keywords="pedro sanchez fontaneria plomeria">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Pedro Sánchez</h2>
+                <p class="specialty">Fontanería</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+             <div class="service-card" data-keywords="sofia gomez electricidad electricista">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Sofía Gómez</h2>
+                <p class="specialty">Electricidad</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+            <div class="service-card" data-keywords="sofia gomez electricidad electricista">
+                <img src="imagenes/trabajador.jpg" alt="Trabajador">
+                <h2>Sofía Gómez</h2>
+                <p class="specialty">Electricidad</p>
+                <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+                <button>Ver publicacion</button>
+            </div>
+        </div>
+    </main>
+
+    
+
+<div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="registroModalLabel">Crear cuenta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formRegistro">
+          <div class="mb-3">
+            <label for="tipoUsuario" class="form-label">Tipo de usuario*</label>
+            <select id="tipoUsuario" class="form-select" required>
+              <option selected disabled value="">Seleccione una opción</option>
+              <option value="1">Cliente</option>
+              <option value="2">Proveedor</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre completo*</label>
+            <input type="text" class="form-control" id="nombre" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico*</label>
+            <input type="email" class="form-control" id="email" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="password" class="form-label">Contraseña*</label>
+            <input type="password" class="form-control" id="password" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirmar contraseña*</label>
+            <input type="password" class="form-control" id="confirmPassword" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="RUT" class="form-label">RUT</label>
+            <input type="text" class="form-control" id="RUT">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+          <div id="estadoRegistro" class="mt-3"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Iniciar sesión</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formLogin">
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="loginEmail" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="loginPassword" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+          <div id="estadoLogin" class="mt-3"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
+

@@ -8,10 +8,10 @@ class LoginModel {
         $this->conn = $db;
     }
 
-    public function obtenerHash($usuario) {
+    public function obtenerHashPorCorreo($correoElectronico) {
         try {
-            $stmt = $this->conn->prepare("SELECT contrasenaUsuario FROM usuario WHERE nombreUsuario = ?");
-            $stmt->execute([$usuario]);
+            $stmt = $this->conn->prepare("SELECT contrasena FROM usuario WHERE correoElectronico = ?");
+            $stmt->execute([$correoElectronico]);
             return $stmt->fetchColumn();
         } catch (PDOException $e) {
             error_log("Excepción en loginModel: " . $e->getMessage());

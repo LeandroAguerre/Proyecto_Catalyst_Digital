@@ -299,9 +299,12 @@ body {
     overflow: hidden;
     width: 100%;
     max-width: 900px;
-    margin: 20px auto;
+    /* margin: 20px 30%; */
+    margin-top: 20px;
     border: 1px solid #ccc;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* opcional, para efecto moderno */
+    /* height: 43.99px; */
+    position: absolute;
 }
 
 .search-bar-unified input {
@@ -346,3 +349,61 @@ body {
 
 
 
+.publicacion-tarjeta{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 100px auto 20px auto;
+    width: 800px;
+    /* border-style: dashed; */
+    /* margin: 200px auto; */
+    align-items: center;
+}
+
+.publicacion-tarjeta img{
+    margin: auto;
+    margin-bottom: 20px;
+    width: 55%;
+    border-radius: 15px;
+}
+
+#cuerpo-pagina{
+    display: flex;
+    /* margin: auto; */;
+    margin-left: 260px;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    height: 100%;
+}
+
+#galeria{
+    margin: 20px auto 20px auto;
+    display: flex;
+    /* width: 300px; */
+    flex-direction: row;
+}
+#galeria img{
+    width: 200px;
+}
+
+#comentarios{
+        margin: 20px auto 20px auto;
+    display: flex;
+    /* width: 300px; */
+    flex-direction: column;
+}
+
+#comentarios .comentario{
+    width: 800px;
+    height: 80px;
+    /* border-style: dashed; */
+    background-color: white;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+#comentarios .comentario p{
+    margin-left: 10px;
+}

@@ -3,6 +3,36 @@
 LOG="/var/log/cuentas.log"
 LogErrores="/var/log/errores.log"
 regex='^[a-z_][a-z0-9_-]*[$]?$' 
+ArchivoDeControl="/etc/configSeguridadAplicada.flag"
+AuthArchivo="/etc/pam.d/common-auth" 
+DefArchivo="/etc/login.defs"
+MaxFallos=3          
+TiempoBloqueo=120
+MaxDias=90 
+
+#Configuracion de intentos fallidos y expiracion de contraseña
+if [[ ! -f "$ArchivoDeControl" ]]; then
+     
+  echo "Aplicando configuración básica de seguridad..."
+
+  #Regla preauth
+  sed -i "1iauth required pam_faillock.so preauth silent deny=$MaxFallos unlock_time=$TiempoBloqueo" "$AuthArchivo"
+
+  #Regla authfail
+  sed -i "/@include common-auth/iauth [default=die] pam_faillock.so authfail deny=$MaxFallos unlock_time=$TiempoBloqueo" "$AuthArchivo"
+
+  #Configurar la politica global para nuevas cuentas
+  sed -i "s/^PASS_MAX_DAYS.*/PASS_MAX_DAYS \t $MaxDias/" "$DefArchivo" 
+
+  #Aplicar la politica a todos los usuarios existentes
+  getent passwd | awk -F: '$3 >= 1000 && $1 != "nobody" { print $1 }' | while read -r user; do
+      
+      chage -M $MaxDias "$user"
+  done
+
+      touch "$ArchivoDeControl"
+      echo "Configuración aplicada"
+fi
 
 #Verifica si existe el archivo de cuentas.log, si no existe, lo crea y configura permisos.
 if [ ! -f "$LOG" ]; then
@@ -79,10 +109,10 @@ while [ "$opcion" != "0" ]; do
   case $opcion in
     1)
       #Solicita tipo de usuario y asigna skel y grupo correspondientes
-      read -p "Ingrese tipo de usuario a crear (1- adminweb , 2- desarrollador , 3- srvweb , 4- mysql , 5- backup): " tipo
+      read -p "Ingrese tipo de usuario a crear (1- administrador , 2- desarrollador , 3- srvweb , 4- mysql , 5- backup): " tipo
       case $tipo in
         1)
-          skel="/etc/skel/adminweb"
+          skel="/etc/skel/administrador"
           grupo="administradores"
           ;;
         2)
@@ -100,7 +130,7 @@ while [ "$opcion" != "0" ]; do
         5)
           skel="/etc/skel/backup"
           grupo="backup"
-          ;;
+          ;; 
         *)
           #Opcion invalida, se marca como novalido y se omite el codigo de creacion del usuario
           echo ""
@@ -113,7 +143,7 @@ while [ "$opcion" != "0" ]; do
       esac
 
       if [[ "$tipo" != "novalido" ]]; then
-
+        
         read -p "Ingrese nombre de usuario [a-z-0-9]: " user
         if [ -n "$user" && "$user" =~ $regex ]; then
           #Verifica si el usuario ya existe
@@ -210,9 +240,9 @@ while [ "$opcion" != "0" ]; do
       echo "1- Alta y baja de cuentas de usuario"
       echo "2- Errores y modificaciones importantes"
       echo "0- Salir"
-      read -p "Elija una opcion: " opcion
+      read -p "Elija una opcion: " opcionLog
 
-      case $tipo in
+      case $opcionLog in
         1)
           cat "$LogErrores"
           echo "[ADVERTENCIA] Se ingreso al archivo errores.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
@@ -229,7 +259,9 @@ while [ "$opcion" != "0" ]; do
           echo "[ERROR] Se ingreso una opcion no valida en ver logs - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
           echo ""
           continue
-      ;;
+          ;;
+      esac
+      ;;   
     0)
       echo " Saliendo..."
       echo "[CIERRE] Se cerro el programa - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"

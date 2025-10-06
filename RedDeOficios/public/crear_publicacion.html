@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear Publicación - Red de Oficios</title>
+  <link rel="stylesheet" href="styles/crear_publicacion.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Crear nueva publicación</h2>
+    <form id="formPublicacion" enctype="multipart/form-data">
+      <label>Título del servicio</label>
+      <input type="text" name="titulo" required>
+
+      <label>Tipo de servicio</label>
+      <input type="text" name="tipo_servicio" required>
+
+      <label>Teléfono</label>
+      <input type="text" name="telefono" required>
+
+      <label>Ubicación</label>
+      <input type="text" name="ubicacion" required>
+
+      <label>Descripción del servicio</label>
+      <textarea name="descripcion" rows="5" required></textarea>
+
+      <label>Disponibilidad horaria</label>
+      <input type="date" name="fecha_inicio" required> a 
+      <input type="date" name="fecha_fin" required>
+
+      <label>Adjuntar fotos</label>
+      <input type="file" name="imagen" accept="image/*">
+
+      <button type="submit">Publicar</button>
+    </form>
+  </div>
+
+  <script src="js/crear_publicacion.js"></script>
+</body>
+</html>

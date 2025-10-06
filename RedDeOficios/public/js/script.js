@@ -259,3 +259,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('✅ Script inicializado completamente');
 });
+async function cargarTarjetas() {
+  const res = await fetch('/publicacion');
+  const publicaciones = await res.json();
+
+  const contenedor = document.getElementById('tarjetas');
+  contenedor.innerHTML = '';
+
+  publicaciones.forEach(pub => {
+    contenedor.innerHTML += `
+      <div class="card">
+        <img src="${pub.imagen}" alt="${pub.titulo}" width="150">
+        <h3>${pub.titulo}</h3>
+        <p>${pub.tipo_servicio}</p>
+        <p>${pub.ubicacion}</p>
+      </div>
+    `;
+  });
+}
+window.onload = cargarTarjetas;

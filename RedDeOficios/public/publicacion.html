@@ -192,6 +192,32 @@
   </div>
 </div>
 
+<div id="contenedorPublicaciones"></div>
+
+
+<script>
+async function cargarPublicacion() {
+  const res = await fetch('../api/controllers/publicacionController.php');
+  const publicaciones = await res.json();
+
+  const contenedor = document.getElementById('contenedorPublicaciones');
+  contenedor.innerHTML = '';
+
+  publicaciones.forEach(pub => {
+    contenedor.innerHTML += `
+      <div class="tarjeta">
+        <h3>${pub.titulo}</h3>
+        <p><strong>Tipo:</strong> ${pub.tipo_servicio}</p>
+        <p><strong>Ubicación:</strong> ${pub.ubicacion}</p>
+        <p><strong>Teléfono:</strong> ${pub.telefono}</p>
+        <p>${pub.descripcion}</p>
+        ${pub.imagen ? `<img src="${pub.imagen}" width="200">` : ''}
+      </div>
+    `;
+  });
+}
+window.onload = cargarPublicacion;
+</script>
 
 </body>
 </html>

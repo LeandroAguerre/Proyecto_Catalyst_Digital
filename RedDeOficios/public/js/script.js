@@ -263,16 +263,21 @@ async function cargarTarjetas() {
   const res = await fetch('/publicacion');
   const publicaciones = await res.json();
 
-  const contenedor = document.getElementById('tarjetas');
-  contenedor.innerHTML = '';
+  // const contenedor = document.getElementById('tarjetas');
+  // contenedor.innerHTML = '';
+
+  const contenedor2 = document.getElementById('grid-servicios');
+  // contenedor2.innerHTML = '';
 
   publicaciones.forEach(pub => {
-    contenedor.innerHTML += `
-      <div class="card">
-        <img src="${pub.imagen}" alt="${pub.titulo}" width="150">
-        <h3>${pub.titulo}</h3>
+    contenedor2.innerHTML += `
+      <div class="service-card">
+        <img src="imagenes/imgdf.webp" alt="${pub.titulo}" width="150">
+        <h2>${pub.titulo}</h3>
         <p>${pub.tipo_servicio}</p>
         <p>${pub.ubicacion}</p>
+        <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
+        <a href="publicacion.html" class="btn btn-primary btn-lg">Ver publicacion</a>
       </div>
     `;
   });

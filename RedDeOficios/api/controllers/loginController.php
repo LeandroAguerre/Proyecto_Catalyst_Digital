@@ -1,20 +1,19 @@
 <?php
-require_once ROOT_PATH . 'api/config/database.php';
-require_once ROOT_PATH . 'api/model/loginModel.php';
+require_once(__DIR__ . "/../config/database.php");
+require_once(__DIR__ . "/../model/loginModel.php");
 
 class LoginController {
     public function login() {
-        // Lee el cuerpo de la solicitud JSON
+        header('Content-Type: application/json; charset=utf-8');
+        
         $inputData = file_get_contents('php://input');
         error_log("Datos recibidos en login: " . $inputData);
         
         $data = json_decode($inputData);
         
-        // Verificar si el JSON se decodificó correctamente
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log("Error al decodificar JSON en login: " . json_last_error_msg());
             http_response_code(400);
-            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'exito' => false,
                 'mensaje' => 'JSON inválido'
@@ -24,8 +23,7 @@ class LoginController {
 
         if (!isset($data->correoElectronico) || !isset($data->contrasena)) {
             error_log("Datos incompletos en login");
-            http_response_code(400); // Bad Request
-            header('Content-Type: application/json; charset=utf-8');
+            http_response_code(400);
             echo json_encode([
                 'exito' => false,
                 'mensaje' => 'Datos incompletos'
@@ -36,10 +34,8 @@ class LoginController {
         $correoElectronico = trim($data->correoElectronico);
         $contrasena = $data->contrasena;
 
-        // Validaciones adicionales
         if (empty($correoElectronico) || empty($contrasena)) {
             http_response_code(400);
-            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'exito' => false,
                 'mensaje' => 'El correo y la contraseña son obligatorios'
@@ -58,19 +54,29 @@ class LoginController {
             $loginModel = new LoginModel($db);
             $hashGuardado = $loginModel->obtenerHashPorCorreo($correoElectronico);
 
-            // Verifica si se encontró el usuario y si la contraseña es correcta
             if ($hashGuardado && password_verify($contrasena, $hashGuardado)) {
-                error_log("Login exitoso para: " . $correoElectronico);
-                http_response_code(200);
-                header('Content-Type: application/json; charset=utf-8');
-                echo json_encode([
-                    'exito' => true, 
-                    'mensaje' => 'Inicio de sesión exitoso'
-                ], JSON_UNESCAPED_UNICODE);
+                // Obtener datos completos del usuario
+                $usuario = $loginModel->obtenerUsuarioPorCorreo($correoElectronico);
+                
+                if ($usuario) {
+                    error_log("Login exitoso para: " . $correoElectronico);
+                    http_response_code(200);
+                    echo json_encode([
+                        'exito' => true, 
+                        'mensaje' => 'Inicio de sesión exitoso',
+                        'usuario' => [
+                            'id' => (int)$usuario['id'],
+                            'tipoUsuario' => (int)$usuario['tipoUsuario'],
+                            'nombreCompleto' => $usuario['nombreCompleto'],
+                            'correoElectronico' => $usuario['correoElectronico']
+                        ]
+                    ], JSON_UNESCAPED_UNICODE);
+                } else {
+                    throw new Exception("Error al obtener datos del usuario");
+                }
             } else {
                 error_log("Login fallido para: " . $correoElectronico);
-                http_response_code(401); // Unauthorized
-                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(401);
                 echo json_encode([
                     'exito' => false,
                     'mensaje' => 'Correo o contraseña incorrectos'
@@ -79,7 +85,6 @@ class LoginController {
         } catch (Exception $e) {
             error_log("Excepción en login: " . $e->getMessage());
             http_response_code(500);
-            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'exito' => false,
                 'mensaje' => 'Error interno del servidor'

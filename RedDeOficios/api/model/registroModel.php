@@ -1,6 +1,5 @@
 <?php
-
-require_once ROOT_PATH . 'api/config/database.php';
+require_once(__DIR__ . "/../config/database.php");
 
 class RegistroModel {
     private $conn;
@@ -35,6 +34,17 @@ class RegistroModel {
             $this->lastError = $e->getMessage();
             error_log("Excepción en registroModel: " . $e->getMessage());
             return false;
+        }
+    }
+    
+    public function obtenerUsuarioPorCorreo($correoElectronico) {
+        try {
+            $stmt = $this->conn->prepare("SELECT id, tipoUsuario, nombreCompleto, correoElectronico FROM usuario WHERE correoElectronico = ?");
+            $stmt->execute([$correoElectronico]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Excepción en obtenerUsuarioPorCorreo: " . $e->getMessage());
+            return null;
         }
     }
     

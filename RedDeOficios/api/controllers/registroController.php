@@ -1,9 +1,12 @@
 <?php
-require_once ROOT_PATH . 'api/config/database.php';
-require_once ROOT_PATH . 'api/model/registroModel.php';
+require_once(__DIR__ . "/../config/database.php");
+require_once(__DIR__ . "/../model/registroModel.php");
 
 class RegistroController {
     public function registrar() {
+        // CRÍTICO: Asegurar que la respuesta sea JSON
+        header('Content-Type: application/json; charset=utf-8');
+        
         // Lee el cuerpo de la solicitud (el JSON enviado por fetch)
         $inputData = file_get_contents('php://input');
         error_log("Datos recibidos en registro: " . $inputData);
@@ -29,7 +32,7 @@ class RegistroController {
             !isset($data->contrasena)
         ) {
             error_log("Datos incompletos recibidos");
-            http_response_code(400); // Bad Request
+            http_response_code(400);
             echo json_encode([
                 'exito' => false,
                 'mensaje' => 'Datos incompletos.'
@@ -81,15 +84,28 @@ class RegistroController {
             $resultado = $registroModel->crearUsuario($tipoUsuario, $nombreCompleto, $correoElectronico, $hash, $rut);
             
             if ($resultado) {
-                error_log("Usuario registrado exitosamente: " . $correoElectronico);
-                http_response_code(201); // Created
-                echo json_encode([
-                    'exito' => true,
-                    'mensaje' => 'Usuario registrado con éxito.'
-                ]);
+                // NUEVO: Obtener datos completos del usuario recién creado
+                $usuario = $registroModel->obtenerUsuarioPorCorreo($correoElectronico);
+                
+                if ($usuario) {
+                    error_log("Usuario registrado exitosamente: " . $correoElectronico);
+                    http_response_code(201);
+                    echo json_encode([
+                        'exito' => true,
+                        'mensaje' => 'Usuario registrado con éxito.',
+                        'usuario' => [
+                            'id' => (int)$usuario['id'],
+                            'tipoUsuario' => (int)$usuario['tipoUsuario'],
+                            'nombreCompleto' => $usuario['nombreCompleto'],
+                            'correoElectronico' => $usuario['correoElectronico']
+                        ]
+                    ], JSON_UNESCAPED_UNICODE);
+                } else {
+                    throw new Exception("Error al obtener datos del usuario creado");
+                }
             } else {
                 error_log("Error al crear usuario en la base de datos");
-                http_response_code(500); // Internal Server Error
+                http_response_code(500);
                 echo json_encode([
                     'exito' => false,
                     'mensaje' => 'Error al registrar el usuario. Posiblemente el correo ya existe.'

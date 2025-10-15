@@ -12,55 +12,88 @@ document.addEventListener('DOMContentLoaded', () => {
   const formLogin = document.getElementById('formLogin');
   const btnSalir = document.getElementById('btnSalir');
 
+  // Función para guardar sesión del usuario
+  function guardarSesion(usuario) {
+    console.log('💾 Guardando sesión:', usuario);
+    sessionStorage.setItem('usuarioId', usuario.id);
+    sessionStorage.setItem('tipoUsuario', usuario.tipoUsuario);
+    sessionStorage.setItem('nombreCompleto', usuario.nombreCompleto);
+    sessionStorage.setItem('correoElectronico', usuario.correoElectronico);
+  }
+
+  // Función para limpiar sesión
+  function limpiarSesion() {
+    console.log('🗑️ Limpiando sesión');
+    sessionStorage.removeItem('usuarioId');
+    sessionStorage.removeItem('tipoUsuario');
+    sessionStorage.removeItem('nombreCompleto');
+    sessionStorage.removeItem('correoElectronico');
+  }
+
+  // Función para obtener sesión actual
+  function obtenerSesion() {
+    const usuarioId = sessionStorage.getItem('usuarioId');
+    if (!usuarioId) return null;
+    
+    return {
+      id: parseInt(usuarioId),
+      tipoUsuario: parseInt(sessionStorage.getItem('tipoUsuario')),
+      nombreCompleto: sessionStorage.getItem('nombreCompleto'),
+      correoElectronico: sessionStorage.getItem('correoElectronico')
+    };
+  }
+
   // Función para mostrar usuario logueado
-  function mostrarUsuarioLogueado(email) {
-    console.log('👤 Mostrando usuario logueado:', email);
+  function mostrarUsuarioLogueado(usuario) {
+    console.log('👤 Mostrando usuario logueado:', usuario);
     if (authButtons) authButtons.style.display = 'none';
-    if (username) username.textContent = email;
+    if (username) username.textContent = usuario.nombreCompleto || usuario.correoElectronico;
     if (welcomeMessage) welcomeMessage.style.display = 'block';
+    
+    // Mostrar botón "Publicar" solo para proveedores (tipo 2)
+    actualizarBotonPublicar(usuario.tipoUsuario);
+  }
+
+  // Función para actualizar visibilidad del botón Publicar
+  function actualizarBotonPublicar(tipoUsuario) {
+    let btnPublicar = document.getElementById('btnPublicar');
+    
+    // Si no existe, crearlo
+    if (!btnPublicar) {
+      const nav = document.querySelector('.navigation ul');
+      if (nav) {
+        const li = document.createElement('li');
+        li.innerHTML = '<a href="crear_publicacion.html" id="btnPublicar" class="btn nav-btn">Publicar</a>';
+        nav.appendChild(li);
+        btnPublicar = document.getElementById('btnPublicar');
+      }
+    }
+    
+    // Mostrar u ocultar según tipo de usuario
+    if (btnPublicar) {
+      if (tipoUsuario === 2) {
+        btnPublicar.parentElement.style.display = 'list-item';
+        console.log('✅ Botón Publicar visible (usuario proveedor)');
+      } else {
+        btnPublicar.parentElement.style.display = 'none';
+        console.log('🚫 Botón Publicar oculto (usuario no es proveedor)');
+      }
+    }
   }
 
   // Función para mostrar estado de no logueado
   function mostrarUsuarioDeslogueado() {
     console.log('🚪 Mostrando estado deslogueado');
-    if (authButtons) {
-      authButtons.style.display = ''; // Remover estilo inline, usar CSS
-    }
+    if (authButtons) authButtons.style.display = '';
     if (welcomeMessage) welcomeMessage.style.display = 'none';
     if (username) username.textContent = '';
-    sessionStorage.removeItem('correoElectronico'); // Usar sessionStorage
-  }
-
-  // Función para hacer login automático (solo después de registro)
-  async function loginAutomatico(email, password) {
-    console.log('🔄 Realizando login automático después del registro...');
+    limpiarSesion();
     
-    try {
-      const res = await fetch('/index.php?accion=login', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ 
-          correoElectronico: email, 
-          contrasena: password 
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.exito) {
-          console.log('✅ Login automático exitoso');
-          sessionStorage.setItem('correoElectronico', email); // Usar sessionStorage
-          return true;
-        }
-      }
-    } catch (err) {
-      console.log('❌ Error en login automático:', err);
+    // Ocultar botón publicar
+    const btnPublicar = document.getElementById('btnPublicar');
+    if (btnPublicar) {
+      btnPublicar.parentElement.style.display = 'none';
     }
-    
-    return false;
   }
 
   // Evento: Botón Salir
@@ -68,6 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSalir.addEventListener('click', () => {
       console.log('🚪 Cerrando sesión...');
       mostrarUsuarioDeslogueado();
+      
+      // Recargar página para limpiar estado
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     });
   }
 
@@ -86,27 +124,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Validaciones
       if (!tipoUsuario || !nombreCompleto || !correoElectronico || !contrasena || !confirmPassword) {
-        estadoRegistro.innerHTML = `<div class="alert alert-warning">⚠️ Por favor complete todos los campos obligatorios</div>`;
+        estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ Por favor complete todos los campos obligatorios</div>';
         return;
       }
 
       if (contrasena !== confirmPassword) {
-        estadoRegistro.innerHTML = `<div class="alert alert-danger">⚠️ Las contraseñas no coinciden</div>`;
+        estadoRegistro.innerHTML = '<div class="alert alert-danger">⚠️ Las contraseñas no coinciden</div>';
         return;
       }
 
       if (contrasena.length < 6) {
-        estadoRegistro.innerHTML = `<div class="alert alert-warning">⚠️ La contraseña debe tener al menos 6 caracteres</div>`;
+        estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe tener al menos 6 caracteres</div>';
         return;
       }
 
-      // Mostrar indicador de carga
-      estadoRegistro.innerHTML = `<div class="alert alert-info">
-        <div class="d-flex align-items-center">
-          <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-          Registrando usuario...
-        </div>
-      </div>`;
+      estadoRegistro.innerHTML = '<div class="alert alert-info"><div class="d-flex align-items-center"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Registrando usuario...</div></div>';
 
       const payload = {
         tipoUsuario,
@@ -117,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       try {
-        const res = await fetch('/index.php?accion=registro', {
+        const res = await fetch('/registro', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -128,64 +160,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         console.log('📨 Respuesta registro:', res.status);
 
-        let data;
-        const contentType = res.headers.get('content-type');
-        
-        if (contentType && contentType.includes('application/json')) {
-          data = await res.json();
-        } else {
-          const textResponse = await res.text();
-          console.log('Respuesta como texto:', textResponse);
-          try {
-            data = JSON.parse(textResponse);
-          } catch {
-            data = { exito: false, mensaje: 'Error en el servidor' };
-          }
-        }
-
+        const data = await res.json();
         console.log('📦 Data registro:', data);
 
-        if (data.exito) {
-          // Mostrar éxito
-          estadoRegistro.innerHTML = `<div class="alert alert-success">✅ ${data.mensaje}</div>`;
+        if (data.exito && data.usuario) {
+          estadoRegistro.innerHTML = '<div class="alert alert-success">✅ ' + data.mensaje + '</div>';
           formRegistro.reset();
           
-          // Login automático después de 1.5 segundos
-          setTimeout(async () => {
-            estadoRegistro.innerHTML = `<div class="alert alert-info">
-              <div class="d-flex align-items-center">
-                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                Iniciando sesión automáticamente...
-              </div>
-            </div>`;
+          // Guardar sesión inmediatamente
+          guardarSesion(data.usuario);
+          
+          setTimeout(() => {
+            estadoRegistro.innerHTML = '<div class="alert alert-success">✅ ¡Perfecto! Redirigiendo...</div>';
             
-            const loginExitoso = await loginAutomatico(correoElectronico, contrasena);
-            
-            if (loginExitoso) {
-              estadoRegistro.innerHTML = `<div class="alert alert-success">✅ ¡Perfecto! Redirigiendo...</div>`;
+            setTimeout(() => {
+              const registroModal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
+              if (registroModal) registroModal.hide();
               
-              // Cerrar modal y recargar página después de 1 segundo
-              setTimeout(() => {
-                const registroModal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
-                if (registroModal) registroModal.hide();
-                
-                // Recargar página para mostrar el estado logueado
-                setTimeout(() => {
-                  window.location.reload();
-                }, 500);
-              }, 1000);
-            } else {
-              estadoRegistro.innerHTML = `<div class="alert alert-warning">✅ Usuario registrado. Por favor inicia sesión manualmente.</div>`;
-            }
-          }, 1500);
+              // Recargar página para mostrar el estado logueado
+              window.location.reload();
+            }, 1000);
+          }, 1000);
           
         } else {
-          estadoRegistro.innerHTML = `<div class="alert alert-danger">❌ ${data.mensaje}</div>`;
+          estadoRegistro.innerHTML = '<div class="alert alert-danger">❌ ' + data.mensaje + '</div>';
         }
         
       } catch (err) {
         console.error('💥 Error de conexión:', err);
-        estadoRegistro.innerHTML = `<div class="alert alert-danger">❌ Error de conexión con el servidor</div>`;
+        estadoRegistro.innerHTML = '<div class="alert alert-danger">❌ Error de conexión con el servidor</div>';
       }
     });
   }
@@ -200,19 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const contrasena = document.getElementById('loginPassword').value.trim();
 
       if (!correoElectronico || !contrasena) {
-        estadoLogin.innerHTML = `<div class="alert alert-warning">⚠️ Por favor complete todos los campos</div>`;
+        estadoLogin.innerHTML = '<div class="alert alert-warning">⚠️ Por favor complete todos los campos</div>';
         return;
       }
 
-      estadoLogin.innerHTML = `<div class="alert alert-info">
-        <div class="d-flex align-items-center">
-          <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-          Validando credenciales...
-        </div>
-      </div>`;
+      estadoLogin.innerHTML = '<div class="alert alert-info"><div class="d-flex align-items-center"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Validando credenciales...</div></div>';
 
       try {
-        const res = await fetch('/index.php?accion=login', {
+        const res = await fetch('/login', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -224,34 +222,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         console.log('📦 Data login:', data);
 
-        if (data.exito) {
-          sessionStorage.setItem('correoElectronico', correoElectronico); // Usar sessionStorage
-          estadoLogin.innerHTML = `<div class="alert alert-success">✅ ¡Bienvenido de nuevo!</div>`;
+        if (data.exito && data.usuario) {
+          guardarSesion(data.usuario);
+          estadoLogin.innerHTML = '<div class="alert alert-success">✅ ¡Bienvenido de nuevo!</div>';
           
           // Actualizar UI
-          mostrarUsuarioLogueado(correoElectronico);
+          mostrarUsuarioLogueado(data.usuario);
           
           // Cerrar modal después de 1 segundo
           setTimeout(() => {
             const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
             if (loginModal) loginModal.hide();
+            
+            // Recargar para actualizar botones
+            window.location.reload();
           }, 1000);
           
         } else {
-          estadoLogin.innerHTML = `<div class="alert alert-danger">❌ ${data.mensaje}</div>`;
+          estadoLogin.innerHTML = '<div class="alert alert-danger">❌ ' + data.mensaje + '</div>';
         }
       } catch (err) {
         console.error('💥 Error en login:', err);
-        estadoLogin.innerHTML = `<div class="alert alert-danger">❌ Error de conexión con el servidor</div>`;
+        estadoLogin.innerHTML = '<div class="alert alert-danger">❌ Error de conexión con el servidor</div>';
       }
     });
   }
 
-  // INICIALIZACIÓN: Verificar sesión guardada SOLO al cargar la página
-  const correoGuardado = sessionStorage.getItem('correoElectronico'); // Usar sessionStorage
-  if (correoGuardado) {
-    console.log('🔄 Sesión encontrada al cargar página:', correoGuardado);
-    mostrarUsuarioLogueado(correoGuardado);
+  // INICIALIZACIÓN: Verificar sesión guardada al cargar la página
+  const sesionActual = obtenerSesion();
+  if (sesionActual) {
+    console.log('🔄 Sesión encontrada al cargar página:', sesionActual);
+    mostrarUsuarioLogueado(sesionActual);
   } else {
     console.log('🔄 No hay sesión guardada');
     mostrarUsuarioDeslogueado();
@@ -259,27 +260,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('✅ Script inicializado completamente');
 });
+
+// Función para cargar tarjetas (publicaciones)
 async function cargarTarjetas() {
-  const res = await fetch('/publicacion');
-  const publicaciones = await res.json();
+  try {
+    console.log('🔄 Cargando publicaciones...');
+    
+    const res = await fetch('/publicacion', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
 
-  // const contenedor = document.getElementById('tarjetas');
-  // contenedor.innerHTML = '';
+    console.log('📨 Status respuesta publicaciones:', res.status);
+    
+    if (!res.ok) {
+      throw new Error('HTTP error! status: ' + res.status);
+    }
 
-  const contenedor2 = document.getElementById('grid-servicios');
-  // contenedor2.innerHTML = '';
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await res.text();
+      console.error('❌ Respuesta no es JSON:', text);
+      throw new Error('La respuesta del servidor no es JSON válido');
+    }
 
-  publicaciones.forEach(pub => {
-    contenedor2.innerHTML += `
-      <div class="service-card">
-        <img src="imagenes/imgdf.webp" alt="${pub.titulo}" width="150">
-        <h2>${pub.titulo}</h3>
-        <p>${pub.tipo_servicio}</p>
-        <p>${pub.ubicacion}</p>
-        <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
-        <a href="publicacion.html" class="btn btn-primary btn-lg">Ver publicacion</a>
-      </div>
-    `;
-  });
+    const publicaciones = await res.json();
+    console.log('✅ Publicaciones cargadas:', publicaciones);
+
+    const contenedor2 = document.getElementById('grid-servicios');
+    
+    if (!contenedor2) {
+      console.error('❌ No se encontró el elemento grid-servicios');
+      return;
+    }
+
+    // Limpiar contenedor
+    contenedor2.innerHTML = '';
+
+    if (!publicaciones || publicaciones.length === 0) {
+      contenedor2.innerHTML = '<p class="text-center">No hay publicaciones disponibles</p>';
+      return;
+    }
+
+    publicaciones.forEach(function(pub) {
+      const imagenUrl = pub.imagen || 'imagenes/trabajador.jpg';
+      
+      contenedor2.innerHTML += '<div class="service-card">' +
+        '<img src="' + imagenUrl + '" alt="' + pub.titulo + '" width="150" onerror="this.src=\'imagenes/trabajador.jpg\'">' +
+        '<h2>' + pub.titulo + '</h2>' +
+        '<p>' + pub.tipo_servicio + '</p>' +
+        '<p>' + pub.ubicacion + '</p>' +
+        '<p class="estrella">' +
+          '<i class="bi bi-star-fill"></i>' +
+          '<i class="bi bi-star-fill"></i>' +
+          '<i class="bi bi-star-fill"></i>' +
+          '<i class="bi bi-star-fill"></i>' +
+          '<i class="bi bi-star-fill"></i>' +
+        '</p>' +
+        '<a href="publicacion.html?id=' + pub.id + '" class="btn btn-primary btn-lg">Ver publicación</a>' +
+      '</div>';
+    });
+
+  } catch (error) {
+    console.error('💥 Error al cargar publicaciones:', error);
+    const contenedor2 = document.getElementById('grid-servicios');
+    if (contenedor2) {
+      contenedor2.innerHTML = '<div class="alert alert-danger" role="alert">❌ Error al cargar publicaciones: ' + error.message + '</div>';
+    }
+  }
 }
-window.onload = cargarTarjetas;
+
+// Cargar al inicio
+window.addEventListener('load', cargarTarjetas);

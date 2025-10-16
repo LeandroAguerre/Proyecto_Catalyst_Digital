@@ -31,4 +31,19 @@ class Publicacion {
             return [];
         }
     }
+
+    public function obtenerPorId($id) {
+        try {
+            $sql = "SELECT p.*, u.nombreCompleto as nombre_proveedor, u.correoElectronico as email_proveedor
+                    FROM publicacion p
+                    LEFT JOIN usuario u ON p.usuario_creador_id = u.id
+                    WHERE p.id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error al obtener publicación por ID: " . $e->getMessage());
+            return null;
+        }
+    }
 }

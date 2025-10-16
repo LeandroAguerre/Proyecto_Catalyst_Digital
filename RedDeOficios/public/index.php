@@ -53,7 +53,12 @@ try {
             $controller = new PublicacionController();
             
             if ($method === 'GET') {
-                $controller->obtenerPublicaciones();
+                // Si viene ?id=X, obtener publicación específica
+                if (isset($_GET['id'])) {
+                    $controller->obtenerPorId();
+                } else {
+                    $controller->obtenerPublicaciones();
+                }
             } elseif ($method === 'POST') {
                 $controller->crearPublicacion();
             } else {

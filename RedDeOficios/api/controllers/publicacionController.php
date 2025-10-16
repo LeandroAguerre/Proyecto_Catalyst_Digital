@@ -23,12 +23,49 @@ class PublicacionController {
             ], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    public function obtenerPorId() {
+        header('Content-Type: application/json; charset=utf-8');
+        
+        // Obtener ID desde query params (?id=X)
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        
+        if ($id <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'ID inválido'
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+        
+        try {
+            $publicacion = new Publicacion();
+            $data = $publicacion->obtenerPorId($id);
+            
+            if ($data) {
+                http_response_code(200);
+                echo json_encode($data, JSON_UNESCAPED_UNICODE);
+            } else {
+                http_response_code(404);
+                echo json_encode([
+                    'error' => 'Publicación no encontrada'
+                ], JSON_UNESCAPED_UNICODE);
+            }
+            
+        } catch (Exception $e) {
+            error_log("Error en obtenerPorId: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Error al obtener publicación',
+                'detalle' => $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    }
     
     public function crearPublicacion() {
         header('Content-Type: application/json; charset=utf-8');
         
         try {
-            // Validar que venga el usuario_creador_id
             if (!isset($_POST['usuario_creador_id']) || empty($_POST['usuario_creador_id'])) {
                 http_response_code(401);
                 echo json_encode([
@@ -40,7 +77,6 @@ class PublicacionController {
             
             $usuario_creador_id = (int)$_POST['usuario_creador_id'];
             
-            // Validar campos requeridos
             if (!isset($_POST['titulo']) || !isset($_POST['tipo_servicio']) || 
                 !isset($_POST['telefono']) || !isset($_POST['ubicacion']) ||
                 !isset($_POST['descripcion']) || !isset($_POST['fecha_inicio']) || 
@@ -62,7 +98,6 @@ class PublicacionController {
             $fecha_inicio = $_POST['fecha_inicio'];
             $fecha_fin = $_POST['fecha_fin'];
 
-            // Manejo de imagen opcional
             $imagen = null;
             if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
                 $nombreArchivo = time() . "_" . basename($_FILES["imagen"]["name"]);

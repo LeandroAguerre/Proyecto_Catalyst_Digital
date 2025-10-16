@@ -3,19 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedDeOficio</title>
+    <title>RedDeOficio - Publicación</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="styles/publicacion_style.css">
-    
 </head>
-<script>
-  console.log('Script embebido cargado correctamente');
-</script>
-<script src="js/script.js"></script>
 <body>
     
     <header class="sidebar">
@@ -31,9 +25,6 @@
             </button>
         </div>
         
-        <!-- <div id="welcomeMessage" class="welcome-message" style="display:none;">
-               Bienvenido, <span id="username"></span>
-        </div> -->
         <div id="welcomeMessage" class="welcome-message" style="display:none;">
           <div class="mb-2">Bienvenido, <span id="username"></span></div>
             <button id="btnSalir" class="btn btn-danger btn-sm">
@@ -43,182 +34,152 @@
 
         <nav class="navigation">
             <ul>
+                <li><a href="index.html" class="btn nav-btn">Inicio</a></li>
                 <li><a href="#" class="btn nav-btn">Servicios</a></li>
                 <li><a href="#" class="btn nav-btn">Destacados</a></li>
                 <li><a href="#" class="btn nav-btn">Soporte</a></li>
-                <!-- <li><a href="#" class="nav-button">Stripper</a></li> -->
-                <!-- <li><a href="#" class="nav-button">Configuracion</a></li> -->
-                <!-- <li><a href="#" class="nav-button">Salir</a></li> -->
             </ul>
         </nav>
     </header>
 
-
-<section id="cuerpo-pagina">
-  <div class="search-bar-unified">
-    <input type="text" class="search-left" placeholder="Tipo de servicio">
-    <span class="divider">|</span>
-    <input type="text" class="search-right" placeholder="Región, Ciudad, Código Postal">
-    <button class="search-button"><i class="bi bi-search"></i></button>
-  </div>
-
-      
-
-  <div class="publicacion-tarjeta" data-keywords="juan perez fontaneria plomeria">
-    <img src="imagenes/trabajador.jpg" alt="Trabajador">
-      <h2>Juan Pérez</h2>
-      <p class="specialty"><b>Sanitario</b></p>
-      <p class="estrella"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i><i class="bi bi-star"></i></p>
-      <p><b>Horario:</b> L a V 8:30 a 17:30</p>
-      <p><b>Descripcion:</b> Realizo servicios de todo tipo y me ajusto a la realidad economica del cliente.</p>
-      <a href="publicacion.html" class="btn btn-primary btn-lg mx-auto">Reservar</a>
-  </div>
-
-  <h4><b>Galería de imágenes:</b></h4>
-  <div id="galeria">
-    <img src="https://www.sau.org.uy/wp-content/uploads/SAU_curso_Sanitaria.jpeg" alt="">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvpdU9x7edo0DFa6gzK-ppsjF-wJLp9Nfx-Q&s" alt="">
-    <img src="https://alinsa.com.uy/wp-content/uploads/2022/09/Sanitaria-7.webp" alt="">
-  </div>
-
-  <h4><b>Comentarios:</b></h4>
-  <div id="comentarios">
-    
-    <div class="comentario"><p><b>Pepito: </b> Muy buen servicio.</p></div>
-    <div class="comentario"><p><b>Menganito: </b> Muy rápido y puntual</p></div>
-    <div class="comentario"><p><b>Fulanito: </b> Está bien, pero podría ser mejor, algo desprolijo.</p></div>
-  </div>
-</section>
-<!-- <div class="search-bar-unified">
-    <input type="text" class="search-left" placeholder="Tipo de servicio">
-    <span class="divider">|</span>
-    <input type="text" class="search-right" placeholder="Región, Ciudad, Código Postal">
-    <button class="search-button"><i class="bi bi-search"></i></button>
-</div>
-
-      
-
-<div class="publicacion-tarjeta" data-keywords="juan perez fontaneria plomeria">
-  <img src="imagenes/trabajador.jpg" alt="Trabajador">
-    <h2>Juan Pérez</h2>
-    <p class="specialty">Sanitario</p>
-    <p class="estrella"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></p>
-    <a href="publicacion.html" class="btn btn-primary btn-lg mx-auto">Reservar</a>
-</div> -->
-
-
-    
-
-<div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h5 class="modal-title" id="registroModalLabel">Crear cuenta</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    <section id="cuerpo-pagina">
+      <div class="search-bar-unified">
+        <input type="text" class="search-left" placeholder="Tipo de servicio">
+        <span class="divider">|</span>
+        <input type="text" class="search-right" placeholder="Región, Ciudad, Código Postal">
+        <button class="search-button"><i class="bi bi-search"></i></button>
       </div>
-      
-      <div class="modal-body">
-        <form id="formRegistro">
-          <div class="mb-3">
-            <label for="tipoUsuario" class="form-label">Tipo de usuario*</label>
-            <select id="tipoUsuario" class="form-select" required>
-              <option selected disabled value="">Seleccione una opción</option>
-              <option value="1">Cliente</option>
-              <option value="2">Proveedor</option>
-            </select>
-          </div>
 
-          <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre completo*</label>
-            <input type="text" class="form-control" id="nombre" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="email" class="form-label">Correo electrónico*</label>
-            <input type="email" class="form-control" id="email" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="password" class="form-label">Contraseña*</label>
-            <input type="password" class="form-control" id="password" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirmar contraseña*</label>
-            <input type="password" class="form-control" id="confirmPassword" required>
-          </div>
-
-          <div class="mb-3">
-            <label for="RUT" class="form-label">RUT</label>
-            <input type="text" class="form-control" id="RUT">
-          </div>
-
-          <button type="submit" class="btn btn-primary w-100">Registrarse</button>
-          <div id="estadoRegistro" class="mt-3"></div>
-        </form>
+      <!-- Contenedor de carga -->
+      <div id="loading-container" style="text-align: center; padding: 40px;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p>Cargando publicación...</p>
       </div>
-    </div>
-  </div>
-</div>
 
+      <!-- Contenedor de la publicación (oculto hasta que cargue) -->
+      <div id="publicacion-container" style="display: none;">
+        <div class="publicacion-tarjeta">
+          <img id="imagen-publicacion" src="imagenes/trabajador.jpg" alt="Imagen de la publicación">
+          <h2 id="titulo-publicacion">Cargando...</h2>
+          <p class="specialty"><b id="tipo-servicio">...</b></p>
+          <p class="estrella">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-half"></i>
+          </p>
+          <p><b>Ubicación:</b> <span id="ubicacion">...</span></p>
+          <p><b>Teléfono:</b> <a id="telefono" href="tel:">...</a></p>
+          <p><b>Disponibilidad:</b> <span id="fecha-inicio">...</span> a <span id="fecha-fin">...</span></p>
+          <p><b>Descripción:</b> <span id="descripcion">...</span></p>
+          <p><b>Proveedor:</b> <span id="nombre-proveedor">...</span></p>
+          <p><small id="fecha-creacion" class="text-muted">...</small></p>
+          <button class="btn btn-primary btn-lg mx-auto">Contactar</button>
+        </div>
 
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">Iniciar sesión</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <h4><b>Galería de imágenes:</b></h4>
+        <div id="galeria">
+          <img src="https://www.sau.org.uy/wp-content/uploads/SAU_curso_Sanitaria.jpeg" alt="">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvpdU9x7edo0DFa6gzK-ppsjF-wJLp9Nfx-Q&s" alt="">
+          <img src="https://alinsa.com.uy/wp-content/uploads/2022/09/Sanitaria-7.webp" alt="">
+        </div>
+
+        <h4><b>Comentarios:</b></h4>
+        <div id="comentarios">
+          <div class="comentario"><p><b>Pepito: </b> Muy buen servicio.</p></div>
+          <div class="comentario"><p><b>Menganito: </b> Muy rápido y puntual</p></div>
+          <div class="comentario"><p><b>Fulanito: </b> Está bien, pero podría ser mejor, algo desprolijo.</p></div>
+        </div>
       </div>
-      
-      <div class="modal-body">
-        <form id="formLogin">
-          <div class="mb-3">
-            <label for="loginEmail" class="form-label">Correo electrónico</label>
-            <input type="email" class="form-control" id="loginEmail" required>
+
+      <!-- Contenedor de error (oculto por defecto) -->
+      <div id="error-container" style="display: none;">
+        <div class="alert alert-danger" role="alert">
+          <h4 class="alert-heading">❌ Error</h4>
+          <p id="error-mensaje">No se pudo cargar la publicación</p>
+          <hr>
+          <a href="index.html" class="btn btn-primary">Volver al inicio</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modales de Login y Registro (igual que antes) -->
+    <div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="registroModalLabel">Crear cuenta</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
-          
-          <div class="mb-3">
-            <label for="loginPassword" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="loginPassword" required>
+          <div class="modal-body">
+            <form id="formRegistro">
+              <div class="mb-3">
+                <label for="tipoUsuario" class="form-label">Tipo de usuario*</label>
+                <select id="tipoUsuario" class="form-select" required>
+                  <option selected disabled value="">Seleccione una opción</option>
+                  <option value="1">Cliente</option>
+                  <option value="2">Proveedor</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo*</label>
+                <input type="text" class="form-control" id="nombre" required>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico*</label>
+                <input type="email" class="form-control" id="email" required>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña*</label>
+                <input type="password" class="form-control" id="password" required>
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirmar contraseña*</label>
+                <input type="password" class="form-control" id="confirmPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="RUT" class="form-label">RUT</label>
+                <input type="text" class="form-control" id="RUT">
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+              <div id="estadoRegistro" class="mt-3"></div>
+            </form>
           </div>
-          
-          <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-          <div id="estadoLogin" class="mt-3"></div>
-        </form>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div id="contenedorPublicaciones"></div>
-
-
-<script>
-async function cargarPublicacion() {
-  const res = await fetch('../api/controllers/publicacionController.php');
-  const publicaciones = await res.json();
-
-  const contenedor = document.getElementById('contenedorPublicaciones');
-  contenedor.innerHTML = '';
-
-  publicaciones.forEach(pub => {
-    contenedor.innerHTML += `
-      <div class="tarjeta">
-        <h3>${pub.titulo}</h3>
-        <p><strong>Tipo:</strong> ${pub.tipo_servicio}</p>
-        <p><strong>Ubicación:</strong> ${pub.ubicacion}</p>
-        <p><strong>Teléfono:</strong> ${pub.telefono}</p>
-        <p>${pub.descripcion}</p>
-        ${pub.imagen ? `<img src="${pub.imagen}" width="200">` : ''}
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Iniciar sesión</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <form id="formLogin">
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="loginEmail" required>
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="loginPassword" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+              <div id="estadoLogin" class="mt-3"></div>
+            </form>
+          </div>
+        </div>
       </div>
-    `;
-  });
-}
-window.onload = cargarPublicacion;
-</script>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+    <script src="js/publicacion.js"></script>
 
 </body>
 </html>
-

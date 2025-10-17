@@ -132,6 +132,63 @@ try {
             }
             break;
 
+        case '/reserva':
+        case '/public/reserva':
+            $controllerPath = __DIR__ . "/../api/controllers/reservaController.php";
+            
+            if (!file_exists($controllerPath)) {
+                error_log("ERROR: No se encuentra reservaController.php");
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(500);
+                echo json_encode(['error' => 'Archivo reservaController no encontrado']);
+                exit;
+            }
+            
+            require_once($controllerPath);
+            
+            if (!class_exists('ReservaController')) {
+                error_log("ERROR: La clase ReservaController no existe");
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(500);
+                echo json_encode(['error' => 'Clase ReservaController no encontrada']);
+                exit;
+            }
+            
+            $controller = new ReservaController();
+            
+            if ($method === 'GET') {
+                // Determinar qué método GET llamar
+                if (isset($_GET['fechas_ocupadas'])) {
+                    $controller->obtenerFechasOcupadas();
+                } else {
+                    $controller->obtenerReservas();
+                }
+            } elseif ($method === 'POST') {
+                // Determinar qué acción POST ejecutar
+                if (isset($_GET['accion'])) {
+                    switch ($_GET['accion']) {
+                        case 'confirmar':
+                            $controller->confirmarReserva();
+                            break;
+                        case 'rechazar':
+                            $controller->rechazarReserva();
+                            break;
+                        case 'cancelar':
+                            $controller->cancelarReserva();
+                            break;
+                        default:
+                            $controller->crearReserva();
+                    }
+                } else {
+                    $controller->crearReserva();
+                }
+            } else {
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(405);
+                echo json_encode(['error' => 'Método no permitido']);
+            }
+            break;
+
         default:
             header('Content-Type: application/json; charset=utf-8');
             http_response_code(404);

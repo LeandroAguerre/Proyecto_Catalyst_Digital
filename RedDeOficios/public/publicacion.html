@@ -77,8 +77,12 @@
           <p><b>Descripción:</b> <span id="descripcion">...</span></p>
           <p><b>Proveedor:</b> <span id="nombre-proveedor">...</span></p>
           <p><small id="fecha-creacion" class="text-muted">...</small></p>
-          <button class="btn btn-primary btn-lg mx-auto">Contactar</button>
+          <button id="btnReservar" class="btn btn-primary btn-lg mx-auto" data-bs-toggle="modal" data-bs-target="#modalReserva">Reservar</button>
         </div>
+        
+        <!-- Datos ocultos para pasar al modal -->
+        <input type="hidden" id="proveedor-id" value="">
+        <input type="hidden" id="publicacion-id-hidden" value="">
 
         <h4><b>Galería de imágenes:</b></h4>
         <div id="galeria">
@@ -176,6 +180,186 @@
         </div>
       </div>
     </div>
+
+    <!-- MODAL DE RESERVA -->
+    <div class="modal fade" id="modalReserva" tabindex="-1" aria-labelledby="modalReservaLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalReservaLabel">
+              <i class="bi bi-calendar-check"></i> Reservar Servicio
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            
+            <!-- Mensaje de estado -->
+            <div id="estadoReserva"></div>
+
+            <div class="row">
+              <!-- Columna izquierda: Calendario -->
+              <div class="col-md-7">
+                <h6><i class="bi bi-calendar3"></i> Selecciona las fechas</h6>
+                
+                <!-- Controles del calendario -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <button class="btn btn-sm btn-outline-primary" id="mesAnterior">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <h5 id="mesAnioActual" class="mb-0">Octubre 2025</h5>
+                  <button class="btn btn-sm btn-outline-primary" id="mesSiguiente">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+
+                <!-- Grid del calendario -->
+                <div id="calendarioGrid" class="mb-3">
+                  <!-- Se llenará dinámicamente -->
+                </div>
+
+                <!-- Leyenda -->
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                  <div><span class="badge bg-success">◼</span> Disponible</div>
+                  <div><span class="badge bg-danger">◼</span> Ocupado</div>
+                  <div><span class="badge bg-primary">◼</span> Seleccionado</div>
+                  <div><span class="badge bg-secondary">◼</span> Pasado</div>
+                </div>
+
+                <!-- Información de selección -->
+                <div id="infoSeleccion" class="alert alert-info" style="display: none;">
+                  <strong>Selección actual:</strong>
+                  <div id="textoSeleccion"></div>
+                </div>
+              </div>
+
+              <!-- Columna derecha: Formulario -->
+              <div class="col-md-5">
+                <h6><i class="bi bi-clock"></i> Detalles de la reserva</h6>
+                
+                <form id="formReserva">
+                  <!-- Fecha y hora de inicio -->
+                  <div class="mb-3">
+                    <label for="fechaInicio" class="form-label">Fecha de inicio*</label>
+                    <input type="date" class="form-control" id="fechaInicio" required readonly>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="horaInicio" class="form-label">Hora de inicio*</label>
+                    <input type="time" class="form-control" id="horaInicio" required>
+                  </div>
+
+                  <!-- Fecha y hora de fin -->
+                  <div class="mb-3">
+                    <label for="fechaFin" class="form-label">Fecha de fin*</label>
+                    <input type="date" class="form-control" id="fechaFin" required readonly>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="horaFin" class="form-label">Hora de fin*</label>
+                    <input type="time" class="form-control" id="horaFin" required>
+                  </div>
+
+                  <!-- Notas adicionales -->
+                  <div class="mb-3">
+                    <label for="notasCliente" class="form-label">Notas adicionales (opcional)</label>
+                    <textarea class="form-control" id="notasCliente" rows="3" placeholder="Ej: Necesito que traiga sus propias herramientas..."></textarea>
+                  </div>
+
+                  <div class="alert alert-warning">
+                    <small><i class="bi bi-info-circle"></i> Tu reserva quedará en estado <strong>pendiente</strong> hasta que el proveedor la confirme.</small>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-send"></i> Enviar Solicitud de Reserva
+                  </button>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estilos para el calendario -->
+    <style>
+      #calendarioGrid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+      }
+
+      .calendario-dia-nombre {
+        text-align: center;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        font-size: 0.9em;
+      }
+
+      .calendario-dia {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        position: relative;
+      }
+
+      .calendario-dia:hover:not(.dia-pasado):not(.dia-ocupado) {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+
+      .calendario-dia.dia-disponible {
+        background-color: #d1e7dd;
+        border-color: #198754;
+        color: #0f5132;
+      }
+
+      .calendario-dia.dia-ocupado {
+        background-color: #f8d7da;
+        border-color: #dc3545;
+        color: #842029;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .calendario-dia.dia-seleccionado {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+        font-weight: bold;
+      }
+
+      .calendario-dia.dia-rango-seleccion {
+        background-color: #cfe2ff;
+        border-color: #0d6efd;
+        color: #084298;
+      }
+
+      .calendario-dia.dia-pasado {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .calendario-dia.dia-vacio {
+        border: none;
+        cursor: default;
+      }
+
+      .calendario-dia.dia-hoy {
+        border: 3px solid #0d6efd;
+      }
+    </style>
 
     <!-- Scripts -->
     <script src="js/script.js"></script>

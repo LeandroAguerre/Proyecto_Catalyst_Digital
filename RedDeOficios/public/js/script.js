@@ -43,17 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Función para mostrar usuario logueado
-  function mostrarUsuarioLogueado(usuario) {
-    console.log('👤 Mostrando usuario logueado:', usuario);
-    if (authButtons) authButtons.style.display = 'none';
-    if (username) username.textContent = usuario.nombreCompleto || usuario.correoElectronico;
-    if (welcomeMessage) welcomeMessage.style.display = 'block';
-    
-    // Mostrar botón "Publicar" solo para proveedores (tipo 2)
-    actualizarBotonPublicar(usuario.tipoUsuario);
-  }
-
   // Función para actualizar visibilidad del botón Publicar
   function actualizarBotonPublicar(tipoUsuario) {
     let btnPublicar = document.getElementById('btnPublicar');
@@ -81,6 +70,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Función para actualizar visibilidad del botón Reservas
+  function actualizarBotonReservas(estaLogueado) {
+    let btnReservas = document.getElementById('btnReservas');
+    
+    // Si no existe, crearlo
+    if (!btnReservas) {
+      const nav = document.querySelector('.navigation ul');
+      if (nav) {
+        const li = document.createElement('li');
+        li.innerHTML = '<a href="reservas.html" id="btnReservas" class="btn nav-btn"><i class="bi bi-calendar-check"></i> Reservas</a>';
+        nav.appendChild(li);
+        btnReservas = document.getElementById('btnReservas');
+      }
+    }
+    
+    // Mostrar u ocultar según si está logueado
+    if (btnReservas) {
+      if (estaLogueado) {
+        btnReservas.parentElement.style.display = 'list-item';
+        console.log('✅ Botón Reservas visible (usuario logueado)');
+      } else {
+        btnReservas.parentElement.style.display = 'none';
+        console.log('🚫 Botón Reservas oculto (usuario no logueado)');
+      }
+    }
+  }
+
+  // Función para mostrar usuario logueado
+  function mostrarUsuarioLogueado(usuario) {
+    console.log('👤 Mostrando usuario logueado:', usuario);
+    if (authButtons) authButtons.style.display = 'none';
+    if (username) username.textContent = usuario.nombreCompleto || usuario.correoElectronico;
+    if (welcomeMessage) welcomeMessage.style.display = 'block';
+    
+    // Mostrar botón "Publicar" solo para proveedores (tipo 2)
+    actualizarBotonPublicar(usuario.tipoUsuario);
+    
+    // Mostrar botón "Reservas" para todos los usuarios logueados
+    actualizarBotonReservas(true);
+  }
+
   // Función para mostrar estado de no logueado
   function mostrarUsuarioDeslogueado() {
     console.log('🚪 Mostrando estado deslogueado');
@@ -94,6 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnPublicar) {
       btnPublicar.parentElement.style.display = 'none';
     }
+    
+    // Ocultar botón reservas
+    actualizarBotonReservas(false);
   }
 
   // Evento: Botón Salir

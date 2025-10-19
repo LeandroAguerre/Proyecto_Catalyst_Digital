@@ -89,14 +89,15 @@ CREATE TABLE `publicacion` (
   `telefono` varchar(20) NOT NULL,
   `ubicacion` varchar(255) NOT NULL,
   `descripcion` text DEFAULT NULL,
-  `fecha_inicio` date NOT NULL,
-  `fecha_fin` date NOT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `fecha_creacion` timestamp NULL DEFAULT current_timestamp(),
+  `hora_inicio` time NOT NULL DEFAULT '09:00:00' COMMENT 'Hora de inicio de trabajo (ej: 08:00)',
+  `hora_fin` time NOT NULL DEFAULT '18:00:00' COMMENT 'Hora de fin de trabajo (ej: 16:00)',
+  `horas_minimas` decimal(3,1) NOT NULL DEFAULT 1.0 COMMENT 'Mínimo de horas por trabajo (ej: 1.0, 2.0, 0.5)',
   PRIMARY KEY (`id`),
   KEY `usuario_creador_id` (`usuario_creador_id`),
   CONSTRAINT `publicacion_ibfk_1` FOREIGN KEY (`usuario_creador_id`) REFERENCES `usuario` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,8 +106,38 @@ CREATE TABLE `publicacion` (
 
 LOCK TABLES `publicacion` WRITE;
 /*!40000 ALTER TABLE `publicacion` DISABLE KEYS */;
-INSERT INTO `publicacion` VALUES (1,NULL,'prueba','striper','0949999','cerro','hola','2025-10-07','2025-10-07','imagenes/1759880907_logo2.png','2025-10-07 23:48:27'),(3,NULL,'Ricardo Fontaner','plomeria','094999987','centro','hola te destapo el caño','2025-10-07','2025-10-08','imagenes/1759881911_logo2.png','2025-10-08 00:05:11'),(4,NULL,'Dictandor Fabian','plomeria','094999987','centro','hola te destapo el caño','2025-10-07','2025-10-08','imagenes/1759882159_logo2.png','2025-10-08 00:09:19'),(5,NULL,'Opa el pro','gaming','094999987','centro','Te llego a diamante en lo que quieras','2025-10-07','2025-10-08','imagenes/1759882369_logo2.png','2025-10-08 00:12:49'),(6,NULL,'Opa el pro2','gaming','094999987','centro','Te llego a diamante en lo que quieras','2025-10-07','2025-10-08','imagenes/1759883190_logo2.png','2025-10-08 00:26:30'),(7,NULL,'Dibujante tecnico','Dibujo para obras','0949999','Parque del plata','Años de experiencia como ayudante de arquitecto.','2025-10-14','2025-10-16',NULL,'2025-10-14 23:45:59'),(8,6,'Gamer','juegar jueguitos','123456767899','Tucasa','lala','2025-10-14','2025-10-16',NULL,'2025-10-15 01:08:24'),(9,7,'programador de dildos 3d','sexual','0929292','montevideo','Olor a culo integrado','2025-07-05','2025-10-23',NULL,'2025-10-15 01:19:17'),(10,5,'Compre-venta','comprar cosas y venderlas','0949999','Tucasa','Te vendo todo','2025-10-15','2025-10-16',NULL,'2025-10-16 00:11:45'),(11,5,'Prueba 1','prueba 1','0949999999','cerro','prueba 1','2025-10-17','2025-10-18',NULL,'2025-10-17 00:09:55'),(12,5,'Viernes','el cuerpo lo sape','123214321453','Montevideo y la costa','con tu mama','2025-10-18','2025-10-31',NULL,'2025-10-17 22:03:34');
+INSERT INTO `publicacion` VALUES (3,NULL,'Ricardo Fontaner','plomeria','094999987','centro','hola te destapo el caño','imagenes/1759881911_logo2.png','2025-10-08 00:05:11','09:00:00','18:00:00',1.0),(4,NULL,'Dictandor Fabian','plomeria','094999987','centro','hola te destapo el caño','imagenes/1759882159_logo2.png','2025-10-08 00:09:19','09:00:00','18:00:00',1.0),(5,NULL,'Opa el pro','gaming','094999987','centro','Te llego a diamante en lo que quieras','imagenes/1759882369_logo2.png','2025-10-08 00:12:49','09:00:00','18:00:00',1.0),(6,NULL,'Opa el pro2','gaming','094999987','centro','Te llego a diamante en lo que quieras','imagenes/1759883190_logo2.png','2025-10-08 00:26:30','09:00:00','18:00:00',1.0),(7,NULL,'Dibujante tecnico','Dibujo para obras','0949999','Parque del plata','Años de experiencia como ayudante de arquitecto.',NULL,'2025-10-14 23:45:59','09:00:00','18:00:00',1.0),(8,6,'Gamer','juegar jueguitos','123456767899','Tucasa','lala',NULL,'2025-10-15 01:08:24','09:00:00','18:00:00',1.0),(10,5,'Compre-venta','comprar cosas y venderlas','0949999','Tucasa','Te vendo todo',NULL,'2025-10-16 00:11:45','09:00:00','18:00:00',1.0),(11,5,'Prueba 1','prueba 1','0949999999','cerro','prueba 1',NULL,'2025-10-17 00:09:55','09:00:00','18:00:00',1.0),(12,5,'Viernes','el cuerpo lo sape','123214321453','Montevideo y la costa','con tu mama',NULL,'2025-10-17 22:03:34','09:00:00','18:00:00',1.0),(13,5,'Albañil con 5 años de experiencia','Albañil','0949999','Montevideo','Peon de obra',NULL,'2025-10-19 00:15:58','09:00:00','18:00:00',4.0),(14,5,'Albañil con 5 años de experiencia','Albañil','0949999','Montevideo','Peon de obra',NULL,'2025-10-19 00:16:03','09:00:00','18:00:00',4.0),(15,5,'Albañil con 5 años de experiencia','Albañil','0949999','Montevideo','Peon de obra',NULL,'2025-10-19 00:16:19','09:00:00','18:00:00',4.0),(16,5,'Albañil con 5 años de experiencia','Albañil','0949999','Montevideo','Peon de obra',NULL,'2025-10-19 00:17:37','09:00:00','18:00:00',4.0),(17,5,'Electricista firma de ute','Electricista','0949999','Montevideo','lala',NULL,'2025-10-19 00:18:38','09:00:00','18:00:00',1.0),(18,5,'prueba','Albañil','0949999','Lavalleja','lala',NULL,'2025-10-19 13:59:58','09:00:00','18:00:00',1.0),(19,5,'Dibujante tecnico','Albañil','0949999999','Durazno','lala',NULL,'2025-10-19 14:30:51','09:00:00','18:00:00',1.0),(20,5,'prueba 10','Carpintero','0929292','Flores','laka',NULL,'2025-10-19 15:29:24','09:00:00','18:00:00',1.0);
 /*!40000 ALTER TABLE `publicacion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `publicacion_imagen`
+--
+
+DROP TABLE IF EXISTS `publicacion_imagen`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `publicacion_imagen` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `publicacion_id` int(11) NOT NULL,
+  `ruta_imagen` varchar(500) NOT NULL,
+  `es_principal` tinyint(1) DEFAULT 0 COMMENT 'TRUE si es la imagen que se muestra en la tarjeta',
+  `orden` tinyint(4) DEFAULT 0 COMMENT 'Orden de visualización (0-9)',
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_publicacion` (`publicacion_id`),
+  KEY `idx_principal` (`publicacion_id`,`es_principal`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `publicacion_imagen`
+--
+
+LOCK TABLES `publicacion_imagen` WRITE;
+/*!40000 ALTER TABLE `publicacion_imagen` DISABLE KEYS */;
+INSERT INTO `publicacion_imagen` VALUES (1,3,'imagenes/1759881911_logo2.png',1,0,'2025-10-19 00:01:48'),(2,4,'imagenes/1759882159_logo2.png',1,0,'2025-10-19 00:01:48'),(3,5,'imagenes/1759882369_logo2.png',1,0,'2025-10-19 00:01:48'),(4,6,'imagenes/1759883190_logo2.png',1,0,'2025-10-19 00:01:48'),(5,18,'uploads/publicaciones/pub_18_img1_1760882398.png',1,0,'2025-10-19 13:59:58'),(6,18,'uploads/publicaciones/pub_18_img2_1760882398.png',0,1,'2025-10-19 13:59:58'),(7,19,'uploads/publicaciones/pub_19_img1_1760884251.png',1,0,'2025-10-19 14:30:51'),(8,19,'uploads/publicaciones/pub_19_img2_1760884251.png',0,1,'2025-10-19 14:30:51'),(9,20,'uploads/publicaciones/pub_20_img1_1760887764.webp',1,0,'2025-10-19 15:29:24'),(10,20,'uploads/publicaciones/pub_20_img2_1760887764.jpg',0,1,'2025-10-19 15:29:24'),(11,20,'uploads/publicaciones/pub_20_img3_1760887764.jpg',0,2,'2025-10-19 15:29:24');
+/*!40000 ALTER TABLE `publicacion_imagen` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -143,7 +174,7 @@ CREATE TABLE `reserva` (
   KEY `idx_fecha_inicio` (`fecha_hora_inicio`),
   KEY `idx_fecha_fin` (`fecha_hora_fin`),
   KEY `idx_estado` (`estado`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,7 +183,7 @@ CREATE TABLE `reserva` (
 
 LOCK TABLES `reserva` WRITE;
 /*!40000 ALTER TABLE `reserva` DISABLE KEYS */;
-INSERT INTO `reserva` VALUES (1,1,2,1,'2025-10-17 11:00:00','2025-10-18 16:00:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Prueba de reserva',NULL,'2025-10-16 23:46:42','2025-10-16 23:46:42'),(2,1,5,11,'2025-10-17 11:00:00','2025-10-18 16:00:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Prueba de reserva',NULL,'2025-10-17 01:30:21','2025-10-17 01:30:21'),(3,5,5,11,'2025-10-20 20:11:00','2025-10-21 21:11:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Tirame la goma',NULL,'2025-10-17 21:12:04','2025-10-17 21:12:04'),(4,2,5,11,'2025-10-23 08:00:00','2025-10-24 16:00:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Necesito que me respondas si te sirve crack',NULL,'2025-10-17 21:59:24','2025-10-17 21:59:24');
+INSERT INTO `reserva` VALUES (1,1,2,1,'2025-10-17 11:00:00','2025-10-18 16:00:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Prueba de reserva',NULL,'2025-10-16 23:46:42','2025-10-16 23:46:42'),(2,1,5,11,'2025-10-17 11:00:00','2025-10-18 16:00:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Prueba de reserva',NULL,'2025-10-17 01:30:21','2025-10-17 01:30:21'),(3,5,5,11,'2025-10-20 20:11:00','2025-10-21 21:11:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'Tirame la goma',NULL,'2025-10-17 21:12:04','2025-10-17 21:12:04'),(4,2,5,11,'2025-10-23 08:00:00','2025-10-24 16:00:00','rechazada',NULL,NULL,NULL,NULL,NULL,5,'no tengo tiempo','2025-10-17 23:06:05','Necesito que me respondas si te sirve crack',NULL,'2025-10-17 21:59:24','2025-10-17 23:06:05'),(5,5,5,17,'2025-10-22 11:56:00','2025-10-23 02:56:00','pendiente',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2025-10-19 13:56:31','2025-10-19 13:56:31');
 /*!40000 ALTER TABLE `reserva` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -193,4 +224,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-17 19:16:43
+-- Dump completed on 2025-10-19 13:49:54

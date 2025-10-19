@@ -83,25 +83,27 @@ function rellenarDatos(pub) {
   const descripcion = document.getElementById('descripcion');
   if (descripcion) descripcion.textContent = pub.descripcion || 'Sin descripción';
 
-  // Fechas de disponibilidad
-  const fechaInicio = document.getElementById('fecha-inicio');
-  if (fechaInicio && pub.fecha_inicio) {
-    const fecha = new Date(pub.fecha_inicio);
-    fechaInicio.textContent = fecha.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  // Horario de trabajo
+  const horarioTrabajo = document.getElementById('horario-trabajo');
+  if (horarioTrabajo && pub.hora_inicio && pub.hora_fin) {
+    horarioTrabajo.textContent = pub.hora_inicio.substring(0, 5) + ' a ' + pub.hora_fin.substring(0, 5);
   }
 
-  const fechaFin = document.getElementById('fecha-fin');
-  if (fechaFin && pub.fecha_fin) {
-    const fecha = new Date(pub.fecha_fin);
-    fechaFin.textContent = fecha.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  // Horas mínimas
+  const horasMinimas = document.getElementById('horas-minimas');
+  if (horasMinimas && pub.horas_minimas) {
+    const horas = parseFloat(pub.horas_minimas);
+    if (horas === 0.5) {
+      horasMinimas.textContent = '30 minutos';
+    } else if (horas === 1) {
+      horasMinimas.textContent = '1 hora';
+    } else if (horas === 1.5) {
+      horasMinimas.textContent = '1 hora y media';
+    } else if (horas >= 8) {
+      horasMinimas.textContent = 'Jornada completa (' + horas + ' horas)';
+    } else {
+      horasMinimas.textContent = horas + ' horas';
+    }
   }
 
   // Nombre del proveedor
@@ -110,11 +112,15 @@ function rellenarDatos(pub) {
     nombreProveedor.textContent = pub.nombre_proveedor || 'Proveedor anónimo';
   }
 
-  // Imagen
+  // Imagen principal
   const imagen = document.getElementById('imagen-publicacion');
   if (imagen) {
-    if (pub.imagen) {
-      imagen.src = pub.imagen;
+    const imagenPrincipal = pub.imagenes && pub.imagenes.length > 0 
+      ? pub.imagenes.find(img => img.es_principal == 1) || pub.imagenes[0]
+      : null;
+    
+    if (imagenPrincipal) {
+      imagen.src = imagenPrincipal.ruta_imagen;
       imagen.alt = pub.titulo;
       imagen.onerror = function() {
         this.src = 'imagenes/trabajador.jpg';
@@ -123,6 +129,20 @@ function rellenarDatos(pub) {
       imagen.src = 'imagenes/trabajador.jpg';
       imagen.alt = 'Imagen no disponible';
     }
+  }
+
+  // Galería de imágenes
+  const galeria = document.getElementById('galeria');
+  if (galeria && pub.imagenes && pub.imagenes.length > 0) {
+    galeria.innerHTML = '';
+    pub.imagenes.forEach(function(img) {
+      const col = document.createElement('div');
+      col.className = 'col-md-4 col-6 mb-3';
+      col.innerHTML = '<img src="' + img.ruta_imagen + '" class="img-fluid rounded shadow-sm" alt="Imagen de la publicación" onerror="this.src=\'imagenes/trabajador.jpg\'">';
+      galeria.appendChild(col);
+    });
+  } else if (galeria) {
+    galeria.innerHTML = '<div class="col-12"><p class="text-muted">No hay imágenes disponibles</p></div>';
   }
 
   // Fecha de creación
@@ -138,14 +158,54 @@ function rellenarDatos(pub) {
     });
   }
 
-  // Guardar IDs ocultos para el modal
+  // Guardar IDs y datos ocultos para el modal
   const proveedorIdInput = document.getElementById('proveedor-id');
   if (proveedorIdInput) proveedorIdInput.value = pub.usuario_creador_id || '';
 
   const publicacionIdInput = document.getElementById('publicacion-id-hidden');
   if (publicacionIdInput) publicacionIdInput.value = pub.id || '';
 
+  const horaInicioInput = document.getElementById('hora-inicio-proveedor');
+  if (horaInicioInput) horaInicioInput.value = pub.hora_inicio || '09:00:00';
+
+  const horaFinInput = document.getElementById('hora-fin-proveedor');
+  if (horaFinInput) horaFinInput.value = pub.hora_fin || '18:00:00';
+
+  const horasMinimasInput = document.getElementById('horas-minimas-proveedor');
+  if (horasMinimasInput) horasMinimasInput.value = pub.horas_minimas || '1';
+
+  // Verificar si el usuario logueado es el dueño de la publicación
+  const sesionActual = obtenerSesion();
+  const btnReservar = document.getElementById('btnReservar');
+  
+  if (sesionActual && btnReservar) {
+    if (sesionActual.id === pub.usuario_creador_id) {
+      // Es el dueño, ocultar botón y mostrar mensaje
+      btnReservar.style.display = 'none';
+      
+      const mensajePropio = document.createElement('div');
+      mensajePropio.className = 'alert alert-info mt-3';
+      mensajePropio.innerHTML = '<i class="bi bi-info-circle"></i> Esta es tu publicación. No puedes reservar tus propios servicios.';
+      btnReservar.parentElement.appendChild(mensajePropio);
+    } else {
+      btnReservar.style.display = 'inline-block';
+    }
+  }
+
   console.log('✅ Datos rellenados en el HTML');
+}
+
+// Función auxiliar para obtener sesión
+function obtenerSesion() {
+  const usuarioId = sessionStorage.getItem('usuarioId');
+  if (!usuarioId) return null;
+  
+  return {
+    id: parseInt(usuarioId),
+    tipoUsuario: parseInt(sessionStorage.getItem('tipoUsuario')),
+    nombreCompleto: sessionStorage.getItem('nombreCompleto'),
+    correoElectronico: sessionStorage.getItem('correoElectronico')
+  };
 }
 
 // Mostrar mensaje de error
@@ -456,7 +516,12 @@ document.getElementById('formReserva').addEventListener('submit', async function
   const horaFin = document.getElementById('horaFin').value;
   const notasCliente = document.getElementById('notasCliente').value;
 
-  // Validaciones
+  // Obtener horarios del proveedor
+  const horaInicioProveedor = document.getElementById('hora-inicio-proveedor').value || '09:00:00';
+  const horaFinProveedor = document.getElementById('hora-fin-proveedor').value || '18:00:00';
+  const horasMinimasProveedor = parseFloat(document.getElementById('horas-minimas-proveedor').value || 1);
+
+  // Validaciones básicas
   if (!fechaInicio || !fechaFin || !horaInicio || !horaFin) {
     estadoReserva.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> Debes seleccionar fechas y horas de inicio y fin</div>';
     return;
@@ -470,6 +535,24 @@ document.getElementById('formReserva').addEventListener('submit', async function
 
   if (fin <= inicio) {
     estadoReserva.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> La fecha/hora de fin debe ser posterior a la de inicio</div>';
+    return;
+  }
+
+  // VALIDAR HORARIOS DEL PROVEEDOR
+  const horaInicioSolo = horaInicio + ':00';
+  const horaFinSolo = horaFin + ':00';
+  
+  if (horaInicioSolo < horaInicioProveedor || horaFinSolo > horaFinProveedor) {
+    estadoReserva.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> El horario seleccionado está fuera del horario de trabajo del proveedor (' + horaInicioProveedor.substring(0,5) + ' a ' + horaFinProveedor.substring(0,5) + ')</div>';
+    return;
+  }
+
+  // VALIDAR HORAS MÍNIMAS
+  const diferenciaMs = fin - inicio;
+  const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+  
+  if (diferenciaHoras < horasMinimasProveedor) {
+    estadoReserva.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> La reserva debe ser de al menos ' + horasMinimasProveedor + ' hora(s). Actualmente: ' + diferenciaHoras.toFixed(2) + ' hora(s)</div>';
     return;
   }
 

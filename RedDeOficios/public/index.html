@@ -16,6 +16,129 @@
   console.log('Script embebido cargado correctamente');
 </script>
 <script src="js/script.js"></script>
+<!-- MODAL DE ALERTAS PERSONALIZADO -->
+<div class="modal fade" id="modalAlerta" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" id="modalAlertaHeader">
+        <h5 class="modal-title" id="modalAlertaTitulo">
+          <i id="modalAlertaIcono" class="bi bi-info-circle"></i>
+          <span id="modalAlertaTituloTexto">Información</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalAlertaMensaje"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalAlertaBtnOk">Aceptar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="modalAlertaBtnCancelar" style="display: none;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPT HELPER PARA MODALES -->
+<script>
+// Función global para mostrar alertas con modal
+window.mostrarAlerta = function(mensaje, tipo = 'info', titulo = null) {
+  const modal = new bootstrap.Modal(document.getElementById('modalAlerta'));
+  const header = document.getElementById('modalAlertaHeader');
+  const icono = document.getElementById('modalAlertaIcono');
+  const tituloTexto = document.getElementById('modalAlertaTituloTexto');
+  const mensajeEl = document.getElementById('modalAlertaMensaje');
+  
+  // Configurar según tipo
+  const configs = {
+    'success': {
+      headerClass: 'bg-success text-white',
+      icono: 'bi-check-circle-fill',
+      titulo: 'Éxito'
+    },
+    'error': {
+      headerClass: 'bg-danger text-white',
+      icono: 'bi-x-circle-fill',
+      titulo: 'Error'
+    },
+    'warning': {
+      headerClass: 'bg-warning text-dark',
+      icono: 'bi-exclamation-triangle-fill',
+      titulo: 'Advertencia'
+    },
+    'info': {
+      headerClass: 'bg-info text-white',
+      icono: 'bi-info-circle-fill',
+      titulo: 'Información'
+    }
+  };
+  
+  const config = configs[tipo] || configs['info'];
+  
+  // Aplicar estilos
+  header.className = 'modal-header ' + config.headerClass;
+  icono.className = 'bi ' + config.icono + ' me-2';
+  tituloTexto.textContent = titulo || config.titulo;
+  mensajeEl.textContent = mensaje;
+  
+  // Mostrar modal
+  modal.show();
+};
+
+// Función global para confirmar con modal
+window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
+  const modal = new bootstrap.Modal(document.getElementById('modalAlerta'));
+  const header = document.getElementById('modalAlertaHeader');
+  const icono = document.getElementById('modalAlertaIcono');
+  const tituloTexto = document.getElementById('modalAlertaTituloTexto');
+  const mensajeEl = document.getElementById('modalAlertaMensaje');
+  const btnOk = document.getElementById('modalAlertaBtnOk');
+  const btnCancelar = document.getElementById('modalAlertaBtnCancelar');
+  
+  // Configurar para confirmación
+  header.className = 'modal-header bg-warning text-dark';
+  icono.className = 'bi bi-question-circle-fill me-2';
+  tituloTexto.textContent = titulo;
+  mensajeEl.textContent = mensaje;
+  
+  // Mostrar botón cancelar
+  btnCancelar.style.display = 'inline-block';
+  
+  // Remover listeners previos
+  const newBtnOk = btnOk.cloneNode(true);
+  btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+  
+  // Agregar nuevo listener
+  newBtnOk.addEventListener('click', function() {
+    modal.hide();
+    if (callback) callback(true);
+  });
+  
+  // Listener para cancelar
+  btnCancelar.addEventListener('click', function() {
+    modal.hide();
+    if (callback) callback(false);
+  }, { once: true });
+  
+  modal.show();
+  
+  // Ocultar botón cancelar al cerrar
+  document.getElementById('modalAlerta').addEventListener('hidden.bs.modal', function() {
+    btnCancelar.style.display = 'none';
+  }, { once: true });
+};
+
+// Sobrescribir alert nativo (opcional)
+// window.alert = function(mensaje) {
+//   mostrarAlerta(mensaje, 'info');
+// };
+
+// Sobrescribir confirm nativo (opcional)
+// window.confirm = function(mensaje) {
+//   return new Promise((resolve) => {
+//     confirmarAccion(mensaje, resolve);
+//   });
+// };
+</script>
 <body>
     
     <header class="sidebar">

@@ -235,123 +235,245 @@ function mostrarReservas(reservas, contenedor, tipo) {
 async function confirmarReserva(reservaId) {
   const sesion = obtenerSesion();
   
-  const respuesta = prompt('Mensaje de confirmación (opcional):');
-  if (respuesta === null) return; // Usuario canceló
+  // Crear modal personalizado para pedir mensaje
+  const modalHtml = `
+    <div class="modal fade" id="modalConfirmarReserva" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title"><i class="bi bi-check-circle"></i> Confirmar Reserva</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas confirmar esta reserva?</p>
+            <label for="mensajeConfirmacion" class="form-label">Mensaje para el cliente (opcional):</label>
+            <textarea id="mensajeConfirmacion" class="form-control" rows="3" placeholder="Ej: Perfecto, nos vemos en la fecha acordada..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success" id="btnConfirmarReservaFinal">
+              <i class="bi bi-check-circle"></i> Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
   
-  try {
-    const res = await fetch('/reserva?accion=confirmar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        reserva_id: reservaId,
-        proveedor_id: sesion.id,
-        respuesta: respuesta || null
-      })
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      alert('✅ ' + data.message);
-      // Recargar reservas
-      document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
-      cargarReservasRecibidas();
-    } else {
-      alert('❌ ' + data.message);
-    }
-    
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error al confirmar la reserva');
+  // Agregar modal al DOM si no existe
+  if (!document.getElementById('modalConfirmarReserva')) {
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
+  
+  const modal = new bootstrap.Modal(document.getElementById('modalConfirmarReserva'));
+  modal.show();
+  
+  // Evento del botón confirmar
+  document.getElementById('btnConfirmarReservaFinal').onclick = async function() {
+    const respuesta = document.getElementById('mensajeConfirmacion').value;
+    
+    try {
+      const res = await fetch('/reserva?accion=confirmar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          reserva_id: reservaId,
+          proveedor_id: sesion.id,
+          respuesta: respuesta || null
+        })
+      });
+      
+      const data = await res.json();
+      
+      modal.hide();
+      
+      if (data.success) {
+        mostrarAlerta(data.message, 'success');
+        // Recargar reservas
+        setTimeout(() => {
+          document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
+          cargarReservasRecibidas();
+        }, 1500);
+      } else {
+        mostrarAlerta(data.message, 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error:', error);
+      modal.hide();
+      mostrarAlerta('Error al confirmar la reserva', 'error');
+    }
+  };
 }
 
 // Rechazar reserva (proveedor rechaza)
 async function rechazarReserva(reservaId) {
   const sesion = obtenerSesion();
   
-  const motivo = prompt('Motivo del rechazo:');
-  if (!motivo) {
-    alert('Debes proporcionar un motivo');
-    return;
+  // Crear modal personalizado
+  const modalHtml = `
+    <div class="modal fade" id="modalRechazarReserva" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-warning text-dark">
+            <h5 class="modal-title"><i class="bi bi-x-circle"></i> Rechazar Reserva</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de que deseas rechazar esta reserva?</p>
+            <label for="motivoRechazo" class="form-label">Motivo del rechazo*:</label>
+            <textarea id="motivoRechazo" class="form-control" rows="3" placeholder="Ej: No estoy disponible en esa fecha..." required></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-warning" id="btnRechazarReservaFinal">
+              <i class="bi bi-x-circle"></i> Rechazar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  if (!document.getElementById('modalRechazarReserva')) {
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
   
-  try {
-    const res = await fetch('/reserva?accion=rechazar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        reserva_id: reservaId,
-        proveedor_id: sesion.id,
-        motivo: motivo
-      })
-    });
+  const modal = new bootstrap.Modal(document.getElementById('modalRechazarReserva'));
+  modal.show();
+  
+  document.getElementById('btnRechazarReservaFinal').onclick = async function() {
+    const motivo = document.getElementById('motivoRechazo').value.trim();
     
-    const data = await res.json();
-    
-    if (data.success) {
-      alert('✅ ' + data.message);
-      // Recargar reservas
-      document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
-      cargarReservasRecibidas();
-    } else {
-      alert('❌ ' + data.message);
+    if (!motivo) {
+      mostrarAlerta('Debes proporcionar un motivo para el rechazo', 'warning');
+      return;
     }
     
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error al rechazar la reserva');
-  }
+    try {
+      const res = await fetch('/reserva?accion=rechazar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          reserva_id: reservaId,
+          proveedor_id: sesion.id,
+          motivo: motivo
+        })
+      });
+      
+      const data = await res.json();
+      
+      modal.hide();
+      
+      if (data.success) {
+        mostrarAlerta(data.message, 'success');
+        setTimeout(() => {
+          document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
+          cargarReservasRecibidas();
+        }, 1500);
+      } else {
+        mostrarAlerta(data.message, 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error:', error);
+      modal.hide();
+      mostrarAlerta('Error al rechazar la reserva', 'error');
+    }
+  };
 }
 
 // Cancelar reserva
 async function cancelarReserva(reservaId) {
   const sesion = obtenerSesion();
   
-  if (!confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
-    return;
+  // Crear modal personalizado
+  const modalHtml = `
+    <div class="modal fade" id="modalCancelarReserva" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title"><i class="bi bi-trash"></i> Cancelar Reserva</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+            <label for="motivoCancelacion" class="form-label">Motivo de la cancelación (opcional):</label>
+            <textarea id="motivoCancelacion" class="form-control" rows="3" placeholder="Ej: Surgió un imprevisto..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No cancelar</button>
+            <button type="button" class="btn btn-danger" id="btnCancelarReservaFinal">
+              <i class="bi bi-trash"></i> Sí, cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  if (!document.getElementById('modalCancelarReserva')) {
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
   
-  const motivo = prompt('Motivo de la cancelación (opcional):');
-  if (motivo === null) return; // Usuario canceló
+  const modal = new bootstrap.Modal(document.getElementById('modalCancelarReserva'));
+  modal.show();
   
-  try {
-    const res = await fetch('/reserva?accion=cancelar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        reserva_id: reservaId,
-        usuario_id: sesion.id,
-        motivo: motivo || null
-      })
-    });
+  document.getElementById('btnCancelarReservaFinal').onclick = async function() {
+    const motivo = document.getElementById('motivoCancelacion').value.trim();
     
-    const data = await res.json();
-    
-    if (data.success) {
-      alert('✅ ' + data.message);
-      // Recargar ambas vistas
-      document.getElementById('contenedor-mis-reservas').innerHTML = '';
-      document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
-      cargarMisReservas();
-      if (sesion.tipoUsuario === 2) {
-        cargarReservasRecibidas();
+    try {
+      const res = await fetch('/reserva?accion=cancelar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          reserva_id: reservaId,
+          usuario_id: sesion.id,
+          motivo: motivo || null
+        })
+      });
+      
+      const data = await res.json();
+      
+      modal.hide();
+      
+      if (data.success) {
+        mostrarAlerta(data.message, 'success');
+        // Recargar ambas vistas
+        setTimeout(() => {
+          document.getElementById('contenedor-mis-reservas').innerHTML = '';
+          document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
+          cargarMisReservas();
+          if (sesion.tipoUsuario === 2) {
+            cargarReservasRecibidas();
+          }
+        }, 1500);
+      } else {
+        mostrarAlerta(data.message, 'error');
       }
-    } else {
-      alert('❌ ' + data.message);
+      
+    } catch (error) {
+      console.error('Error:', error);
+      modal.hide();
+      mostrarAlerta('Error al cancelar la reserva', 'error');
     }
-    
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error al cancelar la reserva');
+  };
+}
+
+// Función para mostrar alertas con modal (helper)
+function mostrarAlerta(mensaje, tipo = 'info') {
+  if (typeof window.mostrarAlerta === 'function') {
+    window.mostrarAlerta(mensaje, tipo);
+  } else {
+    alert(mensaje);
   }
 }

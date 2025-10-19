@@ -155,19 +155,42 @@ document.addEventListener('DOMContentLoaded', () => {
       const confirmPassword = document.getElementById('confirmPassword').value.trim();
       const rut = document.getElementById('RUT').value.trim();
 
-      // Validaciones
+      // VALIDACIONES MEJORADAS
       if (!tipoUsuario || !nombreCompleto || !correoElectronico || !contrasena || !confirmPassword) {
-        estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ Por favor complete todos los campos obligatorios</div>';
+        if (typeof mostrarAlerta === 'function') {
+          mostrarAlerta('Por favor complete todos los campos obligatorios', 'warning');
+        } else {
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ Por favor complete todos los campos obligatorios</div>';
+        }
+        return;
+      }
+
+      // Validar nombre (solo letras, espacios y acentos, mínimo 3 caracteres)
+      const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,}$/;
+      if (!regexNombre.test(nombreCompleto)) {
+        if (typeof mostrarAlerta === 'function') {
+          mostrarAlerta('El nombre debe contener solo letras y espacios, con un mínimo de 3 caracteres. No se permiten números ni símbolos.', 'warning');
+        } else {
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ El nombre debe contener solo letras y espacios, con un mínimo de 3 caracteres</div>';
+        }
         return;
       }
 
       if (contrasena !== confirmPassword) {
-        estadoRegistro.innerHTML = '<div class="alert alert-danger">⚠️ Las contraseñas no coinciden</div>';
+        if (typeof mostrarAlerta === 'function') {
+          mostrarAlerta('Las contraseñas no coinciden', 'error');
+        } else {
+          estadoRegistro.innerHTML = '<div class="alert alert-danger">⚠️ Las contraseñas no coinciden</div>';
+        }
         return;
       }
 
       if (contrasena.length < 6) {
-        estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe tener al menos 6 caracteres</div>';
+        if (typeof mostrarAlerta === 'function') {
+          mostrarAlerta('La contraseña debe tener al menos 6 caracteres', 'warning');
+        } else {
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe tener al menos 6 caracteres</div>';
+        }
         return;
       }
 
@@ -338,7 +361,7 @@ async function cargarTarjetas() {
     }
 
     publicaciones.forEach(function(pub) {
-      const imagenUrl = pub.imagen || 'imagenes/trabajador.jpg';
+      const imagenUrl = pub.imagen_principal || pub.imagen || 'imagenes/trabajador.jpg';
       
       contenedor2.innerHTML += '<div class="service-card">' +
         '<img src="' + imagenUrl + '" alt="' + pub.titulo + '" width="150" onerror="this.src=\'imagenes/trabajador.jpg\'">' +

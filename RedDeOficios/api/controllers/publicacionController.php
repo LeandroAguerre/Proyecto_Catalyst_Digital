@@ -27,14 +27,11 @@ class PublicacionController {
     public function obtenerPorId() {
         header('Content-Type: application/json; charset=utf-8');
         
-        // Obtener ID desde query params (?id=X)
         $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
         
         if ($id <= 0) {
             http_response_code(400);
-            echo json_encode([
-                'error' => 'ID inválido'
-            ], JSON_UNESCAPED_UNICODE);
+            echo json_encode(['error' => 'ID inválido'], JSON_UNESCAPED_UNICODE);
             return;
         }
         
@@ -47,9 +44,7 @@ class PublicacionController {
                 echo json_encode($data, JSON_UNESCAPED_UNICODE);
             } else {
                 http_response_code(404);
-                echo json_encode([
-                    'error' => 'Publicación no encontrada'
-                ], JSON_UNESCAPED_UNICODE);
+                echo json_encode(['error' => 'Publicación no encontrada'], JSON_UNESCAPED_UNICODE);
             }
             
         } catch (Exception $e) {
@@ -77,10 +72,11 @@ class PublicacionController {
             
             $usuario_creador_id = (int)$_POST['usuario_creador_id'];
             
+            // Validar campos requeridos
             if (!isset($_POST['titulo']) || !isset($_POST['tipo_servicio']) || 
                 !isset($_POST['telefono']) || !isset($_POST['ubicacion']) ||
-                !isset($_POST['descripcion']) || !isset($_POST['fecha_inicio']) || 
-                !isset($_POST['fecha_fin'])) {
+                !isset($_POST['descripcion']) || !isset($_POST['hora_inicio']) || 
+                !isset($_POST['hora_fin']) || !isset($_POST['horas_minimas'])) {
                 
                 http_response_code(400);
                 echo json_encode([
@@ -90,57 +86,98 @@ class PublicacionController {
                 return;
             }
             
-            $titulo = $_POST['titulo'];
+            $titulo = trim($_POST['titulo']);
             $tipo_servicio = $_POST['tipo_servicio'];
-            $telefono = $_POST['telefono'];
+            $telefono = trim($_POST['telefono']);
             $ubicacion = $_POST['ubicacion'];
-            $descripcion = $_POST['descripcion'];
-            $fecha_inicio = $_POST['fecha_inicio'];
-            $fecha_fin = $_POST['fecha_fin'];
+            $descripcion = trim($_POST['descripcion']);
+            $hora_inicio = $_POST['hora_inicio'];
+            $hora_fin = $_POST['hora_fin'];
+            $horas_minimas = (float)$_POST['horas_minimas'];
 
-            $imagen = null;
-            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
-                $nombreArchivo = time() . "_" . basename($_FILES["imagen"]["name"]);
-                $rutaDestino = __DIR__ . "/../../public/imagenes/" . $nombreArchivo;
-                
-                $directorioImagenes = __DIR__ . "/../../public/imagenes/";
-                if (!is_dir($directorioImagenes)) {
-                    mkdir($directorioImagenes, 0755, true);
-                }
-                
-                if (move_uploaded_file($_FILES["imagen"]["tmp_name"], $rutaDestino)) {
-                    $imagen = "imagenes/" . $nombreArchivo;
-                } else {
-                    error_log("Error al mover archivo de imagen");
-                }
+            // Validar que hora_fin > hora_inicio
+            if ($hora_fin <= $hora_inicio) {
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'La hora de fin debe ser posterior a la hora de inicio'
+                ], JSON_UNESCAPED_UNICODE);
+                return;
             }
 
             $publicacion = new Publicacion();
-            $ok = $publicacion->crearPublicacion(
+            $publicacion_id = $publicacion->crearPublicacion(
                 $usuario_creador_id,
                 $titulo, 
                 $tipo_servicio, 
                 $telefono, 
                 $ubicacion, 
                 $descripcion, 
-                $fecha_inicio, 
-                $fecha_fin, 
-                $imagen
+                $hora_inicio, 
+                $hora_fin, 
+                $horas_minimas
             );
             
-            if ($ok) {
-                http_response_code(201);
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Publicación creada con éxito.'
-                ], JSON_UNESCAPED_UNICODE);
-            } else {
+            if (!$publicacion_id) {
                 http_response_code(500);
                 echo json_encode([
                     'success' => false,
                     'message' => 'Error al crear publicación.'
                 ], JSON_UNESCAPED_UNICODE);
+                return;
             }
+
+            // Procesar imágenes
+            $imagenesSubidas = 0;
+            if (isset($_FILES['imagenes']) && is_array($_FILES['imagenes']['name'])) {
+                $totalImagenes = count($_FILES['imagenes']['name']);
+                
+                // Crear directorio si no existe
+                $directorioUploads = __DIR__ . "/../../public/uploads/publicaciones/";
+                if (!is_dir($directorioUploads)) {
+                    mkdir($directorioUploads, 0755, true);
+                }
+                
+                for ($i = 0; $i < min($totalImagenes, 5); $i++) {
+                    if ($_FILES['imagenes']['error'][$i] == 0 && $_FILES['imagenes']['size'][$i] > 0) {
+                        // Validar tipo de archivo
+                        $tipoArchivo = strtolower(pathinfo($_FILES['imagenes']['name'][$i], PATHINFO_EXTENSION));
+                        $tiposPermitidos = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        
+                        if (!in_array($tipoArchivo, $tiposPermitidos)) {
+                            error_log("Tipo de archivo no permitido: " . $tipoArchivo);
+                            continue;
+                        }
+                        
+                        // Validar tamaño (máximo 5MB)
+                        if ($_FILES['imagenes']['size'][$i] > 5 * 1024 * 1024) {
+                            error_log("Archivo muy grande: " . $_FILES['imagenes']['size'][$i]);
+                            continue;
+                        }
+                        
+                        // Generar nombre único
+                        $nombreArchivo = 'pub_' . $publicacion_id . '_img' . ($i + 1) . '_' . time() . '.' . $tipoArchivo;
+                        $rutaDestino = $directorioUploads . $nombreArchivo;
+                        
+                        if (move_uploaded_file($_FILES['imagenes']['tmp_name'][$i], $rutaDestino)) {
+                            $rutaRelativa = "uploads/publicaciones/" . $nombreArchivo;
+                            $esPrincipal = ($i === 0); // La primera es la principal
+                            
+                            $publicacion->agregarImagenPublicacion($publicacion_id, $rutaRelativa, $esPrincipal, $i);
+                            $imagenesSubidas++;
+                        } else {
+                            error_log("Error al mover archivo: " . $_FILES['imagenes']['name'][$i]);
+                        }
+                    }
+                }
+            }
+            
+            http_response_code(201);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Publicación creada con éxito. ' . $imagenesSubidas . ' imagen(es) subida(s).',
+                'publicacion_id' => $publicacion_id
+            ], JSON_UNESCAPED_UNICODE);
             
         } catch (Exception $e) {
             error_log("Error en crearPublicacion: " . $e->getMessage());

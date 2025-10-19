@@ -73,7 +73,8 @@
           </p>
           <p><b>Ubicación:</b> <span id="ubicacion">...</span></p>
           <p><b>Teléfono:</b> <a id="telefono" href="tel:">...</a></p>
-          <p><b>Disponibilidad:</b> <span id="fecha-inicio">...</span> a <span id="fecha-fin">...</span></p>
+          <p><b>Horario de trabajo:</b> <span id="horario-trabajo">...</span></p>
+          <p><b>Horas mínimas:</b> <span id="horas-minimas">...</span></p>
           <p><b>Descripción:</b> <span id="descripcion">...</span></p>
           <p><b>Proveedor:</b> <span id="nombre-proveedor">...</span></p>
           <p><small id="fecha-creacion" class="text-muted">...</small></p>
@@ -83,12 +84,13 @@
         <!-- Datos ocultos para pasar al modal -->
         <input type="hidden" id="proveedor-id" value="">
         <input type="hidden" id="publicacion-id-hidden" value="">
+        <input type="hidden" id="hora-inicio-proveedor" value="">
+        <input type="hidden" id="hora-fin-proveedor" value="">
+        <input type="hidden" id="horas-minimas-proveedor" value="">
 
         <h4><b>Galería de imágenes:</b></h4>
-        <div id="galeria">
-          <img src="https://www.sau.org.uy/wp-content/uploads/SAU_curso_Sanitaria.jpeg" alt="">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvpdU9x7edo0DFa6gzK-ppsjF-wJLp9Nfx-Q&s" alt="">
-          <img src="https://alinsa.com.uy/wp-content/uploads/2022/09/Sanitaria-7.webp" alt="">
+        <div id="galeria" class="row">
+          <!-- Se llenará dinámicamente con las imágenes de la publicación -->
         </div>
 
         <h4><b>Comentarios:</b></h4>

@@ -28,5 +28,8 @@ COPY docker/apache-conf.conf /etc/apache2/sites-available/000-default.conf
 RUN a2ensite 000-default.conf
 
 # Da permisos adecuados a los archivos del proyecto (opcional pero recomendado)
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && mkdir -p /var/www/html/public/uploads/publicaciones \
+    && chown -R www-data:www-data /var/www/html/public/uploads \
+    && chmod -R 755 /var/www/html/public/uploads
 

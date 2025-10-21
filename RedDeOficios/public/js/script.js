@@ -360,6 +360,11 @@ async function cargarTarjetas() {
       return;
     }
 
+    // INTEGRACIÓN CON SISTEMA DE BÚSQUEDA
+    if (typeof window.cargarPublicacionesParaBusqueda === 'function') {
+      window.cargarPublicacionesParaBusqueda(publicaciones);
+    }
+
     publicaciones.forEach(function(pub) {
       const imagenUrl = pub.imagen_principal || pub.imagen || 'imagenes/trabajador.jpg';
       

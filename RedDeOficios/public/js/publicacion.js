@@ -249,15 +249,21 @@ function obtenerSesion() {
 }
 
 // Evento: Al abrir el modal de reserva
-document.getElementById('modalReserva').addEventListener('show.bs.modal', function() {
+document.getElementById('modalReserva').addEventListener('show.bs.modal', function(e) {
   console.log('📅 Abriendo modal de reserva');
   
   // Verificar que el usuario esté logueado
   const sesion = obtenerSesion();
   if (!sesion) {
-    alert('Debes iniciar sesión para hacer una reserva');
-    const modal = bootstrap.Modal.getInstance(this);
-    modal.hide();
+    // Prevenir que el modal se abra
+    e.preventDefault();
+    
+    // Mostrar modal de alerta en lugar de alert
+    if (typeof mostrarAlerta === 'function') {
+      mostrarAlerta('Debes iniciar sesión para hacer una reserva', 'warning', 'Autenticación requerida');
+    } else {
+      alert('Debes iniciar sesión para hacer una reserva');
+    }
     return;
   }
 
@@ -601,3 +607,55 @@ document.getElementById('formReserva').addEventListener('submit', async function
     estadoReserva.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> Error de conexión con el servidor</div>';
   }
 });
+
+// Función helper para mostrar alertas con modal
+function mostrarAlerta(mensaje, tipo = 'info', titulo = null) {
+  // Verificar si existe la función global
+  if (typeof window.mostrarAlerta === 'function') {
+    window.mostrarAlerta(mensaje, tipo, titulo);
+    return;
+  }
+  
+  // Fallback: crear modal temporal si no existe
+  const modalId = 'modalAlertaTemp';
+  let modalEl = document.getElementById(modalId);
+  
+  if (!modalEl) {
+    const modalHtml = `
+      <div class="modal fade" id="${modalId}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header" id="${modalId}Header">
+              <h5 class="modal-title" id="${modalId}Titulo"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p id="${modalId}Mensaje"></p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    modalEl = document.getElementById(modalId);
+  }
+  
+  const configs = {
+    'success': { headerClass: 'bg-success text-white', icono: '✅' },
+    'error': { headerClass: 'bg-danger text-white', icono: '❌' },
+    'warning': { headerClass: 'bg-warning text-dark', icono: '⚠️' },
+    'info': { headerClass: 'bg-info text-white', icono: 'ℹ️' }
+  };
+  
+  const config = configs[tipo] || configs['info'];
+  
+  document.getElementById(modalId + 'Header').className = 'modal-header ' + config.headerClass;
+  document.getElementById(modalId + 'Titulo').textContent = config.icono + ' ' + (titulo || tipo.charAt(0).toUpperCase() + tipo.slice(1));
+  document.getElementById(modalId + 'Mensaje').textContent = mensaje;
+  
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+}

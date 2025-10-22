@@ -21,7 +21,7 @@
 body {
     font-family: 'Roboto', sans-serif;
     display: flex;
-    background: linear-gradient(135deg, #b9b9b9, #ffffff);
+    background: #f8f8f8;
     color: white;
     color: var(--text-color);
     /*border: none;*/
@@ -30,7 +30,7 @@ body {
 .sidebar {
     width: var(--sidebar-width);
     height: 100vh;
-    background-color:#157be0;
+    background-color:#007bff;
     padding: 25px 20px;
     position: fixed;
     top: 0;
@@ -57,7 +57,7 @@ body {
 }
 
 .logo span {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--primary-color);
 }
@@ -149,7 +149,7 @@ body {
     padding-bottom: 8px;
     width: 100%;
     box-sizing: border-box;
-    background-color: #157be0;
+    background-color: #007bff;
     color: white;
 }
 .navigation .nav-btn:hover {
@@ -159,7 +159,7 @@ body {
     padding-bottom: 8px;
     width: 100%;
     box-sizing: border-box;
-    background-color: #869099;
+    background-color: #0070e7;
     color: white;
 }
 
@@ -187,7 +187,7 @@ body {
     padding: 20px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--medium-gray-color);
+    border: 1px solid #cfd0d1;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -334,8 +334,17 @@ body {
     background-color: #0056b3;
 }
 
+select {
+    padding: 10px;
+    border: none;
+    outline: none;
+    background-color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
 .welcome-message {
-    background-color: var(--primary-color);
+    background-color: #0070e7;
     color: white;
     padding: 12px;
     border-radius: var(--border-radius);

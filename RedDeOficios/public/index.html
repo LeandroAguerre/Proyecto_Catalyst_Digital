@@ -16,7 +16,7 @@
   console.log('Script embebido cargado correctamente');
 </script>
 <script src="js/script.js"></script>
-<script src="js/buscar.js"></script>
+<script src="js/buscador-principal.js"></script>
 <!-- MODAL DE ALERTAS PERSONALIZADO -->
 <div class="modal fade" id="modalAlerta" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -167,8 +167,8 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
 
         <nav class="navigation">
             <ul>
-                <li><a href="#" class="btn nav-btn">Servicios</a></li>
-                <li><a href="#" class="btn nav-btn">Destacados</a></li>
+                <li><a href="todas.html" class="btn nav-btn">Servicios</a></li>
+                <!-- <li><a href="#" class="btn nav-btn">Destacados</a></li> -->
                 <li><a href="soporte.html" class="btn nav-btn">Soporte</a></li>
                 <!-- <li><a href="#" class="nav-button">Stripper</a></li> -->
                 <!-- <li><a href="#" class="nav-button">Configuracion</a></li> -->
@@ -187,9 +187,9 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
   </div>
 
  
-  <div class="carousel-inner rounded-3 shadow">
+  <div class="carousel-inner rounded-3">
     <div class="carousel-item active">
-      <img src="imagenes/herrero.png"class="d-block w-100" alt="Banner 1">
+      <img src="imagenes/carpintero.jpg"class="d-block w-100" alt="Banner 1">
     </div>
     <div class="carousel-item">
       <img src="imagenes/dentista.png" class="d-block w-100" alt="Banner 2">
@@ -209,14 +209,14 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
 </div>
 
 <div class="search-bar-unified">
-    <input type="text" class="search-left" placeholder="Tipo de servicio">
+    <input type="text" class="search-left" placeholder="Buscar por nombre, tipo de servicio o descripción">
     <span class="divider">|</span>
     <input type="text" class="search-right" placeholder="Región, Ciudad, Código Postal">
     <button class="search-button"><i class="bi bi-search"></i></button>
 </div>
 </div>
 
-        <h1>Servicios mejores valorados</h1>
+        <h1>Últimos servicios publicados</h1>
         <div class="services-grid" id="grid-servicios">
             <!-- <div class="service-card" data-keywords="juan perez fontaneria plomeria">
                 <img src="imagenes/trabajador.jpg" alt="Trabajador">
@@ -284,7 +284,97 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
             </div>
             <div id="tarjetas"></div> -->
         </div>
+        <!-- FOOTER -->
+<footer id="footer-principal" class="footer mt-5 py-4" style="border-top: 1px solid #dee2e6;">
+  <div class="container">
+    <div class="row">
+      
+      <!-- Columna 1: Sobre RedDeOficios -->
+      <div class="col-md-4 mb-4">
+        <h5 class="text-primary"><span class="azul">RedDe</span><span class="naranja">Oficios</span></h5>
+        <p class="text-muted">
+          Conectando clientes con los mejores profesionales de Uruguay. 
+          Tu solución para encontrar servicios de calidad cerca de ti.
+        </p>
+        <div class="social-icons mt-3">
+          <a href="#" class="text-decoration-none me-3" title="Facebook">
+            <i class="bi bi-facebook" style="font-size: 1.5rem;"></i>
+          </a>
+          <a href="#" class="text-decoration-none me-3" title="Instagram">
+            <i class="bi bi-instagram" style="font-size: 1.5rem;"></i>
+          </a>
+          <a href="#" class="text-decoration-none me-3" title="Twitter">
+            <i class="bi bi-twitter" style="font-size: 1.5rem;"></i>
+          </a>
+          <a href="#" class="text-decoration-none" title="LinkedIn">
+            <i class="bi bi-linkedin" style="font-size: 1.5rem;"></i>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Columna 2: Mapa del Sitio -->
+      <div class="col-md-4 mb-4">
+        <h5>Mapa del Sitio</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="index.html" class="text-decoration-none text-muted">Inicio</a></li>
+          <li class="mb-2"><a href="todas.html" class="text-decoration-none text-muted">Todos los Servicios</a></li>
+          <li class="mb-2"><a href="reservas.html" class="text-decoration-none text-muted">Mis Reservas</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Destacados</a></li>
+          <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Soporte</a></li>
+        </ul>
+      </div>
+      
+      <!-- Columna 3: Contacto -->
+      <div class="col-md-4 mb-4">
+        <h5>Contacto</h5>
+        <ul class="list-unstyled text-muted">
+          <li class="mb-2"><i class="bi bi-envelope"></i> info@reddeoficios.uy</li>
+          <li class="mb-2"><i class="bi bi-telephone"></i> 0800 10 10</li>
+          <li class="mb-2"><i class="bi bi-geo-alt"></i> Montevideo, Uruguay</li>
+        </ul>
         
+        
+      </div>
+      
+    </div>
+    
+    <!-- Copyright -->
+    <hr>
+    <div class="row">
+      <div class="col-12 text-center text-muted">
+        <small>
+          &copy; 2025 RedDeOficios. Todos los derechos reservados. | 
+          <a href="#" class="text-decoration-none text-muted">Términos y Condiciones</a> | 
+          <a href="#" class="text-decoration-none text-muted">Política de Privacidad</a>
+        </small>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- CSS para el footer -->
+<style>
+.footer {
+  min-height: 300px;
+}
+
+.footer a:hover {
+  color: var(--bs-primary) !important;
+}
+
+.social-icons a {
+  transition: transform 0.2s;
+}
+
+.social-icons a:hover {
+  transform: scale(1.2);
+}
+
+/* Asegurar que el main tenga altura mínima */
+.content {
+  min-height: calc(100vh - 300px);
+}
+</style>
 
     </main>
 

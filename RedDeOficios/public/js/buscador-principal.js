@@ -1,8 +1,10 @@
-console.log('buscar.js cargado');
+console.log('buscador-principal.js cargado');
 
 // Variables globales
 let todasLasPublicaciones = [];
 let publicacionesFiltradas = [];
+let paginaActual = 1;
+const publicacionesPorPagina = 9;
 
 // Inicializar sistema de búsqueda
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  console.log('✅ Sistema de búsqueda inicializado');
+  console.log('✅ Sistema de búsqueda con paginación inicializado');
   
   // Convertir input derecho en select (departamentos)
   const selectDepartamento = document.createElement('select');
@@ -45,9 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   inputBusquedaDer.parentNode.replaceChild(selectDepartamento, inputBusquedaDer);
   
-  // Actualizar placeholder del input izquierdo
-  inputBusquedaIzq.placeholder = 'Buscar por servicio, nombre o descripción...';
-  
   // Event listeners
   btnBuscar.addEventListener('click', realizarBusqueda);
   
@@ -67,14 +66,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Cargar todas las publicaciones (llamar desde script.js)
+// Cargar publicaciones (desde script.js)
 function cargarPublicacionesParaBusqueda(publicaciones) {
-  todasLasPublicaciones = publicaciones;
-  publicacionesFiltradas = publicaciones;
-  console.log('📦 Publicaciones cargadas para búsqueda:', publicaciones.length);
+  // Ordenar por ID descendente (más recientes primero)
+  todasLasPublicaciones = publicaciones.sort((a, b) => b.id - a.id);
+  publicacionesFiltradas = todasLasPublicaciones;
+  paginaActual = 1;
   
-  // Inicializar mostrando todas las publicaciones
-  mostrarPublicacionesFiltradas();
+  console.log('📦 Publicaciones cargadas para búsqueda paginada:', publicaciones.length);
+  
+  mostrarPublicacionesPaginadas();
 }
 
 // Realizar búsqueda
@@ -82,25 +83,18 @@ function realizarBusqueda() {
   const inputBusqueda = document.querySelector('.search-left');
   const selectDepartamento = document.querySelector('.search-right');
   
-  if (!inputBusqueda || !selectDepartamento) {
-    console.error('❌ Elementos de búsqueda no encontrados');
-    return;
-  }
+  if (!inputBusqueda || !selectDepartamento) return;
   
   const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
   const departamentoSeleccionado = selectDepartamento.value.trim();
   
-  console.log('🔍 Buscando:', { 
-    texto: textoBusqueda, 
-    departamento: departamentoSeleccionado,
-    totalPublicaciones: todasLasPublicaciones.length 
-  });
+  console.log('🔍 Buscando:', { texto: textoBusqueda, departamento: departamentoSeleccionado });
   
   // Si no hay filtros, mostrar todo
   if (!textoBusqueda && !departamentoSeleccionado) {
-    console.log('ℹ️ Sin filtros, mostrando todas las publicaciones');
     publicacionesFiltradas = todasLasPublicaciones;
-    mostrarPublicacionesFiltradas();
+    paginaActual = 1;
+    mostrarPublicacionesPaginadas();
     return;
   }
   
@@ -109,37 +103,23 @@ function realizarBusqueda() {
     let coincideTexto = true;
     let coincideDepartamento = true;
     
-    // Filtro por texto (busca en título, tipo_servicio, descripción)
     if (textoBusqueda) {
       const titulo = (pub.titulo || '').toLowerCase();
       const tipoServicio = (pub.tipo_servicio || '').toLowerCase();
       const descripcion = (pub.descripcion || '').toLowerCase();
       
-      // Buscar la frase completa o palabras individuales
       const terminosBusqueda = textoBusqueda.split(/\s+/).filter(t => t.length > 0);
       
-      // Verificar si TODOS los términos están presentes en alguno de los campos
       coincideTexto = terminosBusqueda.every(function(termino) {
         return titulo.includes(termino) || 
                tipoServicio.includes(termino) || 
                descripcion.includes(termino);
       });
-      
-      console.log('🔎 Verificando:', pub.titulo, '- Coincide:', coincideTexto);
     }
     
-    // Filtro por departamento
     if (departamentoSeleccionado) {
       const ubicacionPub = (pub.ubicacion || '').trim();
-      const deptoSeleccionado = departamentoSeleccionado.trim();
-      
-      coincideDepartamento = ubicacionPub === deptoSeleccionado;
-      
-      console.log('📍 Verificando ubicación:', {
-        publicacion: ubicacionPub,
-        buscado: deptoSeleccionado,
-        coincide: coincideDepartamento
-      });
+      coincideDepartamento = ubicacionPub === departamentoSeleccionado;
     }
     
     return coincideTexto && coincideDepartamento;
@@ -147,12 +127,12 @@ function realizarBusqueda() {
   
   console.log('✅ Resultados encontrados:', publicacionesFiltradas.length);
   
-  // Mostrar resultados
-  mostrarPublicacionesFiltradas();
+  paginaActual = 1; // Reiniciar a la primera página
+  mostrarPublicacionesPaginadas();
 }
 
-// Mostrar publicaciones filtradas
-function mostrarPublicacionesFiltradas() {
+// Mostrar publicaciones paginadas
+function mostrarPublicacionesPaginadas() {
   const contenedor = document.getElementById('grid-servicios');
   
   if (!contenedor) {
@@ -160,10 +140,16 @@ function mostrarPublicacionesFiltradas() {
     return;
   }
   
-  console.log('📊 Mostrando publicaciones:', publicacionesFiltradas.length);
-  
-  // Limpiar contenedor
   contenedor.innerHTML = '';
+  
+  // Calcular índices
+  const totalPaginas = Math.ceil(publicacionesFiltradas.length / publicacionesPorPagina);
+  const inicio = (paginaActual - 1) * publicacionesPorPagina;
+  const fin = inicio + publicacionesPorPagina;
+  const publicacionesPagina = publicacionesFiltradas.slice(inicio, fin);
+  
+  console.log('📄 Página actual:', paginaActual, 'de', totalPaginas);
+  console.log('📊 Mostrando publicaciones:', inicio, '-', fin, 'de', publicacionesFiltradas.length);
   
   // Verificar si hay filtros activos
   const inputBusqueda = document.querySelector('.search-left');
@@ -182,17 +168,17 @@ function mostrarPublicacionesFiltradas() {
         </div>
       </div>
     `;
-    mostrarContadorResultados();
+    renderizarPaginacion();
     return;
   }
   
-  if (publicacionesFiltradas.length === 0 && !hayFiltros) {
+  if (publicacionesPagina.length === 0) {
     contenedor.innerHTML = '<p class="text-center">No hay publicaciones disponibles</p>';
     return;
   }
   
-  // Mostrar publicaciones filtradas
-  publicacionesFiltradas.forEach(function(pub) {
+  // Mostrar publicaciones de la página actual
+  publicacionesPagina.forEach(function(pub) {
     const imagenUrl = pub.imagen_principal || pub.imagen || 'imagenes/trabajador.jpg';
     
     const card = document.createElement('div');
@@ -207,82 +193,131 @@ function mostrarPublicacionesFiltradas() {
     contenedor.appendChild(card);
   });
   
-  // Mostrar contador de resultados
-  mostrarContadorResultados();
+  // Renderizar paginación
+  renderizarPaginacion();
 }
 
-// Mostrar contador de resultados
-function mostrarContadorResultados() {
-  let contadorEl = document.getElementById('contador-resultados');
+// Renderizar controles de paginación
+function renderizarPaginacion() {
+  let paginacionEl = document.getElementById('paginacion');
   
-  if (!contadorEl) {
-    const tituloServicios = document.querySelector('h1');
-    if (tituloServicios) {
-      contadorEl = document.createElement('div');
-      contadorEl.id = 'contador-resultados';
-      contadorEl.className = 'mb-3';
-      tituloServicios.parentNode.insertBefore(contadorEl, tituloServicios.nextSibling);
+  if (!paginacionEl) {
+    const contenedor = document.getElementById('grid-servicios');
+    if (contenedor && contenedor.parentElement) {
+      paginacionEl = document.createElement('nav');
+      paginacionEl.id = 'paginacion';
+      paginacionEl.className = 'mt-4 mb-4';
+      paginacionEl.setAttribute('aria-label', 'Navegación de páginas');
+      contenedor.parentElement.insertBefore(paginacionEl, contenedor.nextSibling);
     }
   }
   
-  if (contadorEl) {
-    const inputBusqueda = document.querySelector('.search-left');
-    const selectDepartamento = document.querySelector('.search-right');
-    const hayFiltros = (inputBusqueda && inputBusqueda.value.trim()) || 
-                       (selectDepartamento && selectDepartamento.value.trim());
-    
-    if (hayFiltros) {
-      const textoBusqueda = inputBusqueda ? inputBusqueda.value.trim() : '';
-      const departamento = selectDepartamento ? selectDepartamento.value.trim() : '';
-      
-      let criterios = [];
-      if (textoBusqueda) criterios.push(`"${textoBusqueda}"`);
-      if (departamento) criterios.push(departamento);
-      
-      contadorEl.innerHTML = `
-        <div class="alert alert-success d-flex justify-content-between align-items-center">
-          <div>
-            <i class="bi bi-funnel-fill"></i> 
-            <strong>${publicacionesFiltradas.length}</strong> resultado(s) de <strong>${todasLasPublicaciones.length}</strong> 
-            con: ${criterios.join(' + ')}
-          </div>
-          <button class="btn btn-sm btn-outline-success" onclick="limpiarBusqueda()">
-            <i class="bi bi-x-circle"></i> Limpiar filtros
-          </button>
-        </div>
-      `;
-    } else {
-      contadorEl.innerHTML = '';
+  if (!paginacionEl) return;
+  
+  const totalPaginas = Math.ceil(publicacionesFiltradas.length / publicacionesPorPagina);
+  
+  // Si solo hay una página o menos, no mostrar paginación
+  if (totalPaginas <= 1) {
+    paginacionEl.innerHTML = '';
+    return;
+  }
+  
+  let html = '<ul class="pagination justify-content-center">';
+  
+  // Botón Anterior
+  html += `
+    <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1}); return false;">
+        <i class="bi bi-chevron-left"></i> Anterior
+      </a>
+    </li>
+  `;
+  
+  // Números de página
+  const maxPaginasVisibles = 5;
+  let inicioPaginas = Math.max(1, paginaActual - Math.floor(maxPaginasVisibles / 2));
+  let finPaginas = Math.min(totalPaginas, inicioPaginas + maxPaginasVisibles - 1);
+  
+  if (finPaginas - inicioPaginas < maxPaginasVisibles - 1) {
+    inicioPaginas = Math.max(1, finPaginas - maxPaginasVisibles + 1);
+  }
+  
+  // Primera página
+  if (inicioPaginas > 1) {
+    html += `
+      <li class="page-item">
+        <a class="page-link" href="#" onclick="cambiarPagina(1); return false;">1</a>
+      </li>
+    `;
+    if (inicioPaginas > 2) {
+      html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
     }
+  }
+  
+  // Páginas intermedias
+  for (let i = inicioPaginas; i <= finPaginas; i++) {
+    html += `
+      <li class="page-item ${i === paginaActual ? 'active' : ''}">
+        <a class="page-link" href="#" onclick="cambiarPagina(${i}); return false;">${i}</a>
+      </li>
+    `;
+  }
+  
+  // Última página
+  if (finPaginas < totalPaginas) {
+    if (finPaginas < totalPaginas - 1) {
+      html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+    }
+    html += `
+      <li class="page-item">
+        <a class="page-link" href="#" onclick="cambiarPagina(${totalPaginas}); return false;">${totalPaginas}</a>
+      </li>
+    `;
+  }
+  
+  // Botón Siguiente
+  html += `
+    <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+      <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1}); return false;">
+        Siguiente <i class="bi bi-chevron-right"></i>
+      </a>
+    </li>
+  `;
+  
+  html += '</ul>';
+  paginacionEl.innerHTML = html;
+}
+
+// Cambiar de página
+function cambiarPagina(nuevaPagina) {
+  const totalPaginas = Math.ceil(publicacionesFiltradas.length / publicacionesPorPagina);
+  
+  if (nuevaPagina < 1 || nuevaPagina > totalPaginas) return;
+  
+  paginaActual = nuevaPagina;
+  mostrarPublicacionesPaginadas();
+  
+  // Scroll suave al inicio de las publicaciones
+  const contenedor = document.getElementById('grid-servicios');
+  if (contenedor) {
+    contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
 // Limpiar búsqueda
 function limpiarBusqueda() {
-  console.log('🧹 Limpiando búsqueda...');
-  
   const inputBusqueda = document.querySelector('.search-left');
   const selectDepartamento = document.querySelector('.search-right');
   
-  if (inputBusqueda) {
-    inputBusqueda.value = '';
-    console.log('✅ Input de búsqueda limpiado');
-  }
+  if (inputBusqueda) inputBusqueda.value = '';
+  if (selectDepartamento) selectDepartamento.value = '';
   
-  if (selectDepartamento) {
-    selectDepartamento.value = '';
-    console.log('✅ Select de departamento limpiado');
-  }
-  
-  // Restaurar todas las publicaciones
   publicacionesFiltradas = todasLasPublicaciones;
-  console.log('✅ Mostrando todas las publicaciones:', publicacionesFiltradas.length);
-  
-  // Mostrar todas las publicaciones
-  mostrarPublicacionesFiltradas();
+  paginaActual = 1;
+  mostrarPublicacionesPaginadas();
 }
 
 // Exponer funciones globalmente
 window.cargarPublicacionesParaBusqueda = cargarPublicacionesParaBusqueda;
+window.cambiarPagina = cambiarPagina;
 window.limpiarBusqueda = limpiarBusqueda;
-window.realizarBusqueda = realizarBusqueda;

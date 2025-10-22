@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const nav = document.querySelector('.navigation ul');
       if (nav) {
         const li = document.createElement('li');
-        li.innerHTML = '<a href="reservas.html" id="btnReservas" class="btn nav-btn"><i class="bi bi-calendar-check"></i> Reservas</a>';
+        li.innerHTML = '<a href="reservas.html" id="btnReservas" class="btn nav-btn">Reservas</a>';
         nav.appendChild(li);
         btnReservas = document.getElementById('btnReservas');
       }
@@ -363,8 +363,12 @@ async function cargarTarjetas() {
     // INTEGRACIÓN CON SISTEMA DE BÚSQUEDA
     if (typeof window.cargarPublicacionesParaBusqueda === 'function') {
       window.cargarPublicacionesParaBusqueda(publicaciones);
+      console.log('✅ Publicaciones enviadas al sistema de búsqueda');
+      // NO renderizar aquí, el buscador lo hará
+      return;
     }
 
+    // Solo si NO hay sistema de búsqueda, renderizar directamente
     publicaciones.forEach(function(pub) {
       const imagenUrl = pub.imagen_principal || pub.imagen || 'imagenes/trabajador.jpg';
       

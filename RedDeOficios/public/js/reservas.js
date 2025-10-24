@@ -200,8 +200,16 @@ function mostrarReservas(reservas, contenedor, tipo) {
     
     html += '</div>';
     
-    // Botones de acción
+    // 🆕 BOTONES DE ACCIÓN (INCLUYENDO CONTACTAR)
     html += '<div class="card-footer">';
+    
+    // 🆕 BOTÓN CONTACTAR (siempre visible para coordinar detalles)
+    const otroUsuarioId = tipo === 'cliente' ? reserva.proveedor_id : reserva.cliente_id;
+    const otroUsuarioNombre = tipo === 'cliente' ? reserva.proveedor_nombre : reserva.cliente_nombre;
+    
+    html += '<button class="btn btn-info btn-sm w-100 mb-2" onclick="contactarUsuario(' + reserva.publicacion_id + ', ' + otroUsuarioId + ', \'' + otroUsuarioNombre + '\', \'' + (reserva.publicacion_titulo || 'Servicio') + '\')">';
+    html += '<i class="bi bi-chat-dots"></i> Contactar por Mensaje';
+    html += '</button>';
     
     if (tipo === 'proveedor' && reserva.estado === 'pendiente') {
       // Botones para proveedor: Confirmar y Rechazar
@@ -229,6 +237,27 @@ function mostrarReservas(reservas, contenedor, tipo) {
   
   html += '</div>';
   contenedor.innerHTML = html;
+}
+
+// 🆕 FUNCIÓN PARA CONTACTAR AL USUARIO
+function contactarUsuario(publicacionId, otroUsuarioId, otroUsuarioNombre, publicacionTitulo) {
+  console.log('💬 Abriendo conversación con:', {
+    publicacionId,
+    otroUsuarioId,
+    otroUsuarioNombre,
+    publicacionTitulo
+  });
+  
+  // Guardar datos en sessionStorage para mensajes.html
+  sessionStorage.setItem('abrirConversacion', JSON.stringify({
+    publicacionId: publicacionId,
+    otroUsuarioId: otroUsuarioId,
+    otroUsuarioNombre: otroUsuarioNombre,
+    publicacionTitulo: publicacionTitulo
+  }));
+  
+  // Redirigir a mensajes
+  window.location.href = 'mensajes.html';
 }
 
 // Confirmar reserva (proveedor acepta)

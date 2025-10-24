@@ -177,11 +177,13 @@ function rellenarDatos(pub) {
   // Verificar si el usuario logueado es el dueño de la publicación
   const sesionActual = obtenerSesion();
   const btnReservar = document.getElementById('btnReservar');
+  const contenedorContactar = document.getElementById('contenedorContactar');
   
   if (sesionActual && btnReservar) {
     if (sesionActual.id === pub.usuario_creador_id) {
       // Es el dueño, ocultar botón y mostrar mensaje
       btnReservar.style.display = 'none';
+      if (contenedorContactar) contenedorContactar.style.display = 'none';
       
       const mensajePropio = document.createElement('div');
       mensajePropio.className = 'alert alert-info mt-3';
@@ -189,10 +191,32 @@ function rellenarDatos(pub) {
       btnReservar.parentElement.appendChild(mensajePropio);
     } else {
       btnReservar.style.display = 'inline-block';
+      
     }
   }
 
+  // 🆕 Configurar botón de contactar
+  configurarBotonContactar(pub.usuario_creador_id, pub.id);
+
   console.log('✅ Datos rellenados en el HTML');
+}
+
+// 🆕 NUEVA FUNCIÓN: Configurar botón de contactar
+function configurarBotonContactar(proveedorId, publicacionId) {
+  const btnContactar = document.getElementById('btnContactar');
+  
+  if (btnContactar) {
+    btnContactar.addEventListener('click', function() {
+      // Guardar datos en sessionStorage para que mensajes.html los use
+      sessionStorage.setItem('abrirConversacion', JSON.stringify({
+        proveedorId: proveedorId,
+        publicacionId: publicacionId
+      }));
+      
+      // Redirigir a mensajes.html
+      window.location.href = 'mensajes.html';
+    });
+  }
 }
 
 // Función auxiliar para obtener sesión
@@ -234,19 +258,6 @@ let anioActual = new Date().getFullYear();
 let fechasOcupadasProveedor = [];
 let fechaInicioSeleccionada = null;
 let fechaFinSeleccionada = null;
-
-// Función para obtener sesión actual
-function obtenerSesion() {
-  const usuarioId = sessionStorage.getItem('usuarioId');
-  if (!usuarioId) return null;
-  
-  return {
-    id: parseInt(usuarioId),
-    tipoUsuario: parseInt(sessionStorage.getItem('tipoUsuario')),
-    nombreCompleto: sessionStorage.getItem('nombreCompleto'),
-    correoElectronico: sessionStorage.getItem('correoElectronico')
-  };
-}
 
 // Evento: Al abrir el modal de reserva
 document.getElementById('modalReserva').addEventListener('show.bs.modal', function(e) {
@@ -502,7 +513,7 @@ function formatearFecha(fecha) {
   return año + '-' + mes + '-' + dia;
 }
 
-// Evento: Enviar formulario de reserva
+// 🆕 Evento: Enviar formulario de reserva (MODIFICADO)
 document.getElementById('formReserva').addEventListener('submit', async function(e) {
   e.preventDefault();
   console.log('📤 Enviando solicitud de reserva');
@@ -593,9 +604,15 @@ document.getElementById('formReserva').addEventListener('submit', async function
       fechaFinSeleccionada = null;
       document.getElementById('infoSeleccion').style.display = 'none';
       
-      // Recargar calendario
+      // Recargar calendario y cerrar modal
       setTimeout(function() {
         cargarCalendarioReservas();
+        
+        // Cerrar modal después de 2 segundos
+        setTimeout(function() {
+          const modalReserva = bootstrap.Modal.getInstance(document.getElementById('modalReserva'));
+          if (modalReserva) modalReserva.hide();
+        }, 2000);
       }, 1000);
 
     } else {

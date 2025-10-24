@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Hacer disponible globalmente para mensajes.js
+  window.obtenerSesion = obtenerSesion;
+
   // Función para actualizar visibilidad del botón Publicar
   function actualizarBotonPublicar(tipoUsuario) {
     let btnPublicar = document.getElementById('btnPublicar');
@@ -79,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const nav = document.querySelector('.navigation ul');
       if (nav) {
         const li = document.createElement('li');
-        li.innerHTML = '<a href="reservas.html" id="btnReservas" class="btn nav-btn">Reservas</a>';
+        li.innerHTML = '<a href="reservas.html" id="btnReservas" class="btn nav-btn"><i class="bi bi-calendar-check"></i> Reservas</a>';
         nav.appendChild(li);
         btnReservas = document.getElementById('btnReservas');
       }
@@ -97,6 +100,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Función para actualizar visibilidad del botón Mensajes
+  function actualizarBotonMensajes(estaLogueado) {
+    let btnMensajes = document.getElementById('btnMensajes');
+    
+    // Si no existe, crearlo
+    if (!btnMensajes) {
+      const nav = document.querySelector('.navigation ul');
+      if (nav) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <a href="mensajes.html" id="btnMensajes" class="btn nav-btn position-relative">
+            <i class="bi bi-chat-dots"></i> Mensajes
+            <span id="mensajesNoLeidos" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+              0
+            </span>
+          </a>
+        `;
+        nav.appendChild(li);
+        btnMensajes = document.getElementById('btnMensajes');
+      }
+    }
+    
+    // Mostrar u ocultar según si está logueado
+    if (btnMensajes) {
+      if (estaLogueado) {
+        btnMensajes.parentElement.style.display = 'list-item';
+        console.log('✅ Botón Mensajes visible (usuario logueado)');
+        
+        // Iniciar actualización del badge
+        actualizarBadgeMensajesNoLeidos();
+        
+        // Actualizar cada 10 segundos
+        if (!window.intervaloBadgeMensajes) {
+          window.intervaloBadgeMensajes = setInterval(actualizarBadgeMensajesNoLeidos, 10000);
+        }
+      } else {
+        btnMensajes.parentElement.style.display = 'none';
+        console.log('🚫 Botón Mensajes oculto (usuario no logueado)');
+        
+        // Detener actualización del badge
+        if (window.intervaloBadgeMensajes) {
+          clearInterval(window.intervaloBadgeMensajes);
+          window.intervaloBadgeMensajes = null;
+        }
+      }
+    }
+  }
+
+  // Función para actualizar el badge de mensajes no leídos
+  async function actualizarBadgeMensajesNoLeidos() {
+    const sesion = obtenerSesion();
+    if (!sesion) return;
+    
+    try {
+      const response = await fetch(`/mensaje?no_leidos=true&usuario_id=${sesion.id}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!response.ok) return;
+      
+      const data = await response.json();
+      const badge = document.getElementById('mensajesNoLeidos');
+      
+      if (badge) {
+        if (data.total > 0) {
+          badge.textContent = data.total;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    } catch (error) {
+      console.error('Error al actualizar badge de mensajes:', error);
+    }
+  }
+
   // Función para mostrar usuario logueado
   function mostrarUsuarioLogueado(usuario) {
     console.log('👤 Mostrando usuario logueado:', usuario);
@@ -109,6 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Mostrar botón "Reservas" para todos los usuarios logueados
     actualizarBotonReservas(true);
+    
+    // Mostrar botón "Mensajes" para todos los usuarios logueados
+    actualizarBotonMensajes(true);
   }
 
   // Función para mostrar estado de no logueado
@@ -127,6 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Ocultar botón reservas
     actualizarBotonReservas(false);
+    
+    // Ocultar botón mensajes
+    actualizarBotonMensajes(false);
   }
 
   // Evento: Botón Salir

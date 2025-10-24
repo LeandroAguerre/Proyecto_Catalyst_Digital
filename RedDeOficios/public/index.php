@@ -189,6 +189,66 @@ try {
             }
             break;
 
+        case '/mensaje':
+        case '/public/mensaje':
+            $controllerPath = __DIR__ . "/../api/controllers/mensajeController.php";
+            
+            if (!file_exists($controllerPath)) {
+                error_log("ERROR: No se encuentra mensajeController.php");
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(500);
+                echo json_encode(['error' => 'Archivo mensajeController no encontrado']);
+                exit;
+            }
+            
+            require_once($controllerPath);
+            
+            if (!class_exists('MensajeController')) {
+                error_log("ERROR: La clase MensajeController no existe");
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(500);
+                echo json_encode(['error' => 'Clase MensajeController no encontrada']);
+                exit;
+            }
+            
+            $controller = new MensajeController();
+            
+            if ($method === 'GET') {
+                if (isset($_GET['conversaciones'])) {
+                    $controller->obtenerConversaciones();
+                } elseif (isset($_GET['mensajes'])) {
+                    $controller->obtenerMensajes();
+                } elseif (isset($_GET['no_leidos'])) {
+                    $controller->contarNoLeidos();
+                } else {
+                    header('Content-Type: application/json; charset=utf-8');
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Acción no especificada']);
+                }
+            } elseif ($method === 'POST') {
+                if (isset($_GET['accion'])) {
+                    switch ($_GET['accion']) {
+                        case 'enviar':
+                            $controller->enviarMensaje();
+                            break;
+                        case 'eliminar':
+                            $controller->eliminarConversacion();
+                            break;
+                        default:
+                            header('Content-Type: application/json; charset=utf-8');
+                            http_response_code(400);
+                            echo json_encode(['error' => 'Acción desconocida']);
+                    }
+                } else {
+                    $controller->enviarMensaje();
+                }
+            } else {
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(405);
+                echo json_encode(['error' => 'Método no permitido']);
+            }
+            break;
+
         default:
             header('Content-Type: application/json; charset=utf-8');
             http_response_code(404);

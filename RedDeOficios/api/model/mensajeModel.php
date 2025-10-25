@@ -120,14 +120,15 @@ class MensajeModel {
     // Marcar mensajes como leídos
     public function marcarComoLeido($usuario_id, $otro_usuario_id, $publicacion_id) {
         try {
+            // Marca como leídos todos los mensajes que el usuario actual ha recibido del otro usuario.
             $sql = "UPDATE mensaje 
                     SET leido = TRUE, fecha_lectura = NOW()
                     WHERE receptor_id = ? 
                       AND emisor_id = ?
-                      AND publicacion_id = ?
                       AND leido = FALSE";
             $stmt = $this->conn->prepare($sql);
-            return $stmt->execute([$usuario_id, $otro_usuario_id, $publicacion_id]);
+            // El publicacion_id se ignora en esta lógica para robustez, pero se mantiene en la firma por compatibilidad.
+            return $stmt->execute([$usuario_id, $otro_usuario_id]);
         } catch (PDOException $e) {
             error_log("Error al marcar como leído: " . $e->getMessage());
             return false;

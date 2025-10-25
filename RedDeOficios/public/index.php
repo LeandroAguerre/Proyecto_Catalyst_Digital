@@ -61,6 +61,8 @@ try {
                 }
             } elseif ($method === 'POST') {
                 $controller->crearPublicacion();
+            } elseif ($method === 'DELETE') {
+                $controller->eliminarPublicacion();
             } else {
                 header('Content-Type: application/json; charset=utf-8');
                 http_response_code(405);

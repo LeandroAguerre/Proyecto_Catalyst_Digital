@@ -1,25 +1,27 @@
-console.log('buscar.js cargado');
+console.log('buscar.js (v2.1) cargado');
 
-// Variables globales
-let todasLasPublicaciones = [];
-let publicacionesFiltradas = [];
-
-// Inicializar sistema de búsqueda
 document.addEventListener('DOMContentLoaded', function() {
-  const inputBusquedaIzq = document.querySelector('.search-left');
-  const inputBusquedaDer = document.querySelector('.search-right');
-  const btnBuscar = document.querySelector('.search-button');
-  
-  if (!inputBusquedaIzq || !inputBusquedaDer || !btnBuscar) {
-    console.log('⚠️ Elementos de búsqueda no encontrados en esta página');
+  // --- ELEMENTOS DEL DOM ---
+  const btnBuscar = document.getElementById('search-button');
+  const btnLimpiar = document.getElementById('clear-filters-button');
+  const gridServicios = document.getElementById('grid-servicios');
+
+  const inputTexto = document.getElementById('search-text');
+  const inputUbicacionOriginal = document.getElementById('search-location');
+  const selectTipoServicio = document.getElementById('filter-tipo-servicio');
+  const inputHoraInicio = document.getElementById('filter-hora-inicio');
+  const inputHoraFin = document.getElementById('filter-hora-fin');
+
+  // --- INICIALIZACIÓN ---
+  if (!btnBuscar) {
+    console.log('⚠️ No es la página de búsqueda, no se inicializa el script.');
     return;
   }
-  
-  console.log('✅ Sistema de búsqueda inicializado');
-  
-  // Convertir input derecho en select (departamentos)
+
+  // 1. Convertir input de ubicación en select de departamentos
   const selectDepartamento = document.createElement('select');
-  selectDepartamento.className = inputBusquedaDer.className;
+  selectDepartamento.className = inputUbicacionOriginal.className;
+  selectDepartamento.id = 'search-location'; // Mantener el ID
   selectDepartamento.innerHTML = `
     <option value="">Todos los departamentos</option>
     <option value="Artigas">Artigas</option>
@@ -42,247 +44,113 @@ document.addEventListener('DOMContentLoaded', function() {
     <option value="Tacuarembó">Tacuarembó</option>
     <option value="Treinta y Tres">Treinta y Tres</option>
   `;
+  inputUbicacionOriginal.parentNode.replaceChild(selectDepartamento, inputUbicacionOriginal);
   
-  inputBusquedaDer.parentNode.replaceChild(selectDepartamento, inputBusquedaDer);
-  
-  // Actualizar placeholder del input izquierdo
-  inputBusquedaIzq.placeholder = 'Buscar por servicio, nombre o descripción...';
-  
-  // Event listeners
+  const inputUbicacion = document.getElementById('search-location');
+
+  // 2. Mostrar mensaje inicial
+  mostrarMensajeInicial();
+
+  // --- EVENT LISTENERS ---
   btnBuscar.addEventListener('click', realizarBusqueda);
+  btnLimpiar.addEventListener('click', limpiarBusqueda);
   
-  inputBusquedaIzq.addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') {
-      realizarBusqueda();
-    }
-  });
+  inputTexto.addEventListener('keyup', e => e.key === 'Enter' && realizarBusqueda());
   
-  selectDepartamento.addEventListener('change', realizarBusqueda);
-  
-  // Buscar mientras escribe (debounce)
-  let timeoutBusqueda;
-  inputBusquedaIzq.addEventListener('input', function() {
-    clearTimeout(timeoutBusqueda);
-    timeoutBusqueda = setTimeout(realizarBusqueda, 500);
-  });
-});
+  console.log('✅ Sistema de búsqueda (v2.1) inicializado con dropdown.');
 
-// Cargar todas las publicaciones (llamar desde script.js)
-function cargarPublicacionesParaBusqueda(publicaciones) {
-  todasLasPublicaciones = publicaciones;
-  publicacionesFiltradas = publicaciones;
-  console.log('📦 Publicaciones cargadas para búsqueda:', publicaciones.length);
-  
-  // Inicializar mostrando todas las publicaciones
-  mostrarPublicacionesFiltradas();
-}
+  // --- FUNCIONES PRINCIPALES ---
 
-// Realizar búsqueda
-function realizarBusqueda() {
-  const inputBusqueda = document.querySelector('.search-left');
-  const selectDepartamento = document.querySelector('.search-right');
-  
-  if (!inputBusqueda || !selectDepartamento) {
-    console.error('❌ Elementos de búsqueda no encontrados');
-    return;
-  }
-  
-  const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
-  const departamentoSeleccionado = selectDepartamento.value.trim();
-  
-  console.log('🔍 Buscando:', { 
-    texto: textoBusqueda, 
-    departamento: departamentoSeleccionado,
-    totalPublicaciones: todasLasPublicaciones.length 
-  });
-  
-  // Si no hay filtros, mostrar todo
-  if (!textoBusqueda && !departamentoSeleccionado) {
-    console.log('ℹ️ Sin filtros, mostrando todas las publicaciones');
-    publicacionesFiltradas = todasLasPublicaciones;
-    mostrarPublicacionesFiltradas();
-    return;
-  }
-  
-  // Filtrar publicaciones
-  publicacionesFiltradas = todasLasPublicaciones.filter(function(pub) {
-    let coincideTexto = true;
-    let coincideDepartamento = true;
+  async function realizarBusqueda() {
+    console.log('🔍 Realizando búsqueda en el servidor...');
     
-    // Filtro por texto (busca en título, tipo_servicio, descripción)
-    if (textoBusqueda) {
-      const titulo = (pub.titulo || '').toLowerCase();
-      const tipoServicio = (pub.tipo_servicio || '').toLowerCase();
-      const descripcion = (pub.descripcion || '').toLowerCase();
-      
-      // Buscar la frase completa o palabras individuales
-      const terminosBusqueda = textoBusqueda.split(/\s+/).filter(t => t.length > 0);
-      
-      // Verificar si TODOS los términos están presentes en alguno de los campos
-      coincideTexto = terminosBusqueda.every(function(termino) {
-        return titulo.includes(termino) || 
-               tipoServicio.includes(termino) || 
-               descripcion.includes(termino);
-      });
-      
-      console.log('🔎 Verificando:', pub.titulo, '- Coincide:', coincideTexto);
-    }
-    
-    // Filtro por departamento
-    if (departamentoSeleccionado) {
-      const ubicacionPub = (pub.ubicacion || '').trim();
-      const deptoSeleccionado = departamentoSeleccionado.trim();
-      
-      coincideDepartamento = ubicacionPub === deptoSeleccionado;
-      
-      console.log('📍 Verificando ubicación:', {
-        publicacion: ubicacionPub,
-        buscado: deptoSeleccionado,
-        coincide: coincideDepartamento
-      });
-    }
-    
-    return coincideTexto && coincideDepartamento;
-  });
-  
-  console.log('✅ Resultados encontrados:', publicacionesFiltradas.length);
-  
-  // Mostrar resultados
-  mostrarPublicacionesFiltradas();
-}
-
-// Mostrar publicaciones filtradas
-function mostrarPublicacionesFiltradas() {
-  const contenedor = document.getElementById('grid-servicios');
-  
-  if (!contenedor) {
-    console.error('❌ No se encontró el contenedor grid-servicios');
-    return;
-  }
-  
-  console.log('📊 Mostrando publicaciones:', publicacionesFiltradas.length);
-  
-  // Limpiar contenedor
-  contenedor.innerHTML = '';
-  
-  // Verificar si hay filtros activos
-  const inputBusqueda = document.querySelector('.search-left');
-  const selectDepartamento = document.querySelector('.search-right');
-  const hayFiltros = (inputBusqueda && inputBusqueda.value.trim()) || 
-                     (selectDepartamento && selectDepartamento.value.trim());
-  
-  if (publicacionesFiltradas.length === 0 && hayFiltros) {
-    contenedor.innerHTML = `
-      <div class="col-12">
-        <div class="alert alert-info">
-          <i class="bi bi-info-circle"></i> No se encontraron publicaciones con los criterios de búsqueda.
-          <button class="btn btn-sm btn-outline-primary ms-3" onclick="limpiarBusqueda()">
-            <i class="bi bi-x-circle"></i> Limpiar búsqueda
-          </button>
-        </div>
+    gridServicios.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+        <p class="mt-3">Buscando servicios...</p>
       </div>
     `;
-    mostrarContadorResultados();
-    return;
-  }
-  
-  if (publicacionesFiltradas.length === 0 && !hayFiltros) {
-    contenedor.innerHTML = '<p class="text-center">No hay publicaciones disponibles</p>';
-    return;
-  }
-  
-  // Mostrar publicaciones filtradas
-  publicacionesFiltradas.forEach(function(pub) {
-    const imagenUrl = pub.imagen_principal || pub.imagen || 'imagenes/trabajador.jpg';
-    
-    const card = document.createElement('div');
-    card.className = 'service-card';
-    card.innerHTML = `
-      <img src="${imagenUrl}" alt="${pub.titulo}" width="150" onerror="this.src='imagenes/trabajador.jpg'">
-      <h2>${pub.titulo}</h2>
-      <p>${pub.tipo_servicio}</p>
-      <p>${pub.ubicacion}</p>
-      <a href="publicacion.html?id=${pub.id}" class="btn btn-primary btn-lg">Ver publicación</a>
-    `;
-    contenedor.appendChild(card);
-  });
-  
-  // Mostrar contador de resultados
-  mostrarContadorResultados();
-}
 
-// Mostrar contador de resultados
-function mostrarContadorResultados() {
-  let contadorEl = document.getElementById('contador-resultados');
-  
-  if (!contadorEl) {
-    const tituloServicios = document.querySelector('h1');
-    if (tituloServicios) {
-      contadorEl = document.createElement('div');
-      contadorEl.id = 'contador-resultados';
-      contadorEl.className = 'mb-3';
-      tituloServicios.parentNode.insertBefore(contadorEl, tituloServicios.nextSibling);
-    }
-  }
-  
-  if (contadorEl) {
-    const inputBusqueda = document.querySelector('.search-left');
-    const selectDepartamento = document.querySelector('.search-right');
-    const hayFiltros = (inputBusqueda && inputBusqueda.value.trim()) || 
-                       (selectDepartamento && selectDepartamento.value.trim());
-    
-    if (hayFiltros) {
-      const textoBusqueda = inputBusqueda ? inputBusqueda.value.trim() : '';
-      const departamento = selectDepartamento ? selectDepartamento.value.trim() : '';
+    const params = new URLSearchParams();
+    if (inputTexto.value) params.append('q', inputTexto.value);
+    if (inputUbicacion.value) params.append('ubicacion', inputUbicacion.value);
+    if (selectTipoServicio.value) params.append('tipo_servicio', selectTipoServicio.value);
+    if (inputHoraInicio.value) params.append('hora_inicio', inputHoraInicio.value);
+    if (inputHoraFin.value) params.append('hora_fin', inputHoraFin.value);
+
+    try {
+      const url = `/publicacion?${params.toString()}`;
+      console.log(`📨 Fetching: ${url}`);
       
-      let criterios = [];
-      if (textoBusqueda) criterios.push(`"${textoBusqueda}"`);
-      if (departamento) criterios.push(departamento);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status}`);
+      }
+      const publicaciones = await response.json();
       
-      contadorEl.innerHTML = `
-        <div class="alert alert-success d-flex justify-content-between align-items-center">
-          <div>
-            <i class="bi bi-funnel-fill"></i> 
-            <strong>${publicacionesFiltradas.length}</strong> resultado(s) de <strong>${todasLasPublicaciones.length}</strong> 
-            con: ${criterios.join(' + ')}
+      mostrarPublicaciones(publicaciones);
+
+    } catch (error) {
+      console.error('💥 Error en la búsqueda:', error);
+      gridServicios.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Ocurrió un error al realizar la búsqueda. Por favor, intenta nuevamente.
           </div>
-          <button class="btn btn-sm btn-outline-success" onclick="limpiarBusqueda()">
-            <i class="bi bi-x-circle"></i> Limpiar filtros
-          </button>
         </div>
       `;
-    } else {
-      contadorEl.innerHTML = '';
     }
   }
-}
 
-// Limpiar búsqueda
-function limpiarBusqueda() {
-  console.log('🧹 Limpiando búsqueda...');
-  
-  const inputBusqueda = document.querySelector('.search-left');
-  const selectDepartamento = document.querySelector('.search-right');
-  
-  if (inputBusqueda) {
-    inputBusqueda.value = '';
-    console.log('✅ Input de búsqueda limpiado');
-  }
-  
-  if (selectDepartamento) {
-    selectDepartamento.value = '';
-    console.log('✅ Select de departamento limpiado');
-  }
-  
-  // Restaurar todas las publicaciones
-  publicacionesFiltradas = todasLasPublicaciones;
-  console.log('✅ Mostrando todas las publicaciones:', publicacionesFiltradas.length);
-  
-  // Mostrar todas las publicaciones
-  mostrarPublicacionesFiltradas();
-}
+  function mostrarPublicaciones(publicaciones) {
+    console.log(`📊 Mostrando ${publicaciones.length} publicaciones.`);
+    gridServicios.innerHTML = '';
 
-// Exponer funciones globalmente
-window.cargarPublicacionesParaBusqueda = cargarPublicacionesParaBusqueda;
-window.limpiarBusqueda = limpiarBusqueda;
-window.realizarBusqueda = realizarBusqueda;
+    if (publicaciones.length === 0) {
+      gridServicios.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No se encontraron publicaciones con los criterios seleccionados.
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    publicaciones.forEach(pub => {
+      const imagenUrl = pub.imagen_principal || pub.imagen || 'imagenes/trabajador.jpg';
+      const card = document.createElement('div');
+      card.className = 'service-card';
+      card.innerHTML = `
+        <img src="${imagenUrl}" alt="${pub.titulo}" width="150" onerror="this.src='imagenes/trabajador.jpg'">
+        <h2>${pub.titulo}</h2>
+        <p>${pub.tipo_servicio}</p>
+        <p>${pub.ubicacion}</p>
+        <a href="publicacion.html?id=${pub.id}" class="btn btn-primary btn-lg">Ver publicación</a>
+      `;
+      gridServicios.appendChild(card);
+    });
+  }
+
+  function limpiarBusqueda() {
+    console.log('🧹 Limpiando filtros y resultados...');
+    inputTexto.value = '';
+    inputUbicacion.value = '';
+    selectTipoServicio.value = '';
+    inputHoraInicio.value = '';
+    inputHoraFin.value = '';
+    
+    mostrarMensajeInicial();
+  }
+
+  function mostrarMensajeInicial() {
+    gridServicios.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-search" style="font-size: 4rem; color: #ccc;"></i>
+        <h4 class="mt-3 text-muted">Utiliza los filtros para buscar</h4>
+        <p class="text-muted">Los resultados aparecerán aquí.</p>
+      </div>
+    `;
+  }
+});

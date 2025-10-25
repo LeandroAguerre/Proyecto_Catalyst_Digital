@@ -177,21 +177,25 @@ function rellenarDatos(pub) {
   // Verificar si el usuario logueado es el dueño de la publicación
   const sesionActual = obtenerSesion();
   const btnReservar = document.getElementById('btnReservar');
+  const btnEliminar = document.getElementById('btnEliminar');
   const contenedorContactar = document.getElementById('contenedorContactar');
   
   if (sesionActual && btnReservar) {
     if (sesionActual.id === pub.usuario_creador_id) {
-      // Es el dueño, ocultar botón y mostrar mensaje
+      // Es el dueño, mostrar botón de eliminar y ocultar el de reservar
       btnReservar.style.display = 'none';
+      btnEliminar.style.display = 'inline-block';
       if (contenedorContactar) contenedorContactar.style.display = 'none';
-      
-      const mensajePropio = document.createElement('div');
-      mensajePropio.className = 'alert alert-info mt-3';
-      mensajePropio.innerHTML = '<i class="bi bi-info-circle"></i> Esta es tu publicación. No puedes reservar tus propios servicios.';
-      btnReservar.parentElement.appendChild(mensajePropio);
+
+      // Añadir evento al botón de eliminar
+      btnEliminar.addEventListener('click', function() {
+        eliminarPublicacion(pub.id, sesionActual.id);
+      });
+
     } else {
+      // No es el dueño, mostrar botón de reservar
       btnReservar.style.display = 'inline-block';
-      
+      btnEliminar.style.display = 'none';
     }
   }
 
@@ -199,6 +203,43 @@ function rellenarDatos(pub) {
   configurarBotonContactar(pub.usuario_creador_id, pub.id);
 
   console.log('✅ Datos rellenados en el HTML');
+}
+
+// 🆕 NUEVA FUNCIÓN: Eliminar publicación
+async function eliminarPublicacion(publicacionId, usuarioId) {
+  window.confirmarAccion('¿Estás seguro de que deseas eliminar esta publicación? Esta acción no se puede deshacer.', async (confirmado) => {
+    if (!confirmado) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/publicacion', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          publicacion_id: publicacionId,
+          usuario_id: usuarioId
+        })
+      });
+
+      const resultado = await response.json();
+
+      if (resultado.success) {
+        window.mostrarAlerta('Publicación eliminada correctamente.', 'success');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2000);
+      } else {
+        throw new Error(resultado.message || 'No se pudo eliminar la publicación.');
+      }
+    } catch (error) {
+      console.error('Error al eliminar la publicación:', error);
+      window.mostrarAlerta(`Error: ${error.message}`, 'error');
+    }
+  }, 'Confirmar Eliminación');
 }
 
 // 🆕 NUEVA FUNCIÓN: Configurar botón de contactar

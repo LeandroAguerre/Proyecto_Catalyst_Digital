@@ -35,8 +35,12 @@
         <nav class="navigation">
             <ul>
                 <li><a href="index.html" class="btn nav-btn">Inicio</a></li>
-                <li><a href="#" class="btn nav-btn">Servicios</a></li>
+                <li><a href="todas.html" class="btn nav-btn">Servicios</a></li>
                 <li><a href="soporte.html" class="btn nav-btn">Soporte</a></li>
+                <!-- Botones Dinámicos -->
+                <li id="li-publicar" style="display: none;"><a href="crear_publicacion.html" id="btnPublicar" class="btn nav-btn">Publicar</a></li>
+                <li id="li-reservas" style="display: none;"><a href="reservas.html" id="btnReservas" class="btn nav-btn"><i class="bi bi-calendar-check"></i> Reservas</a></li>
+                <li id="li-mensajes" style="display: none;"><a href="mensajes.html" id="btnMensajes" class="btn nav-btn position-relative"><i class="bi bi-chat-dots"></i> Mensajes<span id="mensajesNoLeidos" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span></a></li>
             </ul>
         </nav>
     </header>
@@ -78,6 +82,7 @@
           <p><b>Proveedor:</b> <span id="nombre-proveedor">...</span></p>
           <p><small id="fecha-creacion" class="text-muted">...</small></p>
           <button id="btnReservar" class="btn btn-primary btn-lg mx-auto" data-bs-toggle="modal" data-bs-target="#modalReserva">Reservar</button>
+          <button id="btnEliminar" class="btn btn-danger btn-lg mx-auto" style="display: none;"><i class="bi bi-trash"></i> Eliminar Publicación</button>
           
         </div>
 
@@ -458,6 +463,71 @@
         border: 3px solid #0d6efd;
       }
     </style>
+
+    <!-- MODAL DE ALERTAS PERSONALIZADO (copiado de reservas.html) -->
+    <div class="modal fade" id="modalAlerta" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header" id="modalAlertaHeader">
+            <h5 class="modal-title" id="modalAlertaTitulo">
+              <i id="modalAlertaIcono" class="bi bi-info-circle"></i>
+              <span id="modalAlertaTituloTexto">Información</span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p id="modalAlertaMensaje"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="modalAlertaBtnOk">Aceptar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="modalAlertaBtnCancelar" style="display: none;">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPT HELPER PARA MODALES -->
+    <script>
+    window.mostrarAlerta = function(mensaje, tipo = 'info', titulo = null) {
+      const modal = new bootstrap.Modal(document.getElementById('modalAlerta'));
+      const header = document.getElementById('modalAlertaHeader');
+      const icono = document.getElementById('modalAlertaIcono');
+      const tituloTexto = document.getElementById('modalAlertaTituloTexto');
+      const mensajeEl = document.getElementById('modalAlertaMensaje');
+      const configs = {
+        'success': { headerClass: 'bg-success text-white', icono: 'bi-check-circle-fill', titulo: 'Éxito' },
+        'error': { headerClass: 'bg-danger text-white', icono: 'bi-x-circle-fill', titulo: 'Error' },
+        'warning': { headerClass: 'bg-warning text-dark', icono: 'bi-exclamation-triangle-fill', titulo: 'Advertencia' },
+        'info': { headerClass: 'bg-info text-white', icono: 'bi-info-circle-fill', titulo: 'Información' }
+      };
+      const config = configs[tipo] || configs['info'];
+      header.className = 'modal-header ' + config.headerClass;
+      icono.className = 'bi ' + config.icono + ' me-2';
+      tituloTexto.textContent = titulo || config.titulo;
+      mensajeEl.textContent = mensaje;
+      modal.show();
+    };
+    window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
+      const modal = new bootstrap.Modal(document.getElementById('modalAlerta'));
+      const header = document.getElementById('modalAlertaHeader');
+      const icono = document.getElementById('modalAlertaIcono');
+      const tituloTexto = document.getElementById('modalAlertaTituloTexto');
+      const mensajeEl = document.getElementById('modalAlertaMensaje');
+      const btnOk = document.getElementById('modalAlertaBtnOk');
+      const btnCancelar = document.getElementById('modalAlertaBtnCancelar');
+      header.className = 'modal-header bg-warning text-dark';
+      icono.className = 'bi bi-question-circle-fill me-2';
+      tituloTexto.textContent = titulo;
+      mensajeEl.textContent = mensaje;
+      btnCancelar.style.display = 'inline-block';
+      const newBtnOk = btnOk.cloneNode(true);
+      btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+      newBtnOk.addEventListener('click', function() { modal.hide(); if (callback) callback(true); });
+      btnCancelar.addEventListener('click', function() { modal.hide(); if (callback) callback(false); }, { once: true });
+      modal.show();
+      document.getElementById('modalAlerta').addEventListener('hidden.bs.modal', function() { btnCancelar.style.display = 'none'; }, { once: true });
+    };
+    </script>
 
     <!-- Scripts -->
     <script src="js/script.js"></script>

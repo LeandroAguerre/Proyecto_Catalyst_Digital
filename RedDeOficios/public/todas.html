@@ -36,7 +36,11 @@
             <ul>
                 <li><a href="index.html" class="btn nav-btn">Inicio</a></li>
                 <li><a href="todas.html" class="btn nav-btn active">Servicios</a></li>
-                <li><a href="#" class="btn nav-btn">Soporte</a></li>
+                <li><a href="soporte.html" class="btn nav-btn">Soporte</a></li>
+                <!-- Botones Dinámicos -->
+                <li id="li-publicar" style="display: none;"><a href="crear_publicacion.html" id="btnPublicar" class="btn nav-btn">Publicar</a></li>
+                <li id="li-reservas" style="display: none;"><a href="reservas.html" id="btnReservas" class="btn nav-btn"><i class="bi bi-calendar-check"></i> Reservas</a></li>
+                <li id="li-mensajes" style="display: none;"><a href="mensajes.html" id="btnMensajes" class="btn nav-btn position-relative"><i class="bi bi-chat-dots"></i> Mensajes<span id="mensajesNoLeidos" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span></a></li>
             </ul>
         </nav>
     </header>
@@ -44,10 +48,54 @@
     <main class="content">
         <!-- Barra de búsqueda -->
         <div class="search-bar-unified">
-            <input type="text" class="search-left" placeholder="Buscar por servicio, nombre o descripción...">
+            <input type="text" id="search-text" class="search-left" placeholder="Buscar por servicio, nombre o descripción...">
             <span class="divider">|</span>
-            <input type="text" class="search-right" placeholder="Región, Ciudad, Código Postal">
-            <button class="search-button"><i class="bi bi-search"></i></button>
+            <input type="text" id="search-location" class="search-right" placeholder="Región, Ciudad, Código Postal">
+            <button id="search-button" class="search-button"><i class="bi bi-search"></i></button>
+        </div>
+
+        <!-- Filtros adicionales -->
+        <div class="d-flex justify-content-center">
+            <div class="filter-bar mt-3 p-3 bg-light rounded col-lg-10 col-xl-8">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <label for="filter-tipo-servicio" class="form-label">Tipo de Servicio</label>
+                        <select id="filter-tipo-servicio" class="form-select">
+                            <option value="">Cualquier tipo</option>
+                            <option value="Albañil">Albañil</option>
+                            <option value="Plomero">Plomero</option>
+                            <option value="Carpintero">Carpintero</option>
+                            <option value="Cerrajero">Cerrajero</option>
+                            <option value="Electricista">Electricista</option>
+                            <option value="Pintor">Pintor</option>
+                            <option value="Jardinero">Jardinero</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Mudanzas">Mudanzas</option>
+                            <option value="Gasista">Gasista</option>
+                            <option value="Techista">Techista</option>
+                            <option value="Herrería">Herrería</option>
+                            <option value="Climatización">Climatización</option>
+                            <option value="Vidriería">Vidriería</option>
+                            <option value="Tapicería">Tapicería</option>
+                            <option value="Mecánico">Mecánico</option>
+                            <option value="Informático">Informático</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Horario de Trabajo</label>
+                        <div class="input-group">
+                            <input type="time" id="filter-hora-inicio" class="form-control">
+                            <span class="input-group-text">a</span>
+                            <input type="time" id="filter-hora-fin" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <button id="clear-filters-button" class="btn btn-outline-secondary w-100">Limpiar</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <h1>Todos los Servicios</h1>

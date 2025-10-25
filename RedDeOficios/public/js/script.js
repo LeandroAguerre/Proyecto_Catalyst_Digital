@@ -48,102 +48,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para actualizar visibilidad del botón Publicar
   function actualizarBotonPublicar(tipoUsuario) {
-    let btnPublicar = document.getElementById('btnPublicar');
-    
-    // Si no existe, crearlo
-    if (!btnPublicar) {
-      const nav = document.querySelector('.navigation ul');
-      if (nav) {
-        const li = document.createElement('li');
-        li.innerHTML = '<a href="crear_publicacion.html" id="btnPublicar" class="btn nav-btn">Publicar</a>';
-        nav.appendChild(li);
-        btnPublicar = document.getElementById('btnPublicar');
-      }
-    }
-    
-    // Mostrar u ocultar según tipo de usuario
-    if (btnPublicar) {
-      if (tipoUsuario === 2) {
-        btnPublicar.parentElement.style.display = 'list-item';
-        console.log('✅ Botón Publicar visible (usuario proveedor)');
+    const liPublicar = document.getElementById('li-publicar');
+    if (!liPublicar) return;
+
+    if (tipoUsuario === 2) {
+      liPublicar.style.display = 'list-item';
+      const btnPublicar = document.getElementById('btnPublicar');
+      if (window.location.pathname.endsWith('crear_publicacion.html')) {
+        btnPublicar.classList.add('active');
       } else {
-        btnPublicar.parentElement.style.display = 'none';
-        console.log('🚫 Botón Publicar oculto (usuario no es proveedor)');
+        btnPublicar.classList.remove('active');
       }
+    } else {
+      liPublicar.style.display = 'none';
     }
   }
 
   // Función para actualizar visibilidad del botón Reservas
   function actualizarBotonReservas(estaLogueado) {
-    let btnReservas = document.getElementById('btnReservas');
-    
-    // Si no existe, crearlo
-    if (!btnReservas) {
-      const nav = document.querySelector('.navigation ul');
-      if (nav) {
-        const li = document.createElement('li');
-        li.innerHTML = '<a href="reservas.html" id="btnReservas" class="btn nav-btn"><i class="bi bi-calendar-check"></i> Reservas</a>';
-        nav.appendChild(li);
-        btnReservas = document.getElementById('btnReservas');
-      }
-    }
-    
-    // Mostrar u ocultar según si está logueado
-    if (btnReservas) {
-      if (estaLogueado) {
-        btnReservas.parentElement.style.display = 'list-item';
-        console.log('✅ Botón Reservas visible (usuario logueado)');
+    const liReservas = document.getElementById('li-reservas');
+    if (!liReservas) return;
+
+    if (estaLogueado) {
+      liReservas.style.display = 'list-item';
+      const btnReservas = document.getElementById('btnReservas');
+      if (window.location.pathname.endsWith('reservas.html')) {
+        btnReservas.classList.add('active');
       } else {
-        btnReservas.parentElement.style.display = 'none';
-        console.log('🚫 Botón Reservas oculto (usuario no logueado)');
+        btnReservas.classList.remove('active');
       }
+    } else {
+      liReservas.style.display = 'none';
     }
   }
 
   // Función para actualizar visibilidad del botón Mensajes
   function actualizarBotonMensajes(estaLogueado) {
-    let btnMensajes = document.getElementById('btnMensajes');
-    
-    // Si no existe, crearlo
-    if (!btnMensajes) {
-      const nav = document.querySelector('.navigation ul');
-      if (nav) {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <a href="mensajes.html" id="btnMensajes" class="btn nav-btn position-relative">
-            <i class="bi bi-chat-dots"></i> Mensajes
-            <span id="mensajesNoLeidos" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
-              0
-            </span>
-          </a>
-        `;
-        nav.appendChild(li);
-        btnMensajes = document.getElementById('btnMensajes');
-      }
-    }
-    
-    // Mostrar u ocultar según si está logueado
-    if (btnMensajes) {
-      if (estaLogueado) {
-        btnMensajes.parentElement.style.display = 'list-item';
-        console.log('✅ Botón Mensajes visible (usuario logueado)');
-        
-        // Iniciar actualización del badge
-        actualizarBadgeMensajesNoLeidos();
-        
-        // Actualizar cada 10 segundos
-        if (!window.intervaloBadgeMensajes) {
-          window.intervaloBadgeMensajes = setInterval(actualizarBadgeMensajesNoLeidos, 10000);
-        }
+    const liMensajes = document.getElementById('li-mensajes');
+    if (!liMensajes) return;
+
+    if (estaLogueado) {
+      liMensajes.style.display = 'list-item';
+      const btnMensajes = document.getElementById('btnMensajes');
+      if (window.location.pathname.endsWith('mensajes.html')) {
+        btnMensajes.classList.add('active');
       } else {
-        btnMensajes.parentElement.style.display = 'none';
-        console.log('🚫 Botón Mensajes oculto (usuario no logueado)');
-        
-        // Detener actualización del badge
-        if (window.intervaloBadgeMensajes) {
-          clearInterval(window.intervaloBadgeMensajes);
-          window.intervaloBadgeMensajes = null;
-        }
+        btnMensajes.classList.remove('active');
+      }
+      
+      actualizarBadgeMensajesNoLeidos();
+      if (!window.intervaloBadgeMensajes) {
+        window.intervaloBadgeMensajes = setInterval(actualizarBadgeMensajesNoLeidos, 10000);
+      }
+    } else {
+      liMensajes.style.display = 'none';
+      if (window.intervaloBadgeMensajes) {
+        clearInterval(window.intervaloBadgeMensajes);
+        window.intervaloBadgeMensajes = null;
       }
     }
   }
@@ -407,6 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Función para cargar tarjetas (publicaciones)
 async function cargarTarjetas() {
+  // Si estamos en la página de búsqueda, no hacer nada. La búsqueda es manual.
+  if (window.location.pathname.includes('todas.html')) {
+    console.log('ℹ️ Carga inicial de tarjetas omitida en todas.html');
+    return;
+  }
+
   try {
     console.log('🔄 Cargando publicaciones...');
     

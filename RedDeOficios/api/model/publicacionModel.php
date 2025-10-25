@@ -52,9 +52,9 @@ class Publicacion {
         }
     }
 
-    public function obtenerPublicaciones() {
+    public function obtenerPublicaciones($filtros = []) {
         try {
-            $sql = "SELECT p.*, 
+            $sql_base = "SELECT p.*, 
                     COALESCE(
                         (SELECT pi.ruta_imagen 
                          FROM publicacion_imagen pi 
@@ -62,16 +62,55 @@ class Publicacion {
                          LIMIT 1),
                         p.imagen
                     ) as imagen_principal
-                    FROM publicacion p 
-                    ORDER BY p.id DESC";
+                    FROM publicacion p";
+
+            $where_clauses = [];
+            $params = [];
+
+            // Filtro por texto (q) en título y descripción
+            if (!empty($filtros['q'])) {
+                $where_clauses[] = "(p.titulo LIKE ? OR p.descripcion LIKE ?)";
+                $searchTerm = '%' . $filtros['q'] . '%';
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+            }
+
+            // Filtro por ubicación (departamento)
+            if (!empty($filtros['ubicacion'])) {
+                $where_clauses[] = "p.ubicacion = ?";
+                $params[] = $filtros['ubicacion'];
+            }
+
+            // Filtro por tipo de servicio
+            if (!empty($filtros['tipo_servicio'])) {
+                $where_clauses[] = "p.tipo_servicio = ?";
+                $params[] = $filtros['tipo_servicio'];
+            }
+
+            // Filtro por horario de trabajo (el horario del proveedor debe contener el rango buscado)
+            if (!empty($filtros['hora_inicio'])) {
+                $where_clauses[] = "p.hora_inicio <= ?";
+                $params[] = $filtros['hora_inicio'];
+            }
+            if (!empty($filtros['hora_fin'])) {
+                $where_clauses[] = "p.hora_fin >= ?";
+                $params[] = $filtros['hora_fin'];
+            }
+
+            // Construir la consulta final
+            $sql = $sql_base;
+            if (!empty($where_clauses)) {
+                $sql .= " WHERE " . implode(" AND ", $where_clauses);
+            }
+            $sql .= " ORDER BY p.id DESC";
+
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
+            $stmt->execute($params);
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Normalize image paths so frontend won't request non-existing files
+            // Normalizar rutas de imágenes
             foreach ($data as &$row) {
-                $row['imagen_principal'] = $this->normalizeImagePath(isset($row['imagen_principal']) ? $row['imagen_principal'] : null);
-                // also normalize legacy 'imagen' column if present
+                $row['imagen_principal'] = $this->normalizeImagePath($row['imagen_principal'] ?? null);
                 if (isset($row['imagen'])) {
                     $row['imagen'] = $this->normalizeImagePath($row['imagen']);
                 }
@@ -79,7 +118,7 @@ class Publicacion {
 
             return $data;
         } catch (PDOException $e) {
-            error_log("Error al obtener publicaciones: " . $e->getMessage());
+            error_log("Error al obtener publicaciones con filtros: " . $e->getMessage());
             return [];
         }
     }
@@ -195,5 +234,35 @@ class Publicacion {
 
         // Not found — return default
         return $default;
+    }
+
+    public function eliminar($publicacion_id, $usuario_id) {
+        try {
+            $this->conn->beginTransaction();
+
+            // Primero, eliminar imágenes asociadas de la tabla publicacion_imagen
+            $sql_img = "DELETE FROM publicacion_imagen WHERE publicacion_id = ?";
+            $stmt_img = $this->conn->prepare($sql_img);
+            $stmt_img->execute([$publicacion_id]);
+
+            // Luego, eliminar la publicación principal
+            $sql_pub = "DELETE FROM publicacion WHERE id = ? AND usuario_creador_id = ?";
+            $stmt_pub = $this->conn->prepare($sql_pub);
+            $stmt_pub->execute([$publicacion_id, $usuario_id]);
+
+            // Verificar si la publicación fue eliminada
+            if ($stmt_pub->rowCount() > 0) {
+                $this->conn->commit();
+                return true; // Éxito
+            } else {
+                // Si no se eliminó ninguna fila, puede ser porque el ID no existe o el usuario no es el dueño
+                $this->conn->rollBack();
+                return false;
+            }
+        } catch (PDOException $e) {
+            $this->conn->rollBack();
+            error_log("Error al eliminar publicación: " . $e->getMessage());
+            return false;
+        }
     }
 }

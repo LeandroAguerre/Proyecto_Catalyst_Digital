@@ -8,8 +8,26 @@ class PublicacionController {
         header('Content-Type: application/json; charset=utf-8');
         
         try {
+            // Recoger todos los posibles filtros de la URL
+            $filtros = [];
+            if (!empty($_GET['q'])) {
+                $filtros['q'] = $_GET['q'];
+            }
+            if (!empty($_GET['ubicacion'])) {
+                $filtros['ubicacion'] = $_GET['ubicacion'];
+            }
+            if (!empty($_GET['tipo_servicio'])) {
+                $filtros['tipo_servicio'] = $_GET['tipo_servicio'];
+            }
+            if (!empty($_GET['hora_inicio'])) {
+                $filtros['hora_inicio'] = $_GET['hora_inicio'];
+            }
+            if (!empty($_GET['hora_fin'])) {
+                $filtros['hora_fin'] = $_GET['hora_fin'];
+            }
+
             $publicacion = new Publicacion();
-            $data = $publicacion->obtenerPublicaciones();
+            $data = $publicacion->obtenerPublicaciones($filtros);
             
             http_response_code(200);
             echo json_encode($data, JSON_UNESCAPED_UNICODE);
@@ -187,6 +205,41 @@ class PublicacionController {
                 'message' => 'Error interno del servidor',
                 'detalle' => $e->getMessage()
             ], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function eliminarPublicacion() {
+        header('Content-Type: application/json; charset=utf-8');
+        
+        $data = json_decode(file_get_contents('php://input'));
+
+        if (!isset($data->publicacion_id) || !isset($data->usuario_id)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Datos incompletos.']);
+            return;
+        }
+
+        $publicacion_id = (int)$data->publicacion_id;
+        $usuario_id = (int)$data->usuario_id;
+
+        try {
+            // En una aplicación real, se debería validar que el $usuario_id
+            // coincide con el de la sesión activa para máxima seguridad.
+
+            $publicacionModel = new Publicacion();
+            $resultado = $publicacionModel->eliminar($publicacion_id, $usuario_id);
+
+            if ($resultado) {
+                http_response_code(200);
+                echo json_encode(['success' => true, 'message' => 'Publicación eliminada correctamente.']);
+            } else {
+                http_response_code(403); // Prohibido
+                echo json_encode(['success' => false, 'message' => 'No se pudo eliminar la publicación. O no existe o no tienes permiso.']);
+            }
+        } catch (Exception $e) {
+            error_log("Error en eliminarPublicacion: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error interno del servidor.']);
         }
     }
 }

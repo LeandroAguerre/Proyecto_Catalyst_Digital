@@ -129,6 +129,15 @@ function rellenarDatos(pub) {
       imagen.src = 'imagenes/trabajador.jpg';
       imagen.alt = 'Imagen no disponible';
     }
+
+    // Añadir cursor pointer a la imagen principal
+    imagen.style.cursor = 'pointer';
+    // Evento para abrir modal de imagen en pantalla completa
+    imagen.addEventListener('click', function() {
+      const imagenModal = new bootstrap.Modal(document.getElementById('imagenModal'));
+      document.getElementById('imagenModalSrc').src = this.src;
+      imagenModal.show();
+    });
   }
 
   // Galería de imágenes
@@ -138,7 +147,18 @@ function rellenarDatos(pub) {
     pub.imagenes.forEach(function(img) {
       const col = document.createElement('div');
       col.className = 'col-md-4 col-6 mb-3';
-      col.innerHTML = '<img src="' + img.ruta_imagen + '" class="img-fluid rounded shadow-sm" alt="Imagen de la publicación" onerror="this.src=\'imagenes/trabajador.jpg\'">';
+      const imgElement = document.createElement('img');
+      imgElement.src = img.ruta_imagen;
+      imgElement.className = 'img-fluid rounded shadow-sm';
+      imgElement.alt = 'Imagen de la publicación';
+      imgElement.onerror = function() {
+        this.src = 'imagenes/trabajador.jpg';
+      };
+      imgElement.style.cursor = 'pointer'; // Añadir cursor pointer a las miniaturas
+      imgElement.addEventListener('click', function() {
+        document.getElementById('imagen-publicacion').src = this.src;
+      });
+      col.appendChild(imgElement);
       galeria.appendChild(col);
     });
   } else if (galeria) {
@@ -185,7 +205,6 @@ function rellenarDatos(pub) {
       // Es el dueño, mostrar botón de eliminar y ocultar el de reservar
       btnReservar.style.display = 'none';
       btnEliminar.style.display = 'inline-block';
-      if (contenedorContactar) contenedorContactar.style.display = 'none';
 
       // Añadir evento al botón de eliminar
       btnEliminar.addEventListener('click', function() {

@@ -62,39 +62,73 @@
       </div>
 
       <!-- Contenedor de la publicación (oculto hasta que cargue) -->
-      <div id="publicacion-container" style="display: none;">
-        <div class="publicacion-tarjeta">
-          <img id="imagen-publicacion" src="imagenes/trabajador.jpg" alt="Imagen de la publicación">
-          <h2 id="titulo-publicacion">Cargando...</h2>
-          <p class="specialty"><b id="tipo-servicio">...</b></p>
-          <p class="estrella">
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-half"></i>
-          </p>
-          <p><b>Ubicación:</b> <span id="ubicacion">...</span></p>
-          <p><b>Teléfono:</b> <a id="telefono" href="tel:">...</a></p>
-          <p><b>Horario de trabajo:</b> <span id="horario-trabajo">...</span></p>
-          <p><b>Horas mínimas:</b> <span id="horas-minimas">...</span></p>
-          <p><b>Descripción:</b> <span id="descripcion">...</span></p>
-          <p><b>Proveedor:</b> <span id="nombre-proveedor">...</span></p>
-          <p><small id="fecha-creacion" class="text-muted">...</small></p>
-          <button id="btnReservar" class="btn btn-primary btn-lg mx-auto" data-bs-toggle="modal" data-bs-target="#modalReserva">Reservar</button>
-          <button id="btnEliminar" class="btn btn-danger btn-lg mx-auto" style="display: none;"><i class="bi bi-trash"></i> Eliminar Publicación</button>
-          
-        </div>
+      <div id="publicacion-container" class="container mt-4" style="display: none;">
+        <div class="row">
+          <!-- Columna Izquierda: Imagen Principal y Galería -->
+          <div class="col-md-7">
+            <div class="card mb-4 shadow-sm">
+              <img id="imagen-publicacion" src="imagenes/trabajador.jpg" class="card-img-top" alt="Imagen de la publicación" style="max-height: 400px; object-fit: cover;">
+              <div class="card-body">
+                <h5 class="card-title">Galería de imágenes</h5>
+                <div id="galeria" class="row g-2">
+                  <!-- Se llenará dinámicamente con las imágenes de la publicación -->
+                </div>
+              </div>
+            </div>
 
-        <div id="contenedorContactar" style="display: none; margin-top: 15px;">
-          <button id="btnContactar" class="btn btn-success btn-lg mx-auto">
-          <i class="bi bi-chat-dots"></i> Contactar al Proveedor
-          </button>
-          <p class="text-center mt-2 mb-0">
-          <small class="text-muted">
-          <i class="bi bi-info-circle"></i> Puedes enviar mensajes para coordinar detalles de tu reserva
-          </small>
-          </p>
+            <div class="card mb-4 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title">Descripción</h5>
+                <p id="descripcion" class="card-text text-muted">Cargando...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Detalles de la Publicación y Acciones -->
+          <div class="col-md-5">
+            <div class="card mb-4 shadow-sm">
+              <div class="card-body">
+                <h2 class="card-title" id="titulo-publicacion">Cargando...</h2>
+                <p class="card-subtitle mb-2 text-muted"><b id="tipo-servicio">...</b></p>
+                <div class="mb-3">
+                  <span class="text-warning">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                  </span>
+                  <small class="text-muted ms-2">(4.5/5 estrellas)</small>
+                </div>
+                
+                <ul class="list-group list-group-flush mb-3">
+                  <li class="list-group-item"><i class="bi bi-geo-alt-fill me-2"></i><b>Ubicación:</b> <span id="ubicacion">...</span></li>
+                  <li class="list-group-item"><i class="bi bi-telephone-fill me-2"></i><b>Teléfono:</b> <a id="telefono" href="tel:" class="text-decoration-none">...</a></li>
+                  <li class="list-group-item"><i class="bi bi-clock-fill me-2"></i><b>Horario:</b> <span id="horario-trabajo">...</span></li>
+                  <li class="list-group-item"><i class="bi bi-hourglass-split me-2"></i><b>Horas mínimas:</b> <span id="horas-minimas">...</span></li>
+                  <li class="list-group-item"><i class="bi bi-person-fill me-2"></i><b>Proveedor:</b> <span id="nombre-proveedor">...</span></li>
+                  <li class="list-group-item text-end"><small id="fecha-creacion" class="text-muted">...</small></li>
+                </ul>
+
+                <div class="d-grid gap-2 mb-3">
+                  <button id="btnReservar" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalReserva">
+                    <i class="bi bi-calendar-check me-2"></i>Reservar
+                  </button>
+                  <button id="btnContactar" class="btn btn-success btn-lg" style="display: none;">
+                    <i class="bi bi-chat-dots me-2"></i>Contactar al Proveedor
+                  </button>
+                  <button id="btnEliminar" class="btn btn-danger btn-lg" style="display: none;">
+                    <i class="bi bi-trash me-2"></i>Eliminar Publicación
+                  </button>
+                </div>
+                <p class="text-center mt-2 mb-0">
+                  <small class="text-muted">
+                    <i class="bi bi-info-circle"></i> Puedes enviar mensajes para coordinar detalles de tu reserva
+                  </small>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <!-- Datos ocultos para pasar al modal -->
@@ -104,11 +138,19 @@
         <input type="hidden" id="hora-fin-proveedor" value="">
         <input type="hidden" id="horas-minimas-proveedor" value="">
 
-        <h4><b>Galería de imágenes:</b></h4>
-        <div id="galeria" class="row">
-          <!-- Se llenará dinámicamente con las imágenes de la publicación -->
+        <!-- Modal para imagen en pantalla completa -->
+        <div class="modal fade" id="imagenModal" tabindex="-1" aria-labelledby="imagenModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-transparent border-0">
+              <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body d-flex justify-content-center align-items-center">
+                <img src="" id="imagenModalSrc" class="img-fluid" alt="Imagen en pantalla completa">
+              </div>
+            </div>
+          </div>
         </div>
-
       
 
       <!-- Contenedor de error (oculto por defecto) -->

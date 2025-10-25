@@ -75,6 +75,22 @@ async function cargarMisReservas() {
     }
     
     mostrarReservas(reservas, contenedor, 'cliente');
+
+    // Marcar notificaciones de cliente como vistas después de cargarlas
+    if (sesion.tipoUsuario === 1) { // Solo para clientes
+      await fetch('/reserva?accion=marcar_vistas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ cliente_id: sesion.id })
+      });
+      // Actualizar el badge en el navbar después de marcar como vistas
+      if (window.actualizarBadgeReservasPendientes) {
+        window.actualizarBadgeReservasPendientes();
+      }
+    }
     
   } catch (error) {
     console.error('Error:', error);
@@ -217,8 +233,8 @@ function mostrarReservas(reservas, contenedor, tipo) {
       html += '<button class="btn btn-secondary btn-sm" onclick="rechazarReserva(' + reserva.id + ')"><i class="bi bi-x-circle"></i> Rechazar</button>';
     }
     
-    // Botón cancelar (disponible para ambos si está en estado pendiente o confirmada)
-    if (reserva.estado === 'pendiente' || reserva.estado === 'confirmada') {
+    // Botón cancelar (disponible solo si está confirmada y con más de 24h de anticipación)
+    if (reserva.estado === 'confirmada') {
       // Verificar si se puede cancelar (24h antes)
       const ahora = new Date();
       const horasDiferencia = (inicio - ahora) / (1000 * 60 * 60);

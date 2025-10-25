@@ -181,6 +181,61 @@ class ReservaModel {
         }
     }
 
+    // Contar reservas pendientes para un usuario (como cliente o proveedor)
+    public function contarReservasPendientesPorUsuario($usuario_id, $tipoUsuario, &$debug_messages) {
+        try {
+            $totalPendientes = 0;
+
+            // 1. Contar notificaciones de estado para el usuario como cliente (aceptadas, rechazadas, canceladas y no vistas)
+            $sqlClienteStatus = "SELECT COUNT(*) as count_cliente_status 
+                                 FROM reserva 
+                                 WHERE cliente_id = ? 
+                                 AND (estado = 'confirmada' OR estado = 'rechazada' OR estado = 'cancelada') 
+                                 AND cliente_visto_estado = FALSE";
+            $stmtClienteStatus = $this->conn->prepare($sqlClienteStatus);
+            $stmtClienteStatus->execute([$usuario_id]);
+            $resultClienteStatus = $stmtClienteStatus->fetch(PDO::FETCH_ASSOC);
+            $totalPendientes += $resultClienteStatus['count_cliente_status'] ?? 0;
+            $debug_messages[] = "Model: Cliente Status Count: " . ($resultClienteStatus['count_cliente_status'] ?? 0);
+
+            // 2. Si el usuario es un proveedor, contar las reservas pendientes de su acción
+            if ($tipoUsuario == 2) { // Es un proveedor
+                $sqlProveedorPending = "SELECT COUNT(*) as count_proveedor_pending 
+                                        FROM reserva 
+                                        WHERE proveedor_id = ? 
+                                        AND estado = 'pendiente'";
+                $debug_messages[] = "Model: Proveedor Pending SQL: " . $sqlProveedorPending . ", Params: " . $usuario_id;
+                $stmtProveedorPending = $this->conn->prepare($sqlProveedorPending);
+                $stmtProveedorPending->execute([$usuario_id]);
+                $resultProveedorPending = $stmtProveedorPending->fetch(PDO::FETCH_ASSOC);
+                $totalPendientes += $resultProveedorPending['count_proveedor_pending'] ?? 0;
+                $debug_messages[] = "Model: Proveedor Pending Count: " . ($resultProveedorPending['count_proveedor_pending'] ?? 0);
+            }
+
+            return $totalPendientes;
+        } catch (PDOException $e) {
+            $debug_messages[] = "Model Error: " . $e->getMessage();
+            error_log("Error al contar reservas pendientes: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    // Marcar reservas como vistas por el cliente
+    public function marcarReservasVistasPorCliente($cliente_id) {
+        try {
+            $sql = "UPDATE reserva 
+                    SET cliente_visto_estado = TRUE 
+                    WHERE cliente_id = ? 
+                    AND (estado = 'confirmada' OR estado = 'rechazada') 
+                    AND cliente_visto_estado = FALSE";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$cliente_id]);
+        } catch (PDOException $e) {
+            error_log("Error al marcar reservas como vistas: " . $e->getMessage());
+            return false;
+        }
+    }
+
     // Obtener fechas ocupadas del proveedor (para el calendario)
     public function obtenerFechasOcupadasProveedor($proveedor_id, $mes = null, $anio = null) {
         try {

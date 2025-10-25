@@ -77,8 +77,57 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         btnReservas.classList.remove('active');
       }
+      actualizarBadgeReservasPendientes();
+      if (!window.intervaloBadgeReservas) {
+        window.intervaloBadgeReservas = setInterval(actualizarBadgeReservasPendientes, 10000);
+      }
     } else {
       liReservas.style.display = 'none';
+      if (window.intervaloBadgeReservas) {
+        clearInterval(window.intervaloBadgeReservas);
+        window.intervaloBadgeReservas = null;
+      }
+    }
+  }
+
+  // Función para actualizar el badge de reservas pendientes
+  async function actualizarBadgeReservasPendientes() {
+    const sesion = obtenerSesion();
+    if (!sesion) return;
+    
+    try {
+      const response = await fetch(`/reserva?pendientes=true&usuario_id=${sesion.id}&tipo_usuario=${sesion.tipoUsuario}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error('Error al obtener badge de reservas:', response.status, response.statusText);
+        return;
+      }
+      
+      const data = await response.json();
+
+      if (data.debug) {
+        console.groupCollapsed('Debug Reservas Pendientes');
+        data.debug.forEach(msg => console.log(msg));
+        console.groupEnd();
+      }
+
+      const badge = document.getElementById('reservasPendientes');
+      
+      if (badge) {
+        if (data.total > 0) {
+          badge.textContent = data.total;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    } catch (error) {
+      console.error('Error al actualizar badge de reservas pendientes:', error);
     }
   }
 

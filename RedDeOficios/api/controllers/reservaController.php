@@ -91,21 +91,34 @@ class ReservaController {
         }
     }
 
-    // Obtener reservas del usuario (cliente o proveedor)
+    // Obtener reservas del usuario (cliente o proveedor) o cantidad de pendientes
     public function obtenerReservas() {
         header('Content-Type: application/json; charset=utf-8');
         
         $usuario_id = isset($_GET['usuario_id']) ? (int)$_GET['usuario_id'] : 0;
-        $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'cliente'; // 'cliente' o 'proveedor'
+        $pendientes = isset($_GET['pendientes']) && $_GET['pendientes'] === 'true';
+        $tipo_usuario = isset($_GET['tipo_usuario']) ? (int)$_GET['tipo_usuario'] : 0; // 1 para cliente, 2 para proveedor
 
-        if ($usuario_id <= 0) {
+        if ($usuario_id <= 0 || ($pendientes && $tipo_usuario == 0)) {
             http_response_code(400);
-            echo json_encode(['error' => 'ID de usuario inválido']);
+            echo json_encode(['success' => false, 'message' => 'ID de usuario o tipo de usuario inválido']);
             return;
         }
 
         try {
             $reservaModel = new ReservaModel();
+
+            if ($pendientes) {
+                $debug_messages = [];
+                $debug_messages[] = "Controller: usuario_id: " . $usuario_id . ", tipo_usuario: " . $tipo_usuario;
+                $totalPendientes = $reservaModel->contarReservasPendientesPorUsuario($usuario_id, $tipo_usuario, $debug_messages);
+                $debug_messages[] = "Controller: totalPendientes: " . $totalPendientes;
+                http_response_code(200);
+                echo json_encode(['success' => true, 'total' => $totalPendientes, 'debug' => $debug_messages]);
+                return;
+            }
+
+            $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'cliente'; // 'cliente' o 'proveedor'
 
             if ($tipo === 'proveedor') {
                 $reservas = $reservaModel->obtenerReservasPorProveedor($usuario_id);
@@ -119,7 +132,39 @@ class ReservaController {
         } catch (Exception $e) {
             error_log("Error en obtenerReservas: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error al obtener reservas']);
+            echo json_encode(['success' => false, 'message' => 'Error al obtener reservas']);
+        }
+    }
+
+    // Marcar reservas como vistas por el cliente
+    public function marcarReservasVistas() {
+        header('Content-Type: application/json; charset=utf-8');
+        
+        $inputData = file_get_contents('php://input');
+        $data = json_decode($inputData);
+
+        if (!isset($data->cliente_id)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID de cliente no proporcionado']);
+            return;
+        }
+
+        try {
+            $reservaModel = new ReservaModel();
+            $resultado = $reservaModel->marcarReservasVistasPorCliente($data->cliente_id);
+
+            if ($resultado) {
+                http_response_code(200);
+                echo json_encode(['success' => true, 'message' => 'Reservas marcadas como vistas']);
+            } else {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => 'Error al marcar reservas como vistas']);
+            }
+
+        } catch (Exception $e) {
+            error_log("Error en marcarReservasVistas: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
         }
     }
 

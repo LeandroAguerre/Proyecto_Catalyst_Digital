@@ -88,13 +88,31 @@ document.getElementById('inputImagenes').addEventListener('change', function(e) 
   
   const files = e.target.files;
   
-  if (files.length > 5) {
-    mostrarAlerta('Solo puedes subir un máximo de 5 imágenes', 'warning');
+  // Filter out non-image files and collect valid ones
+  const validFiles = [];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    if (file.type.startsWith('image/')) {
+      validFiles.push(file);
+    } else {
+      mostrarAlerta(`El archivo '${file.name}' no es una imagen válida y será ignorado.`, 'warning');
+    }
+  }
+
+  if (validFiles.length === 0 && files.length > 0) {
+    // If all selected files were invalid, clear the input and return
     e.target.value = '';
     return;
   }
+
+  if (validFiles.length > 5) {
+    mostrarAlerta('Solo puedes subir un máximo de 5 imágenes válidas', 'warning');
+    e.target.value = ''; // Clear the input
+    previewContainer.innerHTML = ''; // Clear any previews that might have been there
+    return;
+  }
   
-  Array.from(files).forEach((file, index) => {
+  Array.from(validFiles).forEach((file, index) => {
     const reader = new FileReader();
     
     reader.onload = function(event) {
@@ -194,8 +212,10 @@ document.getElementById('formPublicacion').addEventListener('submit', async func
     if (result.success) {
       mostrarAlerta(result.message, 'success');
       
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = btnText;
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = `publicacion.html?id=${result.publicacion_id}`;
       }, 2000);
     } else {
       mostrarAlerta(result.message, 'error');

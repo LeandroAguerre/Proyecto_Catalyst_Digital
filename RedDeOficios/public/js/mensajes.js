@@ -555,14 +555,20 @@ function escapeHtml(text) {
 
 function mostrarError(mensaje) {
     console.error('❌', mensaje);
-    // Usar alert simple por ahora, puedes integrarlo con tu sistema de alertas
-    alert('❌ ' + mensaje);
+    if (typeof window.mostrarAlerta === 'function') {
+        window.mostrarAlerta(mensaje, 'error');
+    } else {
+        alert('❌ ' + mensaje);
+    }
 }
 
 function mostrarExito(mensaje) {
     console.log('✅', mensaje);
-    // Usar alert simple por ahora, puedes integrarlo con tu sistema de alertas
-    alert('✅ ' + mensaje);
+    if (typeof window.mostrarAlerta === 'function') {
+        window.mostrarAlerta(mensaje, 'success');
+    } else {
+        alert('✅ ' + mensaje);
+    }
 }
 
 // =====================================================

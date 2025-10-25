@@ -311,10 +311,10 @@ document.getElementById('modalReserva').addEventListener('show.bs.modal', functi
     e.preventDefault();
     
     // Mostrar modal de alerta en lugar de alert
-    if (typeof mostrarAlerta === 'function') {
-      mostrarAlerta('Debes iniciar sesión para hacer una reserva', 'warning', 'Autenticación requerida');
+    if (typeof window.mostrarAlerta === 'function') {
+      window.mostrarAlerta('Debes iniciar sesión para hacer una reserva', 'warning', 'Autenticación requerida');
     } else {
-      alert('Debes iniciar sesión para hacer una reserva');
+      alert('Debes iniciar sesión para hacer una reserva'); // Fallback por si el helper no carga
     }
     return;
   }
@@ -561,7 +561,7 @@ document.getElementById('formReserva').addEventListener('submit', async function
 
   const sesion = obtenerSesion();
   if (!sesion) {
-    alert('Debes iniciar sesión');
+    window.mostrarAlerta('Debes iniciar sesión para completar la reserva.', 'warning');
     return;
   }
 

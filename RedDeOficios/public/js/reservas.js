@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (!sesion) {
     console.log('❌ Usuario no autenticado');
-    alert('Debes iniciar sesión para ver tus reservas');
-    window.location.href = 'index.html';
+    window.mostrarAlerta('Debes iniciar sesión para ver tus reservas', 'warning');
+    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
     return;
   }
   
@@ -200,10 +200,10 @@ function mostrarReservas(reservas, contenedor, tipo) {
     
     html += '</div>';
     
-    // 🆕 BOTONES DE ACCIÓN (INCLUYENDO CONTACTAR)
+    // BOTONES DE ACCIÓN
     html += '<div class="card-footer">';
     
-    // 🆕 BOTÓN CONTACTAR (siempre visible para coordinar detalles)
+    // BOTÓN CONTACTAR
     const otroUsuarioId = tipo === 'cliente' ? reserva.proveedor_id : reserva.cliente_id;
     const otroUsuarioNombre = tipo === 'cliente' ? reserva.proveedor_nombre : reserva.cliente_nombre;
     
@@ -239,7 +239,7 @@ function mostrarReservas(reservas, contenedor, tipo) {
   contenedor.innerHTML = html;
 }
 
-// 🆕 FUNCIÓN PARA CONTACTAR AL USUARIO
+// FUNCIÓN PARA CONTACTAR AL USUARIO
 function contactarUsuario(publicacionId, otroUsuarioId, otroUsuarioNombre, publicacionTitulo) {
   console.log('💬 Abriendo conversación con:', {
     publicacionId,
@@ -320,20 +320,18 @@ async function confirmarReserva(reservaId) {
       modal.hide();
       
       if (data.success) {
-        mostrarAlerta(data.message, 'success');
-        // Recargar reservas
+        window.mostrarAlerta(data.message, 'success');
         setTimeout(() => {
           document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
           cargarReservasRecibidas();
         }, 1500);
       } else {
-        mostrarAlerta(data.message, 'error');
+        window.mostrarAlerta(data.message, 'error');
       }
-      
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al confirmar la reserva:', error);
       modal.hide();
-      mostrarAlerta('Error al confirmar la reserva', 'error');
+      window.mostrarAlerta('Error al confirmar la reserva: ' + error.message, 'error');
     }
   };
 }
@@ -378,7 +376,7 @@ async function rechazarReserva(reservaId) {
     const motivo = document.getElementById('motivoRechazo').value.trim();
     
     if (!motivo) {
-      mostrarAlerta('Debes proporcionar un motivo para el rechazo', 'warning');
+      window.mostrarAlerta('Debes proporcionar un motivo para el rechazo', 'warning');
       return;
     }
     
@@ -401,19 +399,19 @@ async function rechazarReserva(reservaId) {
       modal.hide();
       
       if (data.success) {
-        mostrarAlerta(data.message, 'success');
+        window.mostrarAlerta(data.message, 'success');
         setTimeout(() => {
           document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
           cargarReservasRecibidas();
         }, 1500);
       } else {
-        mostrarAlerta(data.message, 'error');
+        window.mostrarAlerta(data.message, 'error');
       }
       
     } catch (error) {
       console.error('Error:', error);
       modal.hide();
-      mostrarAlerta('Error al rechazar la reserva', 'error');
+      window.mostrarAlerta('Error al rechazar la reserva', 'error');
     }
   };
 }
@@ -476,8 +474,7 @@ async function cancelarReserva(reservaId) {
       modal.hide();
       
       if (data.success) {
-        mostrarAlerta(data.message, 'success');
-        // Recargar ambas vistas
+        window.mostrarAlerta(data.message, 'success');
         setTimeout(() => {
           document.getElementById('contenedor-mis-reservas').innerHTML = '';
           document.getElementById('contenedor-reservas-recibidas').innerHTML = '';
@@ -487,22 +484,13 @@ async function cancelarReserva(reservaId) {
           }
         }, 1500);
       } else {
-        mostrarAlerta(data.message, 'error');
+        window.mostrarAlerta(data.message, 'error');
       }
       
     } catch (error) {
       console.error('Error:', error);
       modal.hide();
-      mostrarAlerta('Error al cancelar la reserva', 'error');
+      window.mostrarAlerta('Error al cancelar la reserva', 'error');
     }
   };
-}
-
-// Función para mostrar alertas con modal (helper)
-function mostrarAlerta(mensaje, tipo = 'info') {
-  if (typeof window.mostrarAlerta === 'function') {
-    window.mostrarAlerta(mensaje, tipo);
-  } else {
-    alert(mensaje);
-  }
 }

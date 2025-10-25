@@ -353,6 +353,7 @@
                   <div><span class="badge bg-success">◼</span> Disponible</div>
                   <div><span class="badge bg-danger">◼</span> Ocupado</div>
                   <div><span class="badge bg-primary">◼</span> Seleccionado</div>
+                  <div><span class="badge bg-warning">◼</span> Parcialmente Ocupado</div>
                   <div><span class="badge bg-secondary">◼</span> Pasado</div>
                 </div>
 
@@ -480,6 +481,12 @@
         color: #6c757d;
         cursor: not-allowed;
         opacity: 0.5;
+      }
+
+      .calendario-dia.dia-parcialmente-ocupado {
+        background-color: #fff3cd; /* Light yellow */
+        border-color: #ffc107; /* Yellow */
+        color: #664d03; /* Darker yellow text */
       }
 
       .calendario-dia.dia-vacio {

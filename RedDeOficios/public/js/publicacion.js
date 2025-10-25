@@ -186,13 +186,24 @@ function rellenarDatos(pub) {
   if (publicacionIdInput) publicacionIdInput.value = pub.id || '';
 
   const horaInicioInput = document.getElementById('hora-inicio-proveedor');
-  if (horaInicioInput) horaInicioInput.value = pub.hora_inicio || '09:00:00';
+  if (horaInicioInput) {
+    horaInicioInput.value = pub.hora_inicio || '09:00:00';
+    HORA_INICIO_PROVEEDOR = pub.hora_inicio || '09:00:00';
+  }
 
   const horaFinInput = document.getElementById('hora-fin-proveedor');
-  if (horaFinInput) horaFinInput.value = pub.hora_fin || '18:00:00';
+  if (horaFinInput) {
+    horaFinInput.value = pub.hora_fin || '18:00:00';
+    HORA_FIN_PROVEEDOR = pub.hora_fin || '18:00:00';
+  }
+
 
   const horasMinimasInput = document.getElementById('horas-minimas-proveedor');
-  if (horasMinimasInput) horasMinimasInput.value = pub.horas_minimas || '1';
+  if (horasMinimasInput) {
+    horasMinimasInput.value = pub.horas_minimas || '1';
+    HORAS_MINIMAS_PROVEEDOR = parseFloat(pub.horas_minimas || '1');
+  }
+
 
   // Verificar si el usuario logueado es el dueño de la publicación
   const sesionActual = obtenerSesion();
@@ -315,9 +326,14 @@ document.addEventListener('DOMContentLoaded', cargarPublicacion);
 // Variables globales del calendario
 let mesActual = new Date().getMonth();
 let anioActual = new Date().getFullYear();
-let fechasOcupadasProveedor = [];
+let fechasOcupadasProveedor = []; // Almacenará objetos de reserva con inicio y fin
 let fechaInicioSeleccionada = null;
 let fechaFinSeleccionada = null;
+
+let HORA_INICIO_PROVEEDOR = '09:00:00';
+let HORA_FIN_PROVEEDOR = '18:00:00';
+let HORAS_MINIMAS_PROVEEDOR = 1;
+
 
 // Evento: Al abrir el modal de reserva
 document.getElementById('modalReserva').addEventListener('show.bs.modal', function(e) {
@@ -376,7 +392,7 @@ async function cargarCalendarioReservas() {
   }
 
   try {
-    const res = await fetch('/reserva?fechas_ocupadas=true&proveedor_id=' + proveedorId + '&mes=' + (mesActual + 1) + '&anio=' + anioActual, {
+    const res = await fetch('/reserva?fechas_ocupadas=true&detallado=true&proveedor_id=' + proveedorId + '&mes=' + (mesActual + 1) + '&anio=' + anioActual, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -443,14 +459,25 @@ function renderizarCalendario() {
     // Determinar estado del día
     if (fechaActual < hoy) {
       diaDiv.classList.add('dia-pasado');
-    } else if (esDiaOcupado(fechaActual)) {
-      diaDiv.classList.add('dia-ocupado');
     } else {
-      diaDiv.classList.add('dia-disponible');
-      diaDiv.addEventListener('click', function() {
-        seleccionarDia(fechaActual, diaDiv);
-      });
+      const disponibilidad = obtenerDisponibilidadDia(fechaActual);
+      diaDiv.dataset.disponibilidad = JSON.stringify(disponibilidad); // Guardar para usar al seleccionar
+
+      if (disponibilidad.status === 'fully_occupied') {
+        diaDiv.classList.add('dia-ocupado');
+      } else if (disponibilidad.status === 'partially_occupied') {
+        diaDiv.classList.add('dia-parcialmente-ocupado');
+        diaDiv.addEventListener('click', function() {
+          seleccionarDia(fechaActual, diaDiv);
+        });
+      } else {
+        diaDiv.classList.add('dia-disponible');
+        diaDiv.addEventListener('click', function() {
+          seleccionarDia(fechaActual, diaDiv);
+        });
+      }
     }
+
 
     // Marcar hoy
     if (fechaActual.getTime() === hoy.getTime()) {
@@ -476,7 +503,97 @@ function renderizarCalendario() {
   }
 }
 
-// Verificar si un día está ocupado
+// Verificar si un día está ocupado (total o parcialmente)
+function obtenerDisponibilidadDia(fecha) {
+  const fechaStr = formatearFecha(fecha);
+  const reservasDelDia = fechasOcupadasProveedor.filter(reserva => {
+    const inicioReserva = new Date(reserva.fecha_hora_inicio);
+    return formatearFecha(inicioReserva) === fechaStr;
+  });
+
+  // Convertir horas de inicio y fin del proveedor a minutos desde medianoche
+  const [hInicioProv, mInicioProv] = HORA_INICIO_PROVEEDOR.split(':').map(Number);
+  const [hFinProv, mFinProv] = HORA_FIN_PROVEEDOR.split(':').map(Number);
+  const inicioJornadaMinutos = hInicioProv * 60 + mInicioProv;
+  const finJornadaMinutos = hFinProv * 60 + mFinProv;
+
+  let intervalosOcupados = [];
+  reservasDelDia.forEach(reserva => {
+    const inicioReserva = new Date(reserva.fecha_hora_inicio);
+    const finReserva = new Date(reserva.fecha_hora_fin);
+
+    const inicioReservaMinutos = inicioReserva.getHours() * 60 + inicioReserva.getMinutes();
+    const finReservaMinutos = finReserva.getHours() * 60 + finReserva.getMinutes();
+
+    intervalosOcupados.push({ start: inicioReservaMinutos, end: finReservaMinutos });
+  });
+
+  // Ordenar y fusionar intervalos ocupados
+  intervalosOcupados.sort((a, b) => a.start - b.start);
+  let intervalosFusionados = [];
+  if (intervalosOcupados.length > 0) {
+    let current = intervalosOcupados[0];
+    for (let i = 1; i < intervalosOcupados.length; i++) {
+      if (intervalosOcupados[i].start <= current.end) {
+        current.end = Math.max(current.end, intervalosOcupados[i].end);
+      } else {
+        intervalosFusionados.push(current);
+        current = intervalosOcupados[i];
+      }
+    }
+    intervalosFusionados.push(current);
+  }
+
+  let tiempoOcupadoMinutos = 0;
+  intervalosFusionados.forEach(intervalo => {
+    tiempoOcupadoMinutos += (intervalo.end - intervalo.start);
+  });
+
+  const duracionJornadaMinutos = finJornadaMinutos - inicioJornadaMinutos;
+  const tiempoDisponibleMinutos = duracionJornadaMinutos - tiempoOcupadoMinutos;
+  const horasDisponibles = tiempoDisponibleMinutos / 60;
+  const duracionJornadaHoras = duracionJornadaMinutos / 60;
+  const horasMinimasEnMinutos = HORAS_MINIMAS_PROVEEDOR * 60;
+
+  let status = 'available';
+  if (horasDisponibles <= 0 || tiempoDisponibleMinutos < horasMinimasEnMinutos) {
+    status = 'fully_occupied';
+  } else if (horasDisponibles > 0 && horasDisponibles < duracionJornadaHoras) {
+    status = 'partially_occupied';
+  }
+
+  // Calcular intervalos disponibles
+  let availableSlots = [];
+  let currentAvailableStart = inicioJornadaMinutos;
+
+  intervalosFusionados.forEach(intervalo => {
+    if (intervalo.start > currentAvailableStart) {
+      availableSlots.push({ start: currentAvailableStart, end: intervalo.start });
+    }
+    currentAvailableStart = Math.max(currentAvailableStart, intervalo.end);
+  });
+
+  if (finJornadaMinutos > currentAvailableStart) {
+    availableSlots.push({ start: currentAvailableStart, end: finJornadaMinutos });
+  }
+
+  const availableSlotsFormatted = availableSlots.map(intervalo => ({
+    start: new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), Math.floor(intervalo.start / 60), intervalo.start % 60).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+    end: new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), Math.floor(intervalo.end / 60), intervalo.end % 60).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+  }));
+
+  return {
+    status: status,
+    occupiedSlots: intervalosFusionados.map(intervalo => ({
+      start: new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), Math.floor(intervalo.start / 60), intervalo.start % 60).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      end: new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), Math.floor(intervalo.end / 60), intervalo.end % 60).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+    })),
+    availableHours: horasDisponibles,
+    availableSlots: availableSlotsFormatted
+  };
+}
+
+// Verificar si un día está ocupado (anterior)
 function esDiaOcupado(fecha) {
   return fechasOcupadasProveedor.some(function(reserva) {
     const inicio = new Date(reserva.fecha_hora_inicio);
@@ -525,6 +642,34 @@ function seleccionarDia(fecha, elemento) {
 
   // Mostrar información de selección
   actualizarInfoSeleccion();
+
+  // Si el día seleccionado es parcialmente ocupado, mostrar los horarios ocupados y disponibles
+  const disponibilidad = JSON.parse(elemento.dataset.disponibilidad);
+  const estadoReservaDiv = document.getElementById('estadoReserva');
+
+  if (disponibilidad && disponibilidad.status === 'partially_occupied') {
+    let mensaje = '<div class="alert alert-warning"><i class="bi bi-info-circle"></i> <strong>Día Parcialmente Ocupado:</strong><br>';
+    
+    if (disponibilidad.occupiedSlots.length > 0) {
+      mensaje += '<strong>Reservado de:</strong><br>';
+      disponibilidad.occupiedSlots.forEach(slot => {
+        mensaje += `- ${slot.start} a ${slot.end}<br>`;
+      });
+    }
+
+    if (disponibilidad.availableSlots.length > 0) {
+      mensaje += '<strong>Disponible de:</strong><br>';
+      disponibilidad.availableSlots.forEach(slot => {
+        mensaje += `- ${slot.start} a ${slot.end}<br>`;
+      });
+    } else {
+      mensaje += 'No hay bloques de tiempo disponibles para reservar.';
+    }
+    mensaje += '</div>';
+    estadoReservaDiv.innerHTML = mensaje;
+  } else {
+    estadoReservaDiv.innerHTML = ''; // Limpiar si no es parcialmente ocupado
+  }
 
   // Re-renderizar calendario para actualizar estilos
   renderizarCalendario();
@@ -630,6 +775,20 @@ document.getElementById('formReserva').addEventListener('submit', async function
   
   if (diferenciaHoras < horasMinimasProveedor) {
     estadoReserva.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> La reserva debe ser de al menos ' + horasMinimasProveedor + ' hora(s). Actualmente: ' + diferenciaHoras.toFixed(2) + ' hora(s)</div>';
+    return;
+  }
+
+  // VALIDAR DISPONIBILIDAD EN DÍAS PARCIALMENTE OCUPADOS
+  const fechaSeleccionada = new Date(fechaInicio.replace('-', '/')); // Usar fechaInicio para la validación del día
+  const disponibilidadDia = obtenerDisponibilidadDia(fechaSeleccionada);
+
+  if (disponibilidadDia.status === 'fully_occupied') {
+    estadoReserva.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> El día seleccionado está completamente ocupado.</div>';
+    return;
+  }
+
+  if (diferenciaHoras > disponibilidadDia.availableHours) {
+    estadoReserva.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> No hay suficiente tiempo disponible para esta reserva. Quedan ' + disponibilidadDia.availableHours.toFixed(2) + ' hora(s) disponibles.</div>';
     return;
   }
 

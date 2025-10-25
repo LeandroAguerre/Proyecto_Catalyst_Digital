@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . "/../config/database.php");
 require_once(__DIR__ . "/../model/reservaModel.php");
+require_once(__DIR__ . "/../model/publicacionModel.php");
 
 class ReservaController {
     
@@ -21,27 +22,43 @@ class ReservaController {
 
         // Validar campos requeridos
         if (!isset($data->cliente_id) || !isset($data->proveedor_id) || 
-            !isset($data->fecha_hora_inicio) || !isset($data->fecha_hora_fin)) {
+            !isset($data->fecha_hora_inicio) || !isset($data->fecha_hora_fin) || !isset($data->publicacion_id)) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Faltan campos obligatorios']);
+            echo json_encode(['success' => false, 'message' => 'Faltan campos obligatorios (cliente_id, proveedor_id, publicacion_id, fecha_hora_inicio, fecha_hora_fin)']);
             return;
         }
 
         try {
             $reservaModel = new ReservaModel();
+            $publicacionModel = new Publicacion();
 
-            // Verificar conflicto de horarios
-            $hayConflicto = $reservaModel->verificarConflictoHorario(
+            // Obtener detalles de la publicación para obtener horario y horas mínimas del proveedor
+            $publicacion = $publicacionModel->obtenerPorId($data->publicacion_id);
+            if (!$publicacion) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Publicación no encontrada']);
+                return;
+            }
+
+            $hora_inicio_proveedor = $publicacion['hora_inicio'];
+            $hora_fin_proveedor = $publicacion['hora_fin'];
+            $horas_minimas_proveedor = (float)$publicacion['horas_minimas'];
+
+            // Verificar conflicto de horarios con la nueva lógica detallada
+            $disponibilidad = $reservaModel->verificarDisponibilidadDetallada(
                 $data->proveedor_id,
                 $data->fecha_hora_inicio,
-                $data->fecha_hora_fin
+                $data->fecha_hora_fin,
+                $hora_inicio_proveedor,
+                $hora_fin_proveedor,
+                $horas_minimas_proveedor
             );
 
-            if ($hayConflicto) {
+            if (!$disponibilidad['available']) {
                 http_response_code(409);
                 echo json_encode([
                     'success' => false, 
-                    'message' => 'El proveedor ya tiene una reserva en ese horario'
+                    'message' => $disponibilidad['message']
                 ]);
                 return;
             }
@@ -50,7 +67,7 @@ class ReservaController {
             $resultado = $reservaModel->crearReserva(
                 $data->cliente_id,
                 $data->proveedor_id,
-                $data->publicacion_id ?? null,
+                $data->publicacion_id,
                 $data->fecha_hora_inicio,
                 $data->fecha_hora_fin,
                 $data->notas_cliente ?? null

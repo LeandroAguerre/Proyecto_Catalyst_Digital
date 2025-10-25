@@ -31,5 +31,6 @@ RUN a2ensite 000-default.conf
 RUN chown -R www-data:www-data /var/www/html \
     && mkdir -p /var/www/html/public/uploads/publicaciones \
     && chown -R www-data:www-data /var/www/html/public/uploads \
-    && chmod -R 755 /var/www/html/public/uploads
+    && chmod -R 755 /var/www/html/public/uploads \
+    && chmod -R 775 /var/www/html/public/uploads/publicaciones
 

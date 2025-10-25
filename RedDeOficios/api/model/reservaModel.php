@@ -208,35 +208,118 @@ class ReservaModel {
         }
     }
 
-    // Verificar si hay conflicto de horarios
-    public function verificarConflictoHorario($proveedor_id, $fecha_hora_inicio, $fecha_hora_fin, $reserva_id_excluir = null) {
-        try {
-            $sql = "SELECT COUNT(*) as conflictos 
-                    FROM reserva 
-                    WHERE proveedor_id = ? 
-                    AND estado IN ('pendiente', 'confirmada')
-                    AND (
-                        (fecha_hora_inicio BETWEEN ? AND ?) OR
-                        (fecha_hora_fin BETWEEN ? AND ?) OR
-                        (? BETWEEN fecha_hora_inicio AND fecha_hora_fin) OR
-                        (? BETWEEN fecha_hora_inicio AND fecha_hora_fin)
-                    )";
-            
-            $params = [$proveedor_id, $fecha_hora_inicio, $fecha_hora_fin, $fecha_hora_inicio, $fecha_hora_fin, $fecha_hora_inicio, $fecha_hora_fin];
 
-            if ($reserva_id_excluir) {
-                $sql .= " AND id != ?";
-                $params[] = $reserva_id_excluir;
+
+    // Nueva función para verificar disponibilidad detallada
+    public function verificarDisponibilidadDetallada($proveedor_id, $fecha_hora_inicio_solicitud, $fecha_hora_fin_solicitud, $hora_inicio_proveedor, $hora_fin_proveedor, $horas_minimas_proveedor) {
+        try {
+            $inicio_solicitud = new DateTime($fecha_hora_inicio_solicitud);
+            $fin_solicitud = new DateTime($fecha_hora_fin_solicitud);
+
+            // 1. Validar que la fecha/hora de fin sea posterior a la de inicio
+            if ($fin_solicitud <= $inicio_solicitud) {
+                return ['available' => false, 'message' => 'La fecha/hora de fin debe ser posterior a la de inicio.'];
             }
 
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
-            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            // 2. Validar que la solicitud esté dentro del horario de trabajo del proveedor
+            $fecha_solicitud_str = $inicio_solicitud->format('Y-m-d');
+            $hora_inicio_solicitud_str = $inicio_solicitud->format('H:i:s');
+            $hora_fin_solicitud_str = $fin_solicitud->format('H:i:s');
 
-            return $resultado['conflictos'] > 0;
-        } catch (PDOException $e) {
-            error_log("Error al verificar conflicto: " . $e->getMessage());
-            return true; // Por seguridad, asumimos que hay conflicto si hay error
+            if ($hora_inicio_solicitud_str < $hora_inicio_proveedor || $hora_fin_solicitud_str > $hora_fin_proveedor) {
+                return ['available' => false, 'message' => 'El horario solicitado está fuera del horario de trabajo del proveedor (' . substr($hora_inicio_proveedor, 0, 5) . ' a ' . substr($hora_fin_proveedor, 0, 5) . ').'];
+            }
+
+            // 3. Validar duración mínima
+            $intervalo_solicitud = $inicio_solicitud->diff($fin_solicitud);
+            $duracion_solicitud_horas = $intervalo_solicitud->days * 24 + $intervalo_solicitud->h + $intervalo_solicitud->i / 60;
+
+            if ($duracion_solicitud_horas < $horas_minimas_proveedor) {
+                return ['available' => false, 'message' => 'La reserva debe ser de al menos ' . $horas_minimas_proveedor . ' hora(s).'];
+            }
+
+            // 4. Obtener todas las reservas existentes para el proveedor en el día de la solicitud
+            $reservas_existentes = $this->obtenerFechasOcupadasProveedor(
+                $proveedor_id,
+                (int)$inicio_solicitud->format('m'),
+                (int)$inicio_solicitud->format('Y')
+            );
+
+            $intervalos_ocupados = [];
+            foreach ($reservas_existentes as $reserva) {
+                $res_inicio = new DateTime($reserva['fecha_hora_inicio']);
+                $res_fin = new DateTime($reserva['fecha_hora_fin']);
+
+                // Solo considerar reservas que caen en el mismo día de la solicitud
+                if ($res_inicio->format('Y-m-d') === $fecha_solicitud_str) {
+                    $intervalos_ocupados[] = [
+                        'start' => $res_inicio->format('H:i:s'),
+                        'end' => $res_fin->format('H:i:s')
+                    ];
+                }
+            }
+
+            // Ordenar y fusionar intervalos ocupados para simplificar la lógica de disponibilidad
+            usort($intervalos_ocupados, function($a, $b) { return strtotime($a['start']) - strtotime($b['start']); });
+
+            $intervalos_fusionados = [];
+            if (!empty($intervalos_ocupados)) {
+                $current = $intervalos_ocupados[0];
+                for ($i = 1; $i < count($intervalos_ocupados); $i++) {
+                    if (strtotime($intervalos_ocupados[$i]['start']) <= strtotime($current['end'])) {
+                        $current['end'] = max($current['end'], $intervalos_ocupados[$i]['end']);
+                    } else {
+                        $intervalos_fusionados[] = $current;
+                        $current = $intervalos_ocupados[$i];
+                    }
+                }
+                $intervalos_fusionados[] = $current;
+            }
+
+            // 5. Verificar solapamiento directo con la solicitud
+            foreach ($intervalos_fusionados as $intervalo) {
+                $existente_inicio = new DateTime($fecha_solicitud_str . ' ' . $intervalo['start']);
+                $existente_fin = new DateTime($fecha_solicitud_str . ' ' . $intervalo['end']);
+
+                if (
+                    ($inicio_solicitud < $existente_fin && $fin_solicitud > $existente_inicio)
+                ) {
+                    return ['available' => false, 'message' => 'El horario solicitado se solapa con una reserva existente.'];
+                }
+            }
+
+            // 6. Calcular tiempo disponible y verificar si la solicitud cabe
+            $jornada_inicio = new DateTime($fecha_solicitud_str . ' ' . $hora_inicio_proveedor);
+            $jornada_fin = new DateTime($fecha_solicitud_str . ' ' . $hora_fin_proveedor);
+
+            $tiempo_total_jornada_segundos = $jornada_fin->getTimestamp() - $jornada_inicio->getTimestamp();
+            $tiempo_ocupado_segundos = 0;
+
+            foreach ($intervalos_fusionados as $intervalo) {
+                $reserva_inicio = new DateTime($fecha_solicitud_str . ' ' . $intervalo['start']);
+                $reserva_fin = new DateTime($fecha_solicitud_str . ' ' . $intervalo['end']);
+
+                // Asegurarse de que los intervalos ocupados estén dentro de la jornada laboral
+                $overlap_start = max($jornada_inicio, $reserva_inicio);
+                $overlap_end = min($jornada_fin, $reserva_fin);
+
+                if ($overlap_start < $overlap_end) {
+                    $tiempo_ocupado_segundos += ($overlap_end->getTimestamp() - $overlap_start->getTimestamp());
+                }
+            }
+
+            $tiempo_disponible_segundos = $tiempo_total_jornada_segundos - $tiempo_ocupado_segundos;
+            $tiempo_disponible_horas = $tiempo_disponible_segundos / 3600;
+
+            if ($duracion_solicitud_horas > $tiempo_disponible_horas) {
+                return ['available' => false, 'message' => 'No hay suficiente tiempo disponible para esta reserva en el día solicitado.'];
+            }
+
+            return ['available' => true, 'message' => 'Disponibilidad verificada.'];
+
+        } catch (Exception $e) {
+            error_log("Error en verificarDisponibilidadDetallada: " . $e->getMessage());
+            return ['available' => false, 'message' => 'Error interno del servidor al verificar disponibilidad.'];
         }
     }
 }

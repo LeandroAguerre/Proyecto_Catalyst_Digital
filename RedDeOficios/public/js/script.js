@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para guardar sesión del usuario
   function guardarSesion(usuario) {
-    console.log('💾 Guardando sesión:', usuario);
+    console.log(' Guardando sesión:', usuario);
     sessionStorage.setItem('usuarioId', usuario.id);
     sessionStorage.setItem('tipoUsuario', usuario.tipoUsuario);
     sessionStorage.setItem('nombreCompleto', usuario.nombreCompleto);
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para limpiar sesión
   function limpiarSesion() {
-    console.log('🗑️ Limpiando sesión');
+    console.log(' Limpiando sesión');
     sessionStorage.removeItem('usuarioId');
     sessionStorage.removeItem('tipoUsuario');
     sessionStorage.removeItem('nombreCompleto');
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para mostrar usuario logueado
   function mostrarUsuarioLogueado(usuario) {
-    console.log('👤 Mostrando usuario logueado:', usuario);
+    console.log(' Mostrando usuario logueado:', usuario);
     if (authButtons) authButtons.style.display = 'none';
     if (username) username.textContent = usuario.nombreCompleto || usuario.correoElectronico;
     if (welcomeMessage) welcomeMessage.style.display = 'block';
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para mostrar estado de no logueado
   function mostrarUsuarioDeslogueado() {
-    console.log('🚪 Mostrando estado deslogueado');
+    console.log(' Mostrando estado deslogueado');
     if (authButtons) authButtons.style.display = '';
     if (welcomeMessage) welcomeMessage.style.display = 'none';
     if (username) username.textContent = '';
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Evento: Botón Salir
   if (btnSalir) {
     btnSalir.addEventListener('click', () => {
-      console.log('🚪 Cerrando sesión...');
+      console.log(' Cerrando sesión...');
       mostrarUsuarioDeslogueado();
       
       // Recargar página para limpiar estado
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formRegistro) {
     formRegistro.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('🚀 Formulario de registro enviado');
+      console.log(' Formulario de registro enviado');
 
       const tipoUsuario = document.getElementById('tipoUsuario').value;
       const nombreCompleto = document.getElementById('nombre').value.trim();
@@ -263,10 +263,10 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify(payload)
         });
 
-        console.log('📨 Respuesta registro:', res.status);
+        console.log(' Respuesta registro:', res.status);
 
         const data = await res.json();
-        console.log('📦 Data registro:', data);
+        console.log(' Data registro:', data);
 
         if (data.exito && data.usuario) {
           estadoRegistro.innerHTML = '<div class="alert alert-success">✅ ' + data.mensaje + '</div>';
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
       } catch (err) {
-        console.error('💥 Error de conexión:', err);
+        console.error(' Error de conexión:', err);
         estadoRegistro.innerHTML = '<div class="alert alert-danger">❌ Error de conexión con el servidor</div>';
       }
     });
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('🔑 Formulario de login enviado');
+      console.log(' Formulario de login enviado');
 
       const correoElectronico = document.getElementById('loginEmail').value.trim();
       const contrasena = document.getElementById('loginPassword').value.trim();
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const data = await res.json();
-        console.log('📦 Data login:', data);
+        console.log(' Data login:', data);
 
         if (data.exito && data.usuario) {
           guardarSesion(data.usuario);
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
           estadoLogin.innerHTML = '<div class="alert alert-danger">❌ ' + data.mensaje + '</div>';
         }
       } catch (err) {
-        console.error('💥 Error en login:', err);
+        console.error(' Error en login:', err);
         estadoLogin.innerHTML = '<div class="alert alert-danger">❌ Error de conexión con el servidor</div>';
       }
     });
@@ -356,26 +356,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // INICIALIZACIÓN: Verificar sesión guardada al cargar la página
   const sesionActual = obtenerSesion();
   if (sesionActual) {
-    console.log('🔄 Sesión encontrada al cargar página:', sesionActual);
+    console.log(' Sesión encontrada al cargar página:', sesionActual);
     mostrarUsuarioLogueado(sesionActual);
   } else {
-    console.log('🔄 No hay sesión guardada');
+    console.log(' No hay sesión guardada');
     mostrarUsuarioDeslogueado();
   }
 
-  console.log('✅ Script inicializado completamente');
+  console.log(' Script inicializado completamente');
 });
 
 // Función para cargar tarjetas (publicaciones)
 async function cargarTarjetas() {
   // Si estamos en la página de búsqueda, no hacer nada. La búsqueda es manual.
   if (window.location.pathname.includes('todas.html')) {
-    console.log('ℹ️ Carga inicial de tarjetas omitida en todas.html');
+    console.log(' Carga inicial de tarjetas omitida en todas.html');
     return;
   }
 
   try {
-    console.log('🔄 Cargando publicaciones...');
+    console.log(' Cargando publicaciones...');
     
     const res = await fetch('/publicacion', {
       method: 'GET',
@@ -384,7 +384,7 @@ async function cargarTarjetas() {
       }
     });
 
-    console.log('📨 Status respuesta publicaciones:', res.status);
+    console.log(' Status respuesta publicaciones:', res.status);
     
     if (!res.ok) {
       throw new Error('HTTP error! status: ' + res.status);
@@ -393,17 +393,17 @@ async function cargarTarjetas() {
     const contentType = res.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       const text = await res.text();
-      console.error('❌ Respuesta no es JSON:', text);
+      console.error(' Respuesta no es JSON:', text);
       throw new Error('La respuesta del servidor no es JSON válido');
     }
 
     const publicaciones = await res.json();
-    console.log('✅ Publicaciones cargadas:', publicaciones);
+    console.log(' Publicaciones cargadas:', publicaciones);
 
     const contenedor2 = document.getElementById('grid-servicios');
     
     if (!contenedor2) {
-      console.error('❌ No se encontró el elemento grid-servicios');
+      console.error(' No se encontró el elemento grid-servicios');
       return;
     }
 
@@ -418,7 +418,7 @@ async function cargarTarjetas() {
     // INTEGRACIÓN CON SISTEMA DE BÚSQUEDA
     if (typeof window.cargarPublicacionesParaBusqueda === 'function') {
       window.cargarPublicacionesParaBusqueda(publicaciones);
-      console.log('✅ Publicaciones enviadas al sistema de búsqueda');
+      console.log(' Publicaciones enviadas al sistema de búsqueda');
       // NO renderizar aquí, el buscador lo hará
       return;
     }
@@ -444,7 +444,7 @@ async function cargarTarjetas() {
     });
 
   } catch (error) {
-    console.error('💥 Error al cargar publicaciones:', error);
+    console.error(' Error al cargar publicaciones:', error);
     const contenedor2 = document.getElementById('grid-servicios');
     if (contenedor2) {
       contenedor2.innerHTML = '<div class="alert alert-danger" role="alert">❌ Error al cargar publicaciones: ' + error.message + '</div>';

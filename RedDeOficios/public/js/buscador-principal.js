@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const btnBuscar = document.querySelector('.search-button');
   
   if (!inputBusquedaIzq || !inputBusquedaDer || !btnBuscar) {
-    console.log('⚠️ Elementos de búsqueda no encontrados en esta página');
+    console.log(' Elementos de búsqueda no encontrados en esta página');
     return;
   }
   
-  console.log('✅ Sistema de búsqueda con paginación inicializado');
+  console.log(' Sistema de búsqueda con paginación inicializado');
   
   // Convertir input derecho en select (departamentos)
   const selectDepartamento = document.createElement('select');
@@ -73,7 +73,7 @@ function cargarPublicacionesParaBusqueda(publicaciones) {
   publicacionesFiltradas = todasLasPublicaciones;
   paginaActual = 1;
   
-  console.log('📦 Publicaciones cargadas para búsqueda paginada:', publicaciones.length);
+  console.log(' Publicaciones cargadas para búsqueda paginada:', publicaciones.length);
   
   mostrarPublicacionesPaginadas();
 }
@@ -88,7 +88,7 @@ function realizarBusqueda() {
   const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
   const departamentoSeleccionado = selectDepartamento.value.trim();
   
-  console.log('🔍 Buscando:', { texto: textoBusqueda, departamento: departamentoSeleccionado });
+  console.log(' Buscando:', { texto: textoBusqueda, departamento: departamentoSeleccionado });
   
   // Si no hay filtros, mostrar todo
   if (!textoBusqueda && !departamentoSeleccionado) {
@@ -125,7 +125,7 @@ function realizarBusqueda() {
     return coincideTexto && coincideDepartamento;
   });
   
-  console.log('✅ Resultados encontrados:', publicacionesFiltradas.length);
+  console.log(' Resultados encontrados:', publicacionesFiltradas.length);
   
   paginaActual = 1; // Reiniciar a la primera página
   mostrarPublicacionesPaginadas();
@@ -136,7 +136,7 @@ function mostrarPublicacionesPaginadas() {
   const contenedor = document.getElementById('grid-servicios');
   
   if (!contenedor) {
-    console.error('❌ No se encontró el contenedor grid-servicios');
+    console.error(' No se encontró el contenedor grid-servicios');
     return;
   }
   
@@ -148,8 +148,8 @@ function mostrarPublicacionesPaginadas() {
   const fin = inicio + publicacionesPorPagina;
   const publicacionesPagina = publicacionesFiltradas.slice(inicio, fin);
   
-  console.log('📄 Página actual:', paginaActual, 'de', totalPaginas);
-  console.log('📊 Mostrando publicaciones:', inicio, '-', fin, 'de', publicacionesFiltradas.length);
+  console.log(' Página actual:', paginaActual, 'de', totalPaginas);
+  console.log(' Mostrando publicaciones:', inicio, '-', fin, 'de', publicacionesFiltradas.length);
   
   // Verificar si hay filtros activos
   const inputBusqueda = document.querySelector('.search-left');

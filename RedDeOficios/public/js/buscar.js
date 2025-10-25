@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- INICIALIZACIÓN ---
   if (!btnBuscar) {
-    console.log('⚠️ No es la página de búsqueda, no se inicializa el script.');
+    console.log(' No es la página de búsqueda, no se inicializa el script.');
     return;
   }
 
@@ -57,12 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   inputTexto.addEventListener('keyup', e => e.key === 'Enter' && realizarBusqueda());
   
-  console.log('✅ Sistema de búsqueda (v2.1) inicializado con dropdown.');
+  console.log(' Sistema de búsqueda (v2.1) inicializado con dropdown.');
 
   // --- FUNCIONES PRINCIPALES ---
 
   async function realizarBusqueda() {
-    console.log('🔍 Realizando búsqueda en el servidor...');
+    console.log(' Realizando búsqueda en el servidor...');
     
     gridServicios.innerHTML = `
       <div class="col-12 text-center py-5">
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     try {
       const url = `/publicacion?${params.toString()}`;
-      console.log(`📨 Fetching: ${url}`);
+      console.log(` Fetching: ${url}`);
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
       mostrarPublicaciones(publicaciones);
 
     } catch (error) {
-      console.error('💥 Error en la búsqueda:', error);
+      console.error(' Error en la búsqueda:', error);
       gridServicios.innerHTML = `
         <div class="col-12">
           <div class="alert alert-danger">
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function mostrarPublicaciones(publicaciones) {
-    console.log(`📊 Mostrando ${publicaciones.length} publicaciones.`);
+    console.log(` Mostrando ${publicaciones.length} publicaciones.`);
     gridServicios.innerHTML = '';
 
     if (publicaciones.length === 0) {
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function limpiarBusqueda() {
-    console.log('🧹 Limpiando filtros y resultados...');
+    console.log(' Limpiando filtros y resultados...');
     inputTexto.value = '';
     inputUbicacion.value = '';
     selectTipoServicio.value = '';

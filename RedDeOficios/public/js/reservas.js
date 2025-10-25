@@ -15,18 +15,18 @@ function obtenerSesion() {
 
 // VALIDACIÓN AL CARGAR LA PÁGINA
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔍 Validando acceso a reservas...');
+  console.log(' Validando acceso a reservas...');
   
   const sesion = obtenerSesion();
   
   if (!sesion) {
-    console.log('❌ Usuario no autenticado');
+    console.log(' Usuario no autenticado');
     window.mostrarAlerta('Debes iniciar sesión para ver tus reservas', 'warning');
     setTimeout(() => { window.location.href = 'index.html'; }, 2000);
     return;
   }
   
-  console.log('✅ Usuario autorizado:', sesion);
+  console.log(' Usuario autorizado:', sesion);
   
   // Si es proveedor, mostrar el tab de reservas recibidas
   if (sesion.tipoUsuario === 2) {
@@ -55,7 +55,7 @@ async function cargarMisReservas() {
   const contenedor = document.getElementById('contenedor-mis-reservas');
   
   try {
-    console.log('🔄 Cargando mis reservas...');
+    console.log(' Cargando mis reservas...');
     
     const res = await fetch('/reserva?usuario_id=' + sesion.id + '&tipo=cliente', {
       method: 'GET',
@@ -65,7 +65,7 @@ async function cargarMisReservas() {
     if (!res.ok) throw new Error('Error al cargar reservas');
     
     const reservas = await res.json();
-    console.log('✅ Mis reservas:', reservas);
+    console.log(' Mis reservas:', reservas);
     
     loadingDiv.style.display = 'none';
     
@@ -93,7 +93,7 @@ async function cargarReservasRecibidas() {
   if (contenedor.innerHTML.trim() !== '') return;
   
   try {
-    console.log('🔄 Cargando reservas recibidas...');
+    console.log(' Cargando reservas recibidas...');
     
     const res = await fetch('/reserva?usuario_id=' + sesion.id + '&tipo=proveedor', {
       method: 'GET',
@@ -103,7 +103,7 @@ async function cargarReservasRecibidas() {
     if (!res.ok) throw new Error('Error al cargar reservas');
     
     const reservas = await res.json();
-    console.log('✅ Reservas recibidas:', reservas);
+    console.log(' Reservas recibidas:', reservas);
     
     loadingDiv.style.display = 'none';
     
@@ -241,12 +241,7 @@ function mostrarReservas(reservas, contenedor, tipo) {
 
 // FUNCIÓN PARA CONTACTAR AL USUARIO
 function contactarUsuario(publicacionId, otroUsuarioId, otroUsuarioNombre, publicacionTitulo) {
-  console.log('💬 Abriendo conversación con:', {
-    publicacionId,
-    otroUsuarioId,
-    otroUsuarioNombre,
-    publicacionTitulo
-  });
+  console.log(' Abriendo conversación con:', { publicacionId, otroUsuarioId, otroUsuarioNombre, publicacionTitulo });
   
   // Guardar datos en sessionStorage para mensajes.html
   sessionStorage.setItem('abrirConversacion', JSON.stringify({

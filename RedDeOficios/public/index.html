@@ -141,6 +141,10 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
 // };
 </script>
 <body>
+    <!-- Hamburger menu button for mobile -->
+    <button class="hamburger-menu-button d-lg-none" id="hamburgerMenuButton">
+        <i class="bi bi-list"></i>
+    </button>
     
     <header class="sidebar">
         <div class="logo">
@@ -154,8 +158,9 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
               Registrarse
             </button>
         </div>
-        
 
+
+        
         <div id="welcomeMessage" class="welcome-message" style="display:none;">
           <div class="mb-2">Bienvenido, <span id="username"></span></div>
             <button id="btnSalir" class="btn btn-danger btn-sm">
@@ -163,7 +168,7 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
             </button>
         </div>
 
-        <nav class="navigation">
+        <nav class="navigation" id="mainNavigation">
             <ul>
                 <li><a href="index.html" class="btn nav-btn active">Inicio</a></li>
                 <li><a href="todas.html" class="btn nav-btn">Servicios</a></li>

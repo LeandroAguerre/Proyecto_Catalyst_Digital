@@ -413,6 +413,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   console.log(' Script inicializado completamente');
+
+  // Hamburger menu functionality
+  const hamburgerButton = document.getElementById('hamburgerMenuButton');
+  const mainNavigation = document.getElementById('mainNavigation');
+  const sidebar = document.querySelector('.sidebar'); // Assuming .sidebar is the main container for the nav
+
+  if (hamburgerButton && mainNavigation && sidebar) {
+    hamburgerButton.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking outside of it on mobile
+    document.addEventListener('click', (event) => {
+      if (window.innerWidth <= 991.98 && !sidebar.contains(event.target) && !hamburgerButton.contains(event.target)) {
+        sidebar.classList.remove('active');
+      }
+    });
+  }
+
+
 });
 
 // Función para cargar tarjetas (publicaciones)

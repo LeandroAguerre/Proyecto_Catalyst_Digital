@@ -11,28 +11,33 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
+    <!-- Hamburger menu button for mobile -->
+    <button class="hamburger-menu-button d-lg-none" id="hamburgerMenuButton">
+        <i class="bi bi-list"></i>
+    </button>
     
     <header class="sidebar">
         <div class="logo">
            <a href="index.html"><span class="azul">RedDe</span><span class="naranja">Oficios</span></a>
         </div>
-         <div class="auth-buttons">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Ingresar
-            </button>
-            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#registroModal">
-              Registrarse
-            </button>
-        </div>
-        
-        <div id="welcomeMessage" class="welcome-message" style="display:none;">
-          <div class="mb-2">Bienvenido, <span id="username"></span></div>
-            <button id="btnSalir" class="btn btn-danger btn-sm">
-                <i class="bi bi-box-arrow-right"></i> Salir
-            </button>
-        </div>
-
-        <nav class="navigation">
+                 <div class="auth-buttons">
+                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                       Ingresar
+                     </button>
+                     <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#registroModal">
+                       Registrarse
+                     </button>
+                 </div>
+         
+                                  
+                 <div id="welcomeMessage" class="welcome-message" style="display:none;">
+                   <div class="mb-2">Bienvenido, <span id="username"></span></div>
+                     <button id="btnSalir" class="btn btn-danger btn-sm">
+                         <i class="bi bi-box-arrow-right"></i> Salir
+                     </button>
+                 </div>
+         
+                 <nav class="navigation" id="mainNavigation">
             <ul>
                 <li><a href="index.html" class="btn nav-btn">Inicio</a></li>
                 <li><a href="todas.html" class="btn nav-btn active">Servicios</a></li>

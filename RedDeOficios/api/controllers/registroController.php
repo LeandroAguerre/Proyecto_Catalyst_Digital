@@ -66,6 +66,66 @@ class RegistroController {
             return;
         }
 
+        // Validaciones de contraseña
+        if (strlen($contrasena) < 8) {
+            http_response_code(400);
+            echo json_encode([
+                'exito' => false,
+                'mensaje' => 'La contraseña debe tener al menos 8 caracteres.'
+            ]);
+            return;
+        }
+
+        if (!preg_match('/[A-Z]/', $contrasena)) {
+            http_response_code(400);
+            echo json_encode([
+                'exito' => false,
+                'mensaje' => 'La contraseña debe contener al menos una letra mayúscula.'
+            ]);
+            return;
+        }
+
+        if (!preg_match('/[a-z]/', $contrasena)) {
+            http_response_code(400);
+            echo json_encode([
+                'exito' => false,
+                'mensaje' => 'La contraseña debe contener al menos una letra minúscula.'
+            ]);
+            return;
+        }
+
+        if (!preg_match('/[0-9]/', $contrasena)) {
+            http_response_code(400);
+            echo json_encode([
+                'exito' => false,
+                'mensaje' => 'La contraseña debe contener al menos un número.'
+            ]);
+            return;
+        }
+
+        if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\'"\\|,.<>\/?]/u', $contrasena)) {
+            http_response_code(400);
+            echo json_encode([
+                'exito' => false,
+                'mensaje' => 'La contraseña debe contener al menos un carácter especial.'
+            ]);
+            return;
+        }
+
+        // Convertir a minúsculas para comparación insensible a mayúsculas/minúsculas
+        $contrasenaLower = strtolower($contrasena);
+        $nombreCompletoLower = strtolower($nombreCompleto);
+        $correoElectronicoLower = strtolower($correoElectronico);
+
+        if (strpos($contrasenaLower, $nombreCompletoLower) !== false || strpos($contrasenaLower, $correoElectronicoLower) !== false) {
+            http_response_code(400);
+            echo json_encode([
+                'exito' => false,
+                'mensaje' => 'La contraseña no debe contener su nombre de usuario o correo electrónico.'
+            ]);
+            return;
+        }
+
         // Encriptar la contraseña
         $hash = password_hash($contrasena, PASSWORD_DEFAULT);
 

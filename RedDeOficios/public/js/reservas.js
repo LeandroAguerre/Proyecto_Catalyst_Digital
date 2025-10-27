@@ -78,6 +78,7 @@ async function cargarMisReservas() {
 
     // Marcar notificaciones de cliente como vistas después de cargarlas
     if (sesion.tipoUsuario === 1) { // Solo para clientes
+      console.log('Marcando reservas como vistas para cliente_id:', sesion.id);
       await fetch('/reserva?accion=marcar_vistas', {
         method: 'POST',
         headers: {

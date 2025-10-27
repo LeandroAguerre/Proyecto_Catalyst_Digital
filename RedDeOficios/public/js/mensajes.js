@@ -34,6 +34,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cargar conversaciones
     cargarConversaciones();
 
+    // Ocultar elementos del header del chat por defecto
+    const chatPublicacionImg = document.getElementById('chatPublicacionImg');
+    const chatPublicacionTitulo = document.getElementById('chatPublicacionTitulo');
+    const chatOtroUsuario = document.getElementById('chatOtroUsuario');
+
+    if (chatPublicacionImg) chatPublicacionImg.style.display = 'none';
+    if (chatPublicacionTitulo) chatPublicacionTitulo.style.display = 'none';
+    if (chatOtroUsuario) chatOtroUsuario.style.display = 'none';
+
     // Configurar formulario de envío
     const formEnviar = document.getElementById('formEnviarMensaje');
     if (formEnviar) {
@@ -206,12 +215,25 @@ function abrirConversacion(elemento) {
     chatActivo.style.display = 'flex';
 
     // Actualizar header del chat
-    document.getElementById('chatPublicacionImg').src = conversacionActual.publicacionImg;
-    document.getElementById('chatPublicacionImg').onerror = function() {
-        this.src = 'imagenes/trabajador.jpg';
-    };
-    document.getElementById('chatPublicacionTitulo').textContent = conversacionActual.publicacionTitulo;
-    document.getElementById('chatOtroUsuario').textContent = conversacionActual.otroUsuarioNombre;
+    const chatPublicacionImg = document.getElementById('chatPublicacionImg');
+    const chatPublicacionTitulo = document.getElementById('chatPublicacionTitulo');
+    const chatOtroUsuario = document.getElementById('chatOtroUsuario');
+
+    if (chatPublicacionImg) {
+        chatPublicacionImg.src = conversacionActual.publicacionImg;
+        chatPublicacionImg.onerror = function() {
+            this.src = 'imagenes/trabajador.jpg';
+        };
+        chatPublicacionImg.style.display = 'block';
+    }
+    if (chatPublicacionTitulo) {
+        chatPublicacionTitulo.textContent = conversacionActual.publicacionTitulo;
+        chatPublicacionTitulo.style.display = 'block';
+    }
+    if (chatOtroUsuario) {
+        chatOtroUsuario.textContent = conversacionActual.otroUsuarioNombre;
+        chatOtroUsuario.style.display = 'block';
+    }
 
     // Cargar mensajes
     cargarMensajes();
@@ -553,22 +575,63 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 }
 
+function mostrarAlertaModal(mensaje, tipo = 'info', titulo = null) {
+    const modalId = 'genericAlertModal';
+    let modalElement = document.getElementById(modalId);
+
+    if (!modalElement) {
+        const modalHtml = `
+            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="${modalId}Label"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modalElement = document.getElementById(modalId);
+    }
+
+    const modalTitle = modalElement.querySelector('.modal-title');
+    const modalBody = modalElement.querySelector('.modal-body');
+    const modalHeader = modalElement.querySelector('.modal-header');
+
+    // Reset classes
+    modalHeader.className = 'modal-header';
+    modalTitle.textContent = titulo || (tipo === 'success' ? 'Éxito' : (tipo === 'error' ? 'Error' : 'Información'));
+    modalBody.innerHTML = mensaje;
+
+    // Apply type-specific styling
+    if (tipo === 'success') {
+        modalHeader.classList.add('bg-success', 'text-white');
+    } else if (tipo === 'error') {
+        modalHeader.classList.add('bg-danger', 'text-white');
+    } else if (tipo === 'warning') {
+        modalHeader.classList.add('bg-warning', 'text-dark');
+    } else {
+        modalHeader.classList.add('bg-info', 'text-white');
+    }
+
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}
+
 function mostrarError(mensaje) {
     console.error('', mensaje);
-    if (typeof window.mostrarAlerta === 'function') {
-        window.mostrarAlerta(mensaje, 'error');
-    } else {
-        alert('❌ ' + mensaje);
-    }
+    mostrarAlertaModal(mensaje, 'error', 'Error');
 }
 
 function mostrarExito(mensaje) {
     console.log('', mensaje);
-    if (typeof window.mostrarAlerta === 'function') {
-        window.mostrarAlerta(mensaje, 'success');
-    } else {
-        alert('✅ ' + mensaje);
-    }
+    mostrarAlertaModal(mensaje, 'success', 'Éxito');
 }
 
 // =====================================================
@@ -624,7 +687,12 @@ async function crearConversacionInicial(receptorId, publicacionId, publicacionTi
     console.log('Creando conversación inicial con:', { receptorId, publicacionId, publicacionTitulo });
     try {
         // Enviar un mensaje inicial para establecer la conversación
-        const mensajeInicial = `Hola! Estoy interesado en tu servicio: "${publicacionTitulo}".`;
+        let mensajeInicial;
+        if (usuarioActual.tipoUsuario === 1) { // Cliente
+            mensajeInicial = `Hola! Estoy interesado en tu servicio: "${publicacionTitulo}".`;
+        } else { // Proveedor
+            mensajeInicial = `Hola!`;
+        }
         
         const responseMsg = await fetch(`${API_BASE}/mensaje?accion=enviar`, {
             method: 'POST',

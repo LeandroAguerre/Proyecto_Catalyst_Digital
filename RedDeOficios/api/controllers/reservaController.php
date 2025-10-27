@@ -138,13 +138,25 @@ class ReservaController {
 
     // Marcar reservas como vistas por el cliente
     public function marcarReservasVistas() {
+        ob_start(); // Start output buffering
         header('Content-Type: application/json; charset=utf-8');
         
         $inputData = file_get_contents('php://input');
+        error_log("marcarReservasVistas: Datos recibidos: " . $inputData);
         $data = json_decode($inputData);
+        error_log("marcarReservasVistas: Datos decodificados: " . print_r($data, true));
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("marcarReservasVistas: Error al decodificar JSON: " . json_last_error_msg());
+            http_response_code(400);
+            ob_clean(); // Clean any previous output
+            echo json_encode(['success' => false, 'message' => 'JSON inválido.']);
+            return;
+        }
 
         if (!isset($data->cliente_id)) {
             http_response_code(400);
+            ob_clean(); // Clean any previous output
             echo json_encode(['success' => false, 'message' => 'ID de cliente no proporcionado']);
             return;
         }
@@ -155,15 +167,18 @@ class ReservaController {
 
             if ($resultado) {
                 http_response_code(200);
+                ob_clean(); // Clean any previous output
                 echo json_encode(['success' => true, 'message' => 'Reservas marcadas como vistas']);
             } else {
                 http_response_code(500);
+                ob_clean(); // Clean any previous output
                 echo json_encode(['success' => false, 'message' => 'Error al marcar reservas como vistas']);
             }
 
         } catch (Exception $e) {
             error_log("Error en marcarReservasVistas: " . $e->getMessage());
             http_response_code(500);
+            ob_clean(); // Clean any previous output
             echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
         }
     }

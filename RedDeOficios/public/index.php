@@ -178,6 +178,9 @@ try {
                         case 'cancelar':
                             $controller->cancelarReserva();
                             break;
+                        case 'marcar_vistas':
+                            $controller->marcarReservasVistas();
+                            break;
                         default:
                             $controller->crearReserva();
                     }

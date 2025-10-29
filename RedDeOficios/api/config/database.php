@@ -3,8 +3,8 @@
 class Database {
     private $host = 'db';
     private $db_name = 'reddeoficios';
-    private $username = 'root';
-    private $password = 'catalystdigital05';
+    private $username = 'reddeoficios_app';
+    private $password = 'pass_app';
     public $conn;
 
     public function getConnection() {

@@ -272,7 +272,7 @@ async function eliminarPublicacion(publicacionId, usuarioId) {
   }, 'Confirmar Eliminación');
 }
 
-// 🆕 NUEVA FUNCIÓN: Configurar botón de contactar
+// Configurar botón de contactar
 function configurarBotonContactar(proveedorId, publicacionId) {
   const btnContactar = document.getElementById('btnContactar');
   
@@ -319,9 +319,7 @@ function mostrarError(mensaje) {
 // Cargar al iniciar la página
 document.addEventListener('DOMContentLoaded', cargarPublicacion);
 
-// ========================================
 // SISTEMA DE RESERVAS CON CALENDARIO
-// ========================================
 
 // Variables globales del calendario
 let mesActual = new Date().getMonth();
@@ -718,7 +716,7 @@ function formatearFecha(fecha) {
   return año + '-' + mes + '-' + dia;
 }
 
-// 🆕 Evento: Enviar formulario de reserva (MODIFICADO)
+// Evento: Enviar formulario de reserva (MODIFICADO)
 document.getElementById('formReserva').addEventListener('submit', async function(e) {
   e.preventDefault();
   console.log(' Enviando solicitud de reserva');
@@ -852,7 +850,7 @@ function mostrarAlerta(mensaje, tipo = 'info', titulo = null) {
     return;
   }
   
-  // Fallback: crear modal temporal si no existe
+  // Crear modal temporal si no existe
   const modalId = 'modalAlertaTemp';
   let modalEl = document.getElementById(modalId);
   

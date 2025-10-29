@@ -70,7 +70,7 @@ async function cargarMisReservas() {
     loadingDiv.style.display = 'none';
     
     if (reservas.length === 0) {
-      contenedor.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No tienes reservas realizadas</div>';
+      contenedor.innerHTML = '<div class="alert alert-info">No tienes reservas realizadas</div>';
       return;
     }
     
@@ -125,7 +125,7 @@ async function cargarReservasRecibidas() {
     loadingDiv.style.display = 'none';
     
     if (reservas.length === 0) {
-      contenedor.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No tienes solicitudes de reserva</div>';
+      contenedor.innerHTML = '<div class="alert alert-info">No tienes solicitudes de reserva</div>';
       return;
     }
     
@@ -186,9 +186,9 @@ function mostrarReservas(reservas, contenedor, tipo) {
     
     // Mostrar cliente o proveedor según el tipo
     if (tipo === 'cliente') {
-      html += '<p class="card-text"><strong><i class="bi bi-person"></i> Proveedor:</strong> ' + reserva.proveedor_nombre + '</p>';
+      html += '<p class="card-text"><strong>Proveedor:</strong> ' + reserva.proveedor_nombre + '</p>';
     } else {
-      html += '<p class="card-text"><strong><i class="bi bi-person"></i> Cliente:</strong> ' + reserva.cliente_nombre + '</p>';
+      html += '<p class="card-text"><strong>Cliente:</strong> ' + reserva.cliente_nombre + '</p>';
     }
     
     html += '<p class="card-text"><strong><i class="bi bi-calendar"></i> Desde:</strong><br>' + inicio.toLocaleString('es-ES') + '</p>';
@@ -225,7 +225,7 @@ function mostrarReservas(reservas, contenedor, tipo) {
     const otroUsuarioNombre = tipo === 'cliente' ? reserva.proveedor_nombre : reserva.cliente_nombre;
     
     html += '<button class="btn btn-info btn-sm w-100 mb-2" onclick="contactarUsuario(' + reserva.publicacion_id + ', ' + otroUsuarioId + ', \'' + otroUsuarioNombre + '\', \'' + (reserva.publicacion_titulo || 'Servicio') + '\')">';
-    html += '<i class="bi bi-chat-dots"></i> Contactar por Mensaje';
+    html += 'Contactar por Mensaje';
     html += '</button>';
     
     if (tipo === 'proveedor' && reserva.estado === 'pendiente') {

@@ -255,19 +255,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // VALIDACIONES MEJORADAS
       if (!tipoUsuario || !nombreCompleto || !correoElectronico || !contrasena || !confirmPassword) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ Por favor complete todos los campos obligatorios</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">Por favor complete todos los campos obligatorios</div>';
         return;
       }
 
       // Validar nombre (solo letras, espacios y acentos, mínimo 3 caracteres)
       const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,}$/;
       if (!regexNombre.test(nombreCompleto)) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ El nombre debe contener solo letras y espacios, con un mínimo de 3 caracteres</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">El nombre debe contener solo letras y espacios, con un mínimo de 3 caracteres</div>';
         return;
       }
 
       if (contrasena !== confirmPassword) {
-          estadoRegistro.innerHTML = '<div class="alert alert-danger">⚠️ Las contraseñas no coinciden</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-danger">Las contraseñas no coinciden</div>';
         return;
       }
 
@@ -278,32 +278,32 @@ document.addEventListener('DOMContentLoaded', () => {
       const regexCaracterEspecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
 
       if (contrasena.length < 8) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe tener al menos 8 caracteres</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">La contraseña debe tener al menos 8 caracteres</div>';
         return;
       }
 
       if (!regexMayuscula.test(contrasena)) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe contener al menos una letra mayúscula</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">La contraseña debe contener al menos una letra mayúscula</div>';
         return;
       }
 
       if (!regexMinuscula.test(contrasena)) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe contener al menos una letra minúscula</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">La contraseña debe contener al menos una letra minúscula</div>';
         return;
       }
 
       if (!regexNumero.test(contrasena)) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe contener al menos un número</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">La contraseña debe contener al menos un número</div>';
         return;
       }
 
       if (!regexCaracterEspecial.test(contrasena)) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña debe contener al menos un carácter especial</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">La contraseña debe contener al menos un carácter especial</div>';
         return;
       }
 
       if (contrasena.toLowerCase().includes(nombreCompleto.toLowerCase()) || contrasena.toLowerCase().includes(correoElectronico.toLowerCase())) {
-          estadoRegistro.innerHTML = '<div class="alert alert-warning">⚠️ La contraseña no debe contener su nombre de usuario o correo electrónico</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-warning">La contraseña no debe contener su nombre de usuario o correo electrónico</div>';
         return;
       }
 
@@ -333,14 +333,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(' Data registro:', data);
 
         if (data.exito && data.usuario) {
-          estadoRegistro.innerHTML = '<div class="alert alert-success">✅ ' + data.mensaje + '</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-success">' + data.mensaje + '</div>';
           formRegistro.reset();
           
           // Guardar sesión inmediatamente
           guardarSesion(data.usuario);
           
           setTimeout(() => {
-            estadoRegistro.innerHTML = '<div class="alert alert-success">✅ ¡Perfecto! Redirigiendo...</div>';
+            estadoRegistro.innerHTML = '<div class="alert alert-success">¡Perfecto! Redirigiendo...</div>';
             
             setTimeout(() => {
               const registroModal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
@@ -352,12 +352,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 1000);
           
         } else {
-          estadoRegistro.innerHTML = '<div class="alert alert-danger">❌ ' + data.mensaje + '</div>';
+          estadoRegistro.innerHTML = '<div class="alert alert-danger">' + data.mensaje + '</div>';
         }
         
       } catch (err) {
         console.error(' Error de conexión:', err);
-        estadoRegistro.innerHTML = '<div class="alert alert-danger">❌ Error de conexión con el servidor</div>';
+        estadoRegistro.innerHTML = '<div class="alert alert-danger">Error de conexión con el servidor</div>';
       }
     });
   }
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const contrasena = document.getElementById('loginPassword').value.trim();
 
       if (!correoElectronico || !contrasena) {
-        estadoLogin.innerHTML = '<div class="alert alert-warning">⚠️ Por favor complete todos los campos</div>';
+        estadoLogin.innerHTML = '<div class="alert alert-warning">Por favor complete todos los campos</div>';
         return;
       }
 
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.exito && data.usuario) {
           guardarSesion(data.usuario);
-          estadoLogin.innerHTML = '<div class="alert alert-success">✅ ¡Bienvenido de nuevo!</div>';
+          estadoLogin.innerHTML = '<div class="alert alert-success">¡Bienvenido de nuevo!</div>';
           
           // Actualizar UI
           mostrarUsuarioLogueado(data.usuario);
@@ -408,11 +408,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 1000);
           
         } else {
-          estadoLogin.innerHTML = '<div class="alert alert-danger">❌ ' + data.mensaje + '</div>';
+          estadoLogin.innerHTML = '<div class="alert alert-danger"> ' + data.mensaje + '</div>';
         }
       } catch (err) {
         console.error(' Error en login:', err);
-        estadoLogin.innerHTML = '<div class="alert alert-danger">❌ Error de conexión con el servidor</div>';
+        estadoLogin.innerHTML = '<div class="alert alert-danger">Error de conexión con el servidor</div>';
       }
     });
   }
@@ -429,17 +429,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log(' Script inicializado completamente');
 
-  // Hamburger menu functionality
+  // Funcionalidad Menu Hamburguesa
   const hamburgerButton = document.getElementById('hamburgerMenuButton');
   const mainNavigation = document.getElementById('mainNavigation');
-  const sidebar = document.querySelector('.sidebar'); // Assuming .sidebar is the main container for the nav
+  const sidebar = document.querySelector('.sidebar'); 
 
   if (hamburgerButton && mainNavigation && sidebar) {
     hamburgerButton.addEventListener('click', () => {
       sidebar.classList.toggle('active');
     });
 
-    // Close sidebar when clicking outside of it on mobile
+    
     document.addEventListener('click', (event) => {
       if (window.innerWidth <= 991.98 && !sidebar.contains(event.target) && !hamburgerButton.contains(event.target)) {
         sidebar.classList.remove('active');
@@ -516,13 +516,6 @@ async function cargarTarjetas() {
         '<h2>' + pub.titulo + '</h2>' +
         '<p>' + pub.tipo_servicio + '</p>' +
         '<p>' + pub.ubicacion + '</p>' +
-        '<p class="estrella">' +
-          '<i class="bi bi-star-fill"></i>' +
-          '<i class="bi bi-star-fill"></i>' +
-          '<i class="bi bi-star-fill"></i>' +
-          '<i class="bi bi-star-fill"></i>' +
-          '<i class="bi bi-star-fill"></i>' +
-        '</p>' +
         '<a href="publicacion.html?id=' + pub.id + '" class="btn btn-primary btn-lg">Ver publicación</a>' +
       '</div>';
     });
@@ -531,7 +524,7 @@ async function cargarTarjetas() {
     console.error(' Error al cargar publicaciones:', error);
     const contenedor2 = document.getElementById('grid-servicios');
     if (contenedor2) {
-      contenedor2.innerHTML = '<div class="alert alert-danger" role="alert">❌ Error al cargar publicaciones: ' + error.message + '</div>';
+      contenedor2.innerHTML = '<div class="alert alert-danger" role="alert"> Error al cargar publicaciones: ' + error.message + '</div>';
     }
   }
 }

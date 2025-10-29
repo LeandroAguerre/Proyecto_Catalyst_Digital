@@ -10,7 +10,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="styles/style.css">
-    
+    <link rel="icon" href="imagenes/RO.png" type="image/x-icon">
 </head>
 <script>
   console.log('Script embebido cargado correctamente');
@@ -128,20 +128,10 @@ window.confirmarAccion = function(mensaje, callback, titulo = 'Confirmar') {
   }, { once: true });
 };
 
-// Sobrescribir alert nativo (opcional)
-// window.alert = function(mensaje) {
-//   mostrarAlerta(mensaje, 'info');
-// };
 
-// Sobrescribir confirm nativo (opcional)
-// window.confirm = function(mensaje) {
-//   return new Promise((resolve) => {
-//     confirmarAccion(mensaje, resolve);
-//   });
-// };
 </script>
 <body>
-    <!-- Hamburger menu button for mobile -->
+    <!-- Botón de menú hamburguesa para móviles -->
     <button class="hamburger-menu-button d-lg-none" id="hamburgerMenuButton">
         <i class="bi bi-list"></i>
     </button>

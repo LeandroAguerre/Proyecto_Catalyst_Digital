@@ -88,7 +88,7 @@ document.getElementById('inputImagenes').addEventListener('change', function(e) 
   
   const files = e.target.files;
   
-  // Filter out non-image files and collect valid ones
+  // Filtrar solo archivos de imagen válidos
   const validFiles = [];
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
@@ -100,15 +100,15 @@ document.getElementById('inputImagenes').addEventListener('change', function(e) 
   }
 
   if (validFiles.length === 0 && files.length > 0) {
-    // If all selected files were invalid, clear the input and return
+    // 
     e.target.value = '';
     return;
   }
 
   if (validFiles.length > 5) {
     mostrarAlerta('Solo puedes subir un máximo de 5 imágenes válidas', 'warning');
-    e.target.value = ''; // Clear the input
-    previewContainer.innerHTML = ''; // Clear any previews that might have been there
+    e.target.value = ''; // Limpiar el input
+    previewContainer.innerHTML = ''; // Limpiar las vistas previas
     return;
   }
   

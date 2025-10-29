@@ -10,9 +10,9 @@ let intervaloActualizacion = null;
 const API_BASE = ''; // Sin prefijo ya que public/ es la raíz
 const INTERVALO_POLLING = 5000; // 5 segundos
 
-// =====================================================
+
 // INICIALIZACIÓN
-// =====================================================
+
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log(' Iniciando sistema de mensajería...');
@@ -55,13 +55,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Actualizar badge inicial
     actualizarBadgeMensajes();
 
-    // 🆕 Verificar si se debe abrir una conversación específica
+    // Verificar si se debe abrir una conversación específica
     verificarConversacionPendiente();
 });
 
-// =====================================================
+
 // GESTIÓN DE SESIÓN (Compatible con script.js)
-// =====================================================
+
 
 function obtenerUsuarioSesion() {
     const usuarioId = sessionStorage.getItem('usuarioId');
@@ -75,9 +75,9 @@ function obtenerUsuarioSesion() {
     };
 }
 
-// =====================================================
+
 // CARGAR CONVERSACIONES
-// =====================================================
+
 
 async function cargarConversaciones() {
     const listaConversaciones = document.getElementById('conversacionesList');
@@ -183,9 +183,9 @@ async function cargarConversaciones() {
     }
 }
 
-// =====================================================
+
 // ABRIR CONVERSACIÓN
-// =====================================================
+
 
 function abrirConversacion(elemento) {
     console.log(' Abriendo conversación...');
@@ -239,9 +239,9 @@ function abrirConversacion(elemento) {
     cargarMensajes();
 }
 
-// =====================================================
+
 // CARGAR MENSAJES
-// =====================================================
+
 
 async function cargarMensajes() {
     if (!conversacionActual) return;
@@ -311,9 +311,9 @@ async function cargarMensajes() {
     }
 }
 
-// =====================================================
+
 // ENVIAR MENSAJE
-// =====================================================
+
 
 async function enviarMensaje(e) {
     e.preventDefault();
@@ -387,9 +387,9 @@ async function enviarMensaje(e) {
     }
 }
 
-// =====================================================
+
 // ELIMINAR CONVERSACIÓN
-// =====================================================
+
 
 async function eliminarConversacion() {
     if (!conversacionActual) {
@@ -444,9 +444,9 @@ async function eliminarConversacion() {
     }
 }
 
-// =====================================================
+
 // ACTUALIZAR BADGE DE MENSAJES NO LEÍDOS
-// =====================================================
+
 
 async function actualizarBadgeMensajes() {
     try {
@@ -478,9 +478,9 @@ async function actualizarBadgeMensajes() {
     }
 }
 
-// =====================================================
+
 // POLLING PARA ACTUALIZACIÓN AUTOMÁTICA
-// =====================================================
+
 
 function iniciarPolling() {
     // Detener polling anterior si existe
@@ -519,9 +519,9 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
-// =====================================================
+
 // UTILIDADES
-// =====================================================
+
 
 function formatearFecha(fecha) {
     if (!fecha) return '';
@@ -634,9 +634,9 @@ function mostrarExito(mensaje) {
     mostrarAlertaModal(mensaje, 'success', 'Éxito');
 }
 
-// =====================================================
+
 // EXPONER FUNCIONES GLOBALES
-// =====================================================
+
 
 // Hacer disponibles las funciones que se llaman desde HTML
 window.abrirConversacion = abrirConversacion;
@@ -644,9 +644,9 @@ window.eliminarConversacion = eliminarConversacion;
 
 console.log(' mensajes.js cargado correctamente');
 
-// =====================================================
-// 🆕 ABRIR CONVERSACIÓN AUTOMÁTICAMENTE (desde publicacion.html)
-// =====================================================
+
+// ABRIR CONVERSACIÓN AUTOMÁTICAMENTE (desde publicacion.html)
+
 
 async function verificarConversacionPendiente() {
     const datosConversacion = sessionStorage.getItem('abrirConversacion');

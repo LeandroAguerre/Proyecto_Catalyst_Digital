@@ -414,3 +414,37 @@ select {
         margin-left: var(--sidebar-width); /* Push content to the right of the sidebar */
     }
 }
+
+#galeria img{
+    width: 100%;
+    height: 100px; /* Altura fija para las miniaturas */
+    object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#galeria img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#comentarios{
+        margin: 20px auto 20px auto;
+    display: flex;
+    /* width: 300px; */
+    flex-direction: column;
+}
+
+#comentarios .comentario{
+    width: 800px;
+    height: 80px;
+    /* border-style: dashed; */
+    background-color: white;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+#comentarios .comentario p{
+    margin-left: 10px;
+}

@@ -1,0 +1,24 @@
+-- Usuario para la aplicación web (red Docker)
+CREATE USER 'reddeoficios_app'@'172.%' IDENTIFIED BY 'pass_app';
+GRANT SELECT, INSERT, UPDATE, DELETE ON reddeoficios.* TO 'reddeoficios_app'@'172.%';
+
+-- Usuario admin (red Docker, incluye tu host)
+CREATE USER 'reddeoficios_admin'@'172.%' IDENTIFIED BY 'pass_admin';
+GRANT ALL PRIVILEGES ON reddeoficios.* TO 'reddeoficios_admin'@'172.%';
+
+-- Usuario admin desde dentro del contenedor
+CREATE USER 'reddeoficios_admin'@'localhost' IDENTIFIED BY 'pass_admin';
+GRANT ALL PRIVILEGES ON reddeoficios.* TO 'reddeoficios_admin'@'localhost';
+
+FLUSH PRIVILEGES;
+
+-- Verificar
+SELECT User, Host FROM mysql.user WHERE User LIKE 'reddeoficios%';
+```
++--------------------+-----------+
+| User               | Host      |
++--------------------+-----------+
+| reddeoficios_admin | 172.%     |
+| reddeoficios_admin | localhost |
+| reddeoficios_app   | 172.%     |
++--------------------+-----------+

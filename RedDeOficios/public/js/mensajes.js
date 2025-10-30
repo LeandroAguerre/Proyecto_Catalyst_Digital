@@ -10,18 +10,15 @@ let intervaloActualizacion = null;
 const API_BASE = ''; // Sin prefijo ya que public/ es la raíz
 const INTERVALO_POLLING = 5000; // 5 segundos
 
-
 // INICIALIZACIÓN
-
-
 document.addEventListener('DOMContentLoaded', function() {
-    console.log(' Iniciando sistema de mensajería...');
+    console.log('Iniciando sistema de mensajería...');
     
     // Verificar sesión
     usuarioActual = obtenerUsuarioSesion();
     
     if (!usuarioActual) {
-        console.warn(' No hay sesión activa');
+        console.warn('No hay sesión activa');
         mostrarError('Debes iniciar sesión para ver tus mensajes');
         setTimeout(() => {
             window.location.href = 'index.html';
@@ -29,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    console.log(' Usuario logueado:', usuarioActual);
+    console.log('Usuario logueado:', usuarioActual);
 
     // Cargar conversaciones
     cargarConversaciones();
@@ -38,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatPublicacionImg = document.getElementById('chatPublicacionImg');
     const chatPublicacionTitulo = document.getElementById('chatPublicacionTitulo');
     const chatOtroUsuario = document.getElementById('chatOtroUsuario');
-
+    
     if (chatPublicacionImg) chatPublicacionImg.style.display = 'none';
     if (chatPublicacionTitulo) chatPublicacionTitulo.style.display = 'none';
     if (chatOtroUsuario) chatOtroUsuario.style.display = 'none';
@@ -59,10 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
     verificarConversacionPendiente();
 });
 
-
 // GESTIÓN DE SESIÓN (Compatible con script.js)
-
-
 function obtenerUsuarioSesion() {
     const usuarioId = sessionStorage.getItem('usuarioId');
     if (!usuarioId) return null;
@@ -75,10 +69,7 @@ function obtenerUsuarioSesion() {
     };
 }
 
-
 // CARGAR CONVERSACIONES
-
-
 async function cargarConversaciones() {
     const listaConversaciones = document.getElementById('conversacionesList');
     
@@ -100,14 +91,14 @@ async function cargarConversaciones() {
             }
         );
 
-        console.log(' Status conversaciones:', response.status);
+        console.log('Status conversaciones:', response.status);
 
         if (!response.ok) {
             throw new Error('Error al cargar conversaciones');
         }
 
         const conversaciones = await response.json();
-        console.log(' Conversaciones obtenidas:', conversaciones);
+        console.log('Conversaciones obtenidas:', conversaciones);
 
         if (!Array.isArray(conversaciones) || conversaciones.length === 0) {
             listaConversaciones.innerHTML = `
@@ -170,10 +161,10 @@ async function cargarConversaciones() {
             `;
         }).join('');
 
-        console.log(' Conversaciones renderizadas');
+        console.log('Conversaciones renderizadas');
 
     } catch (error) {
-        console.error(' Error al cargar conversaciones:', error);
+        console.error('Error al cargar conversaciones:', error);
         listaConversaciones.innerHTML = `
             <div class="alert alert-danger m-3">
                 <i class="bi bi-exclamation-triangle"></i>
@@ -183,12 +174,9 @@ async function cargarConversaciones() {
     }
 }
 
-
 // ABRIR CONVERSACIÓN
-
-
 function abrirConversacion(elemento) {
-    console.log(' Abriendo conversación...');
+    console.log('Abriendo conversación...');
     
     // Remover clase active de todas las conversaciones
     document.querySelectorAll('.conversacion-item').forEach(item => {
@@ -207,7 +195,7 @@ function abrirConversacion(elemento) {
         publicacionImg: elemento.dataset.publicacionImg
     };
 
-    console.log(' Conversación actual:', conversacionActual);
+    console.log('Conversación actual:', conversacionActual);
 
     // Mostrar chat activo
     document.getElementById('noConversacion').style.display = 'none';
@@ -226,10 +214,12 @@ function abrirConversacion(elemento) {
         };
         chatPublicacionImg.style.display = 'block';
     }
+
     if (chatPublicacionTitulo) {
         chatPublicacionTitulo.textContent = conversacionActual.publicacionTitulo;
         chatPublicacionTitulo.style.display = 'block';
     }
+
     if (chatOtroUsuario) {
         chatOtroUsuario.textContent = conversacionActual.otroUsuarioNombre;
         chatOtroUsuario.style.display = 'block';
@@ -239,10 +229,7 @@ function abrirConversacion(elemento) {
     cargarMensajes();
 }
 
-
 // CARGAR MENSAJES
-
-
 async function cargarMensajes() {
     if (!conversacionActual) return;
 
@@ -259,14 +246,14 @@ async function cargarMensajes() {
             }
         );
 
-        console.log(' Status mensajes:', response.status);
+        console.log('Status mensajes:', response.status);
 
         if (!response.ok) {
             throw new Error('Error al cargar mensajes');
         }
 
         const mensajes = await response.json();
-        console.log(' Mensajes obtenidos:', mensajes.length);
+        console.log('Mensajes obtenidos:', mensajes.length);
 
         if (!Array.isArray(mensajes) || mensajes.length === 0) {
             chatMensajes.innerHTML = `
@@ -301,7 +288,7 @@ async function cargarMensajes() {
         actualizarBadgeMensajes();
 
     } catch (error) {
-        console.error(' Error al cargar mensajes:', error);
+        console.error('Error al cargar mensajes:', error);
         chatMensajes.innerHTML = `
             <div class="alert alert-danger m-3">
                 <i class="bi bi-exclamation-triangle"></i>
@@ -311,10 +298,7 @@ async function cargarMensajes() {
     }
 }
 
-
 // ENVIAR MENSAJE
-
-
 async function enviarMensaje(e) {
     e.preventDefault();
 
@@ -330,7 +314,7 @@ async function enviarMensaje(e) {
         return;
     }
 
-    console.log(' Enviando mensaje...');
+    console.log('Enviando mensaje...');
 
     // Deshabilitar input mientras se envía
     inputMensaje.disabled = true;
@@ -350,10 +334,10 @@ async function enviarMensaje(e) {
             })
         });
 
-        console.log(' Status envío:', response.status);
+        console.log('Status envío:', response.status);
 
         const resultado = await response.json();
-        console.log(' Resultado envío:', resultado);
+        console.log('Resultado envío:', resultado);
 
         if (!response.ok || !resultado.success) {
             throw new Error(resultado.message || 'Error al enviar mensaje');
@@ -364,7 +348,7 @@ async function enviarMensaje(e) {
         inputMensaje.disabled = false;
         inputMensaje.focus();
 
-        console.log(' Mensaje enviado correctamente');
+        console.log('Mensaje enviado correctamente');
 
         // Recargar mensajes inmediatamente
         await cargarMensajes();
@@ -381,73 +365,72 @@ async function enviarMensaje(e) {
         });
 
     } catch (error) {
-        console.error(' Error al enviar mensaje:', error);
+        console.error('Error al enviar mensaje:', error);
         mostrarError('Error al enviar mensaje. Por favor, intenta nuevamente.');
         inputMensaje.disabled = false;
     }
 }
 
-
 // ELIMINAR CONVERSACIÓN
-
-
 async function eliminarConversacion() {
     if (!conversacionActual) {
         mostrarError('No hay conversación activa');
         return;
     }
 
-    if (!confirm('¿Estás seguro de que deseas eliminar esta conversación? Esta acción no se puede deshacer.')) {
-        return;
-    }
+    confirmarAccion(
+        '¿Estás seguro de que deseas eliminar esta conversación? Esta acción no se puede deshacer.',
+        async (confirmado) => {
+            if (!confirmado) {
+                return;
+            }
 
-    console.log(' Eliminando conversación...');
+            console.log('Eliminando conversación...');
 
-    try {
-        const response = await fetch(`${API_BASE}/mensaje?accion=eliminar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                usuario_id: usuarioActual.id,
-                otro_usuario_id: conversacionActual.otroUsuarioId,
-                publicacion_id: conversacionActual.publicacionId
-            })
-        });
+            try {
+                const response = await fetch(`${API_BASE}/mensaje?accion=eliminar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        usuario_id: usuarioActual.id,
+                        otro_usuario_id: conversacionActual.otroUsuarioId,
+                        publicacion_id: conversacionActual.publicacionId
+                    })
+                });
 
-        console.log(' Status eliminación:', response.status);
+                console.log('Status eliminación:', response.status);
 
-        const resultado = await response.json();
-        console.log(' Resultado eliminación:', resultado);
+                const resultado = await response.json();
+                console.log('Resultado eliminación:', resultado);
 
-        if (!response.ok || !resultado.success) {
-            throw new Error(resultado.message || 'Error al eliminar conversación');
+                if (!response.ok || !resultado.success) {
+                    throw new Error(resultado.message || 'Error al eliminar conversación');
+                }
+
+                // Cerrar chat
+                document.getElementById('chatActivo').style.display = 'none';
+                document.getElementById('noConversacion').style.display = 'flex';
+                conversacionActual = null;
+
+                console.log('Conversación eliminada correctamente');
+
+                // Recargar conversaciones
+                await cargarConversaciones();
+
+                mostrarExito('Conversación eliminada correctamente');
+
+            } catch (error) {
+                console.error('Error al eliminar conversación:', error);
+                mostrarError('Error al eliminar conversación. Por favor, intenta nuevamente.');
+            }
         }
-
-        // Cerrar chat
-        document.getElementById('chatActivo').style.display = 'none';
-        document.getElementById('noConversacion').style.display = 'flex';
-        conversacionActual = null;
-
-        console.log(' Conversación eliminada correctamente');
-
-        // Recargar conversaciones
-        await cargarConversaciones();
-
-        mostrarExito('Conversación eliminada correctamente');
-
-    } catch (error) {
-        console.error(' Error al eliminar conversación:', error);
-        mostrarError('Error al eliminar conversación. Por favor, intenta nuevamente.');
-    }
+    );
 }
 
-
 // ACTUALIZAR BADGE DE MENSAJES NO LEÍDOS
-
-
 async function actualizarBadgeMensajes() {
     try {
         const response = await fetch(
@@ -474,21 +457,18 @@ async function actualizarBadgeMensajes() {
             }
         }
     } catch (error) {
-        console.error(' Error al actualizar badge:', error);
+        console.error('Error al actualizar badge:', error);
     }
 }
 
-
 // POLLING PARA ACTUALIZACIÓN AUTOMÁTICA
-
-
 function iniciarPolling() {
     // Detener polling anterior si existe
     if (intervaloActualizacion) {
         clearInterval(intervaloActualizacion);
     }
 
-    console.log(' Iniciando polling cada', INTERVALO_POLLING / 1000, 'segundos');
+    console.log('Iniciando polling cada', INTERVALO_POLLING / 1000, 'segundos');
 
     // Iniciar nuevo polling
     intervaloActualizacion = setInterval(async () => {
@@ -515,14 +495,11 @@ function iniciarPolling() {
 window.addEventListener('beforeunload', () => {
     if (intervaloActualizacion) {
         clearInterval(intervaloActualizacion);
-        console.log(' Polling detenido');
+        console.log('Polling detenido');
     }
 });
 
-
 // UTILIDADES
-
-
 function formatearFecha(fecha) {
     if (!fecha) return '';
     
@@ -575,10 +552,59 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 }
 
+// MODAL DE CONFIRMACIÓN (basado en el estilo de script.js)
+function confirmarAccion(mensaje, callback) {
+    const modalId = 'confirmActionModal';
+    let modalElement = document.getElementById(modalId);
+    
+    if (!modalElement) {
+        const modalHtml = `
+            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning text-dark">
+                            <h5 class="modal-title" id="${modalId}Label">
+                                <i class="bi bi-exclamation-triangle"></i> Confirmar acción
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="confirmModalBody"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modalElement = document.getElementById(modalId);
+    }
+    
+    const modalBody = document.getElementById('confirmModalBody');
+    const confirmBtn = document.getElementById('confirmActionBtn');
+    
+    modalBody.textContent = mensaje;
+    
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Remover listeners previos clonando el botón
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Agregar nuevo listener para confirmar
+    newConfirmBtn.addEventListener('click', () => {
+        modal.hide();
+        callback(true);
+    });
+    
+    modal.show();
+}
+
 function mostrarAlertaModal(mensaje, tipo = 'info', titulo = null) {
     const modalId = 'genericAlertModal';
     let modalElement = document.getElementById(modalId);
-
+    
     if (!modalElement) {
         const modalHtml = `
             <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
@@ -599,16 +625,17 @@ function mostrarAlertaModal(mensaje, tipo = 'info', titulo = null) {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
         modalElement = document.getElementById(modalId);
     }
-
+    
     const modalTitle = modalElement.querySelector('.modal-title');
     const modalBody = modalElement.querySelector('.modal-body');
     const modalHeader = modalElement.querySelector('.modal-header');
-
+    
     // Reset classes
     modalHeader.className = 'modal-header';
+    
     modalTitle.textContent = titulo || (tipo === 'success' ? 'Éxito' : (tipo === 'error' ? 'Error' : 'Información'));
     modalBody.innerHTML = mensaje;
-
+    
     // Apply type-specific styling
     if (tipo === 'success') {
         modalHeader.classList.add('bg-success', 'text-white');
@@ -619,35 +646,29 @@ function mostrarAlertaModal(mensaje, tipo = 'info', titulo = null) {
     } else {
         modalHeader.classList.add('bg-info', 'text-white');
     }
-
+    
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
 }
 
 function mostrarError(mensaje) {
-    console.error('', mensaje);
+    console.error(mensaje);
     mostrarAlertaModal(mensaje, 'error', 'Error');
 }
 
 function mostrarExito(mensaje) {
-    console.log('', mensaje);
+    console.log(mensaje);
     mostrarAlertaModal(mensaje, 'success', 'Éxito');
 }
 
-
 // EXPONER FUNCIONES GLOBALES
-
-
-// Hacer disponibles las funciones que se llaman desde HTML
 window.abrirConversacion = abrirConversacion;
 window.eliminarConversacion = eliminarConversacion;
+window.confirmarAccion = confirmarAccion;
 
-console.log(' mensajes.js cargado correctamente');
-
+console.log('mensajes.js cargado correctamente');
 
 // ABRIR CONVERSACIÓN AUTOMÁTICAMENTE (desde publicacion.html)
-
-
 async function verificarConversacionPendiente() {
     const datosConversacion = sessionStorage.getItem('abrirConversacion');
     
@@ -655,7 +676,7 @@ async function verificarConversacionPendiente() {
     
     try {
         const datos = JSON.parse(datosConversacion);
-        console.log(' Conversación pendiente detectada:', datos);
+        console.log('Conversación pendiente detectada:', datos);
         
         // Limpiar flag
         sessionStorage.removeItem('abrirConversacion');
@@ -669,11 +690,11 @@ async function verificarConversacionPendiente() {
             
             if (conversacionElemento) {
                 // La conversación existe, abrirla
-                console.log(' Conversación encontrada, abriendo...');
+                console.log('Conversación encontrada, abriendo...');
                 abrirConversacion(conversacionElemento);
             } else {
                 // La conversación no existe, necesitamos crearla
-                console.log(' Conversación no existe, creando...');
+                console.log('Conversación no existe, creando...');
                 await crearConversacionInicial(datos.otroUsuarioId, datos.publicacionId, datos.publicacionTitulo);
             }
         }, 1500);
@@ -685,6 +706,7 @@ async function verificarConversacionPendiente() {
 
 async function crearConversacionInicial(receptorId, publicacionId, publicacionTitulo) {
     console.log('Creando conversación inicial con:', { receptorId, publicacionId, publicacionTitulo });
+    
     try {
         // Enviar un mensaje inicial para establecer la conversación
         let mensajeInicial;
@@ -714,7 +736,7 @@ async function crearConversacionInicial(receptorId, publicacionId, publicacionTi
             throw new Error(resultado.message || 'La API falló al crear la conversación');
         }
         
-        console.log(' Conversación creada en el backend');
+        console.log('Conversación creada en el backend');
         
         // Recargar la lista de conversaciones para que incluya la nueva
         await cargarConversaciones();
@@ -726,7 +748,7 @@ async function crearConversacionInicial(receptorId, publicacionId, publicacionTi
             );
             
             if (nuevoElemento) {
-                console.log(' Abriendo la nueva conversación...');
+                console.log('Abriendo la nueva conversación...');
                 abrirConversacion(nuevoElemento);
             } else {
                 console.error('No se encontró el elemento de la nueva conversación después de recargar.');

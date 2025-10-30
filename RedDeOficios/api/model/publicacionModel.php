@@ -188,7 +188,7 @@ class Publicacion {
      * If the file doesn't exist, returns the default placeholder 'imagenes/trabajador.jpg'.
      */
     private function normalizeImagePath($ruta) {
-        $default = 'imagenes/trabajador.jpg';
+        $default = 'imagenes/RO.png';
 
         if (!$ruta || trim($ruta) === '') {
             return $default;

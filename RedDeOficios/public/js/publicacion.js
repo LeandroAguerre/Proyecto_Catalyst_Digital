@@ -123,10 +123,10 @@ function rellenarDatos(pub) {
       imagen.src = imagenPrincipal.ruta_imagen;
       imagen.alt = pub.titulo;
       imagen.onerror = function() {
-        this.src = 'imagenes/trabajador.jpg';
+        this.src = 'imagenes/RO.png';
       };
     } else {
-      imagen.src = 'imagenes/trabajador.jpg';
+      imagen.src = 'imagenes/RO.png';
       imagen.alt = 'Imagen no disponible';
     }
 
@@ -235,41 +235,60 @@ function rellenarDatos(pub) {
   console.log(' Datos rellenados en el HTML');
 }
 
-// 🆕 NUEVA FUNCIÓN: Eliminar publicación
+// Eliminar publicación
 async function eliminarPublicacion(publicacionId, usuarioId) {
-  window.confirmarAccion('¿Estás seguro de que deseas eliminar esta publicación? Esta acción no se puede deshacer.', async (confirmado) => {
-    if (!confirmado) {
+  // Verificar que window.confirmarAccion exista
+  if (typeof window.confirmarAccion !== 'function') {
+    console.error('window.confirmarAccion no está disponible');
+    alert('¿Estás seguro de que deseas eliminar esta publicación?');
+    // Continuar con la eliminación si el usuario acepta el alert nativo
+    if (!confirm('¿Estás seguro de que deseas eliminar esta publicación? Esta acción no se puede deshacer.')) {
       return;
     }
-
-    try {
-      const response = await fetch('/publicacion', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          publicacion_id: publicacionId,
-          usuario_id: usuarioId
-        })
-      });
-
-      const resultado = await response.json();
-
-      if (resultado.success) {
-        window.mostrarAlerta('Publicación eliminada correctamente.', 'success');
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 2000);
-      } else {
-        throw new Error(resultado.message || 'No se pudo eliminar la publicación.');
+  } else {
+    // Usar el modal de confirmación
+    window.confirmarAccion('¿Estás seguro de que deseas eliminar esta publicación? Esta acción no se puede deshacer.', async (confirmado) => {
+      if (!confirmado) {
+        return;
       }
-    } catch (error) {
-      console.error('Error al eliminar la publicación:', error);
-      window.mostrarAlerta(`Error: ${error.message}`, 'error');
+      await ejecutarEliminacion(publicacionId, usuarioId);
+    });
+    return; // Salir aquí para evitar ejecución duplicada
+  }
+  
+  // Si usamos alert nativo, ejecutar directamente
+  await ejecutarEliminacion(publicacionId, usuarioId);
+}
+
+// Función auxiliar para la eliminación
+async function ejecutarEliminacion(publicacionId, usuarioId) {
+  try {
+    const response = await fetch('/publicacion', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        publicacion_id: publicacionId,
+        usuario_id: usuarioId
+      })
+    });
+
+    const resultado = await response.json();
+
+    if (resultado.success) {
+      mostrarAlertaLocal('Publicación eliminada correctamente.', 'success', 'Éxito');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 2000);
+    } else {
+      throw new Error(resultado.message || 'No se pudo eliminar la publicación.');
     }
-  }, 'Confirmar Eliminación');
+  } catch (error) {
+    console.error('Error al eliminar la publicación:', error);
+    mostrarAlertaLocal(`Error: ${error.message}`, 'error', 'Error');
+  }
 }
 
 // Configurar botón de contactar
@@ -843,15 +862,14 @@ document.getElementById('formReserva').addEventListener('submit', async function
 });
 
 // Función helper para mostrar alertas con modal
-function mostrarAlerta(mensaje, tipo = 'info', titulo = null) {
+function mostrarAlertaLocal(mensaje, tipo = 'info', titulo = null) {
   // Verificar si existe la función global
   if (typeof window.mostrarAlerta === 'function') {
     window.mostrarAlerta(mensaje, tipo, titulo);
     return;
   }
-  
-  // Crear modal temporal si no existe
-  const modalId = 'modalAlertaTemp';
+
+  // Crear modal temporal si no existe  const modalId = 'modalAlertaTemp';
   let modalEl = document.getElementById(modalId);
   
   if (!modalEl) {

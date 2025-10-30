@@ -1,5 +1,6 @@
 #!/bin/bash
 
+logBackups="/var/log/backups.log"
 LOG="/var/log/cuentas.log"
 LogErrores="/var/log/errores.log"
 regex='^[a-z_][a-z0-9_-]*[$]?$' 
@@ -10,10 +11,14 @@ MaxFallos=3
 TiempoBloqueo=120
 MaxDias=90 
 
+#Config de permisos de cron
+chown root:administradores /etc/cron.allow
+chmod 770 /etc/cron.allow
+
 #Configuracion de intentos fallidos y expiracion de contraseña
 if [[ ! -f "$ArchivoDeControl" ]]; then
      
-  echo "Aplicando configuración básica de seguridad..."
+  echo "Aplicando configuracion basica de seguridad..."
 
   #Regla preauth
   sed -i "1iauth required pam_faillock.so preauth silent deny=$MaxFallos unlock_time=$TiempoBloqueo" "$AuthArchivo"
@@ -31,23 +36,41 @@ if [[ ! -f "$ArchivoDeControl" ]]; then
   done
 
       touch "$ArchivoDeControl"
-      echo "Configuración aplicada"
+      echo "Configuracion aplicada"
+fi
+
+#Crea el grupo admin si no existe
+if ! getent group administradores &>/dev/null; then
+    echo "Grupo 'administradores' no existe, creandolo..."
+    groupadd administradores
+fi
+
+if ! getent group backup &>/dev/null; then
+    groupadd backup
+fi
+
+#Crea archivo sudoers para el grupo administradores si no existe
+if [ ! -f /etc/sudoers.d/administradores ]; then
+  echo "%administradores ALL=(ALL) ALL" > /etc/sudoers.d/administradores
+  chmod 440 /etc/sudoers.d/administradores
+  chown root:administradores /etc/sudoers.d/administradores
+  echo "[PERMISOS] Grupo 'administradores' agregado a sudoers - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
 fi
 
 #Verifica si existe el archivo de cuentas.log, si no existe, lo crea y configura permisos.
 if [ ! -f "$LOG" ]; then
-  sudo touch "$LOG"
-  sudo chmod 644 "$LOG"
-  sudo chown root:root "$LOG"
-  echo "[PERMISOS] Permisos dados a cuentas.log  - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+  touch "$LOG"
+  chmod 770 "$LOG"
+  chown root:administradores "$LOG"
+  echo "[PERMISOS] Permisos dados a cuentas.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
 fi 
 
 #Verifica si existe el archivo de errores.log, si no existe, lo crea y configura permisos.
 if [ ! -f "$LogErrores" ]; then
-  sudo touch "$LogErrores"
-  sudo chmod 644 "$LogErrores"
-  sudo chown root:root "$LogErrores"
-  echo "[PERMISOS] Permisos dados a errores.log  - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+  touch "$LogErrores"
+  chmod 770 "$LogErrores"
+  chown root:administradores "$LogErrores"
+  echo "[PERMISOS] Permisos dados a errores.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
 fi 
 
 #Verifica si el login del usuario root esta deshabilitado completamente
@@ -64,31 +87,24 @@ for carpeta in "${carpetas[@]}"; do
   rutaCompleta="$rutaBase/$carpeta"
   if [ ! -d "$rutaCompleta" ]; then
     mkdir -p "$rutaCompleta"
+    chown root:administradores "$rutaCompleta"
     echo "[CREACION] Se crearon carpetas de skel - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
   fi
 done
-
-#Crea archivo sudoers para el grupo administradores si no existe
-if [ ! -f /etc/sudoers.d/administradores ]; then
-  echo "%administradores ALL=(ALL) ALL" > /etc/sudoers.d/administradores
-  chmod 440 /etc/sudoers.d/administradores
-  chown root:root /etc/sudoers.d/administradores
-  echo "[PERMISOS] Grupo 'administradores' agregado a sudoers - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
-fi
 
 #Revisa y corrige permisos de directorios y archivos dentro de las carpetas skel
 for carpeta in "${carpetas[@]}"; do
   rutaCompleta="$rutaBase/$carpeta"
 
   #Si encuentra directorios con permisos distintos de 755, los corrige
-  if find "$rutaCompleta" -type d ! -perm 755 | grep -q .; then
-    find "$rutaCompleta" -type d ! -perm 755 -exec chmod 755 {} \;
+  if find "$rutaCompleta" -type d ! -perm 770 | grep -q .; then
+    find "$rutaCompleta" -type d ! -perm 770 -exec chmod 770 {} \;
     echo "[PERMISOS] Se corrigieron permisos de directorios en '$carpeta' - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
   fi
 
   #Si encuentra archivos con permisos distintos de 644, los corrige
-  if find "$rutaCompleta" -type f ! -perm 644 | grep -q .; then
-    find "$rutaCompleta" -type f ! -perm 644 -exec chmod 644 {} \;
+  if find "$rutaCompleta" -type f ! -perm 770 | grep -q .; then
+    find "$rutaCompleta" -type f ! -perm 770 -exec chmod 770 {} \;
     echo "[PERMISOS] Se corrigieron permisos de archivos en '$carpeta' - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
   fi
 done
@@ -145,7 +161,7 @@ while [ "$opcion" != "0" ]; do
       if [[ "$tipo" != "novalido" ]]; then
         
         read -p "Ingrese nombre de usuario [a-z-0-9]: " user
-        if [ -n "$user" && "$user" =~ $regex ]; then
+        if [[ -n "$user" && "$user" =~ $regex ]]; then
           #Verifica si el usuario ya existe
           if id "$user" &>/dev/null; then
             echo "El usuario '$user' ya existe."
@@ -158,16 +174,55 @@ while [ "$opcion" != "0" ]; do
             fi
             #Crea el usuario con el skel y grupo asignado
             useradd -m -k "$skel" -g "$grupo" "$user"
+	          chown -R "$user":administradores /home/"$user"
+	          chmod 770 /home/"$user"
             echo " Usuario '$user' creado y asignado al grupo '$grupo'."
-            echo "[CREADO] El usuario '$user' fue creado - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LogErrores"
+            echo "[CREADO] El usuario '$user' fue creado - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LOG"
             passwd "$user"
-            #Establece vencimiento de contraseña a 90 dias
+            #Establece vencimiento de contraseñaa a 90 dias
             chage -M 90 "$user"
             #Si se crea un administrador y root aun no esta deshabilitado, muestra recordatorio
             if [[ "$grupo" == "administradores" && "$rootOff" -eq 0 ]]; then
               echo ""
               echo "[RECORDATORIO] Desactivar login root en la opcion 5"
-            fi  
+            fi
+
+            if [[ "$grupo" == "srveb" ]]; then
+
+                chown -R "$user":backup /home/"$user"
+                chown -R "$user":desarrolladores /home/"$user"
+                usermod -aG docker "$user"
+            fi
+
+            if [[ "$grupo" == "backup" ]]; then
+
+                chown -R "$user":backup /home/"$user"
+
+
+                if ! grep -q "^$user$" /etc/cron.allow 2>/dev/null; then
+                     
+                  sh -c "echo '$user' >> /etc/cron.allow"
+                fi
+
+            fi
+
+            if [[ "$grupo" == "administradores" ]]; then
+
+              if ! grep -q "^$user$" /etc/cron.allow 2>/dev/null; then
+                    
+                  sh -c "echo '$user' >> /etc/cron.allow"
+              fi
+              usermod -aG docker "$user"
+
+            fi
+
+            if [[ "$grupo" == "desarrolladores" ]]; then
+
+              usermod -aG docker "$user"
+
+            fi
+
+
           fi
         else
           echo "El nombre de usuario es invalido"  
@@ -224,7 +279,7 @@ while [ "$opcion" != "0" ]; do
           passwd -l root
           usermod -s /usr/sbin/nologin root
           echo "Usuario root desactivado completamente"
-          echo "[DESACTIVADO] Usuario root - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+          echo "[DESACTIVADO] Usuario root - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG"
           rootOff=1
         else
           echo "" 
@@ -239,17 +294,22 @@ while [ "$opcion" != "0" ]; do
       echo "A que archivo desea acceder?"
       echo "1- Alta y baja de cuentas de usuario"
       echo "2- Errores y modificaciones importantes"
+      echo "3- Logs de backup"
       echo "0- Salir"
       read -p "Elija una opcion: " opcionLog
 
       case $opcionLog in
         1)
+          cat "$LOG"
+          echo "[ADVERTENCIA] Se ingreso al archivo cuentas.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+          ;;
+        2)
           cat "$LogErrores"
           echo "[ADVERTENCIA] Se ingreso al archivo errores.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
           ;;
-        2)
-          cat "$LOG"
-          echo "[ADVERTENCIA] Se ingreso al archivo cuentas.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+        3)
+          cat "$logBackups"
+          echo "[ADVERTENCIA] Se ingreso al archivo backup.log - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
           ;;
         0) 
           echo "Saliendo.."

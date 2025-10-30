@@ -1,5 +1,10 @@
 #!/bin/bash
 
+service_exists() {
+    
+    systemctl list-unit-files --no-pager "$1.service" &>/dev/null
+}
+
 while [ "$opcion" != "0" ]; do
     
     echo ""
@@ -18,7 +23,7 @@ while [ "$opcion" != "0" ]; do
     case $opcion in
         1)
             read -p "Ingresa el nombre del servicio: " servicio
-            if [[ -n "$servicio" ]] && systemctl status "$servicio" &>/dev/null ; then
+            if service_exists "$servicio"; then
                 systemctl start "$servicio"
                 echo "El servicio '$servicio' se ha iniciado."
             else
@@ -27,7 +32,7 @@ while [ "$opcion" != "0" ]; do
             ;;
         2)
             read -p "Ingresa el nombre del servicio: " servicio
-            if [[ -n "$servicio" ]] && systemctl status "$servicio" &>/dev/null ; then
+            if service_exists "$servicio"; then
                 systemctl stop "$servicio"
                 echo "El servicio '$servicio' se ha detenido."
             else
@@ -36,7 +41,7 @@ while [ "$opcion" != "0" ]; do
             ;;
         3)
             read -p "Ingresa el nombre del servicio: " servicio
-            if [[ -n "$servicio" ]] && systemctl status "$servicio" &>/dev/null ; then
+            if service_exists "$servicio"; then
                 systemctl restart "$servicio"
                 echo "El servicio '$servicio' se ha reiniciado."
             else
@@ -45,15 +50,15 @@ while [ "$opcion" != "0" ]; do
             ;;
         4)
             read -p "Ingresa el nombre del servicio: " servicio
-            if [[ -n "$servicio" ]] && systemctl status "$servicio" &>/dev/null ; then
-                systemctl status "$servicio"
+            if service_exists "$servicio"; then
+                echo "$(systemctl status "$servicio")"
             else
                 echo "Error, El servicio no existe."
             fi
             ;;
         5)
             read -p "Ingresa el nombre del servicio: " servicio
-            if [[ -n "$servicio" ]] && systemctl status "$servicio" &>/dev/null ; then
+            if service_exists "$servicio"; then
                 systemctl enable "$servicio"
                 echo "El servicio '$servicio' se ha habilitado para iniciar en el arranque."
             else
@@ -62,7 +67,7 @@ while [ "$opcion" != "0" ]; do
             ;;
         6)
             read -p "Ingresa el nombre del servicio: " servicio
-            if [[ -n "$servicio" ]] && systemctl status "$servicio" &>/dev/null ; then
+            if service_exists "$servicio"; then
                 systemctl disable "$servicio"
                 echo "El servicio '$servicio' se ha deshabilitado para el arranque."
             else
@@ -70,13 +75,13 @@ while [ "$opcion" != "0" ]; do
             fi
             ;;
         7)
-            systemctl list-units --type=service
+            echo "$(systemctl list-units --type=service)"
             ;;    
         0)
             echo "Saliendo..."
             ;;
         *)
-            echo "Opcian invalida. Por favor, selecciona un numero del  0 al 6."
+            echo "Opcian invalida. Por favor, selecciona un numero del  0 al 7."
             ;;
     esac
 done

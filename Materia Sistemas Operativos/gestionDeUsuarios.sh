@@ -9,7 +9,6 @@ AuthArchivo="/etc/pam.d/common-auth"
 DefArchivo="/etc/login.defs"
 MaxFallos=3          
 TiempoBloqueo=120
-MaxDias=90 
 
 #Config de permisos de cron
 chown root:administradores /etc/cron.allow
@@ -32,17 +31,28 @@ if [[ ! -f "$ArchivoDeControl" ]]; then
   #Aplicar la politica a todos los usuarios existentes
   getent passwd | awk -F: '$3 >= 1000 && $1 != "nobody" { print $1 }' | while read -r user; do
       
-      chage -M $MaxDias "$user"
+      chage -M 90 "$user"
   done
 
       touch "$ArchivoDeControl"
       echo "Configuracion aplicada"
 fi
 
-#Crea el grupo admin si no existe
+#Crea los grupos si no existen
 if ! getent group administradores &>/dev/null; then
-    echo "Grupo 'administradores' no existe, creandolo..."
-    groupadd administradores
+    groupadd -g 1000 administradores
+fi
+
+if ! getent group srvweb &>/dev/null; then
+    groupadd srvweb
+fi
+
+if ! getent group desarrolladores &>/dev/null; then
+    groupadd desarrolladores
+fi
+
+if ! getent group mysql &>/dev/null; then
+    groupadd mysql
 fi
 
 if ! getent group backup &>/dev/null; then
@@ -174,35 +184,32 @@ while [ "$opcion" != "0" ]; do
             fi
             #Crea el usuario con el skel y grupo asignado
             useradd -m -k "$skel" -g "$grupo" "$user"
-	          chown -R "$user":administradores /home/"$user"
+	          chown -R "$user":"$user" /home/"$user"
 	          chmod 770 /home/"$user"
             echo " Usuario '$user' creado y asignado al grupo '$grupo'."
             echo "[CREADO] El usuario '$user' fue creado - $(date '+%d-%m-%Y / %H:%M:%S')" >> "$LOG"
             passwd "$user"
-            #Establece vencimiento de contraseñaa a 90 dias
-            chage -M 90 "$user"
-            #Si se crea un administrador y root aun no esta deshabilitado, muestra recordatorio
-            if [[ "$grupo" == "administradores" && "$rootOff" -eq 0 ]]; then
+            #Establece vencimiento de contraseña a 90 dias
+            chage -M "$MaxDias" "$user"
+            #Si se encuentra un usuario con el grupo administradores (1000) y root aun no esta deshabilitado, muestra recordatorio
+            if getent passwd | cut -d: -f4 | grep -q 1000 && [ "$rootOff" -eq 0 ]; then
               echo ""
               echo "[RECORDATORIO] Desactivar login root en la opcion 5"
             fi
 
             if [[ "$grupo" == "srveb" ]]; then
 
-                chown -R "$user":backup /home/"$user"
-                chown -R "$user":desarrolladores /home/"$user"
                 usermod -aG docker "$user"
             fi
 
             if [[ "$grupo" == "backup" ]]; then
 
-                chown -R "$user":backup /home/"$user"
-
-
                 if ! grep -q "^$user$" /etc/cron.allow 2>/dev/null; then
                      
                   sh -c "echo '$user' >> /etc/cron.allow"
                 fi
+                usermod -aG srvweb "$user"
+                
 
             fi
 
@@ -212,13 +219,15 @@ while [ "$opcion" != "0" ]; do
                     
                   sh -c "echo '$user' >> /etc/cron.allow"
               fi
-              usermod -aG docker "$user"
+              
+              usermod -aG backup,srvweb,desarrolladores,mysql,docker "$user"
 
             fi
 
             if [[ "$grupo" == "desarrolladores" ]]; then
 
-              usermod -aG docker "$user"
+              usermod -aG docker,srvweb "$user"
+              
 
             fi
 
@@ -269,10 +278,17 @@ while [ "$opcion" != "0" ]; do
       idAdmin=$(getent group administradores | cut -d: -f3)
       userAdmin=$(awk -F: -v gid="$idAdmin" '$4 == gid { print $1 }' /etc/passwd)
 
+      
+
       echo "[RECORDATORIO] Recuerda tener un usuario aministrador antes de usar esta opcion."
       read -p "Desea desactivar el login root? si/no " loginOpcion
       if [[ "$loginOpcion" == "si" ]]; then 
-        if [[ -n "$userAdmin" ]]; then
+        if getent passwd | cut -d: -f4 | grep -q 1000 ; then
+          echo "" 
+          echo "[RECORDATORIO] Recuerda tener un usuario aministrador antes de usar esta opcion."
+          echo "[ERROR] Se intento desactivar al usuario root sin un administrador - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
+        else
+
           #Deshabilita login SSH, shell y contraseña del usuario root
           sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
           systemctl restart sshd
@@ -281,10 +297,6 @@ while [ "$opcion" != "0" ]; do
           echo "Usuario root desactivado completamente"
           echo "[DESACTIVADO] Usuario root - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG"
           rootOff=1
-        else
-          echo "" 
-          echo "[RECORDATORIO] Recuerda tener un usuario aministrador antes de usar esta opcion."
-          echo "[ERROR] Se intento desactivar al usuario root sin un administrador - $(date '+%Y-%m-%d %H:%M:%S')" >> "$LogErrores"
         fi  
       else
         echo "Opcion incorrecta."

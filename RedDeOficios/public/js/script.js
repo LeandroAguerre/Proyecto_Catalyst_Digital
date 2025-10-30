@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.debug) {
         console.groupCollapsed('Debug Reservas Pendientes');
-        data.debug.forEach(msg => console.log(msg));
+        
         console.groupEnd();
       }
 

@@ -129,14 +129,13 @@ async function cargarReservasRecibidas() {
       return;
     }
     
-    mostrarReservas(reservas, contenedor, 'proveedor');
+        mostrarReservas(reservas, contenedor, 'proveedor');
     
-  } catch (error) {
-    console.error('Error:', error);
-    loadingDiv.style.display = 'none';
-    contenedor.innerHTML = '<div class="alert alert-danger">Error al cargar reservas</div>';
-  }
-}
+      } catch (error) {
+        console.error('Error:', error);
+        loadingDiv.style.display = 'none';
+        contenedor.innerHTML = '<div class="alert alert-danger">Error al cargar reservas</div>';
+      }}
 
 // Mostrar reservas en tarjetas
 function mostrarReservas(reservas, contenedor, tipo) {

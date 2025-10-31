@@ -12,7 +12,7 @@ const INTERVALO_POLLING = 5000; // 5 segundos
 
 // INICIALIZACIÓN
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Iniciando sistema de mensajería...');
+    // console.log('Iniciando sistema de mensajería...');
     
     // Verificar sesión
     usuarioActual = obtenerUsuarioSesion();
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    console.log('Usuario logueado:', usuarioActual);
+    // console.log('Usuario logueado:', usuarioActual);
 
     // Cargar conversaciones
     cargarConversaciones();
@@ -91,14 +91,14 @@ async function cargarConversaciones() {
             }
         );
 
-        console.log('Status conversaciones:', response.status);
+        // console.log('Status conversaciones:', response.status);
 
         if (!response.ok) {
             throw new Error('Error al cargar conversaciones');
         }
 
         const conversaciones = await response.json();
-        console.log('Conversaciones obtenidas:', conversaciones);
+        // console.log('Conversaciones obtenidas:', conversaciones);
 
         if (!Array.isArray(conversaciones) || conversaciones.length === 0) {
             listaConversaciones.innerHTML = `
@@ -161,7 +161,7 @@ async function cargarConversaciones() {
             `;
         }).join('');
 
-        console.log('Conversaciones renderizadas');
+        // console.log('Conversaciones renderizadas');
 
     } catch (error) {
         console.error('Error al cargar conversaciones:', error);
@@ -176,7 +176,7 @@ async function cargarConversaciones() {
 
 // ABRIR CONVERSACIÓN
 function abrirConversacion(elemento) {
-    console.log('Abriendo conversación...');
+    // console.log('Abriendo conversación...');
     
     // Remover clase active de todas las conversaciones
     document.querySelectorAll('.conversacion-item').forEach(item => {
@@ -195,7 +195,7 @@ function abrirConversacion(elemento) {
         publicacionImg: elemento.dataset.publicacionImg
     };
 
-    console.log('Conversación actual:', conversacionActual);
+    // console.log('Conversación actual:', conversacionActual);
 
     // Mostrar chat activo
     document.getElementById('noConversacion').style.display = 'none';
@@ -246,14 +246,14 @@ async function cargarMensajes() {
             }
         );
 
-        console.log('Status mensajes:', response.status);
+        // console.log('Status mensajes:', response.status);
 
         if (!response.ok) {
             throw new Error('Error al cargar mensajes');
         }
 
         const mensajes = await response.json();
-        console.log('Mensajes obtenidos:', mensajes.length);
+        // console.log('Mensajes obtenidos:', mensajes.length);
 
         if (!Array.isArray(mensajes) || mensajes.length === 0) {
             chatMensajes.innerHTML = `
@@ -334,10 +334,10 @@ async function enviarMensaje(e) {
             })
         });
 
-        console.log('Status envío:', response.status);
+        // console.log('Status envío:', response.status);
 
         const resultado = await response.json();
-        console.log('Resultado envío:', resultado);
+        // console.log('Resultado envío:', resultado);
 
         if (!response.ok || !resultado.success) {
             throw new Error(resultado.message || 'Error al enviar mensaje');
@@ -348,7 +348,7 @@ async function enviarMensaje(e) {
         inputMensaje.disabled = false;
         inputMensaje.focus();
 
-        console.log('Mensaje enviado correctamente');
+        // console.log('Mensaje enviado correctamente');
 
         // Recargar mensajes inmediatamente
         await cargarMensajes();
@@ -385,7 +385,7 @@ async function eliminarConversacion() {
                 return;
             }
 
-            console.log('Eliminando conversación...');
+            // console.log('Eliminando conversación...');
 
             try {
                 const response = await fetch(`${API_BASE}/mensaje?accion=eliminar`, {
@@ -401,10 +401,10 @@ async function eliminarConversacion() {
                     })
                 });
 
-                console.log('Status eliminación:', response.status);
+                // console.log('Status eliminación:', response.status);
 
                 const resultado = await response.json();
-                console.log('Resultado eliminación:', resultado);
+                // console.log('Resultado eliminación:', resultado);
 
                 if (!response.ok || !resultado.success) {
                     throw new Error(resultado.message || 'Error al eliminar conversación');
@@ -415,7 +415,7 @@ async function eliminarConversacion() {
                 document.getElementById('noConversacion').style.display = 'flex';
                 conversacionActual = null;
 
-                console.log('Conversación eliminada correctamente');
+                // console.log('Conversación eliminada correctamente');
 
                 // Recargar conversaciones
                 await cargarConversaciones();
@@ -468,7 +468,7 @@ function iniciarPolling() {
         clearInterval(intervaloActualizacion);
     }
 
-    console.log('Iniciando polling cada', INTERVALO_POLLING / 1000, 'segundos');
+    // console.log('Iniciando polling cada', INTERVALO_POLLING / 1000, 'segundos');
 
     // Iniciar nuevo polling
     intervaloActualizacion = setInterval(async () => {
@@ -495,7 +495,7 @@ function iniciarPolling() {
 window.addEventListener('beforeunload', () => {
     if (intervaloActualizacion) {
         clearInterval(intervaloActualizacion);
-        console.log('Polling detenido');
+        // console.log('Polling detenido');
     }
 });
 
@@ -657,7 +657,7 @@ function mostrarError(mensaje) {
 }
 
 function mostrarExito(mensaje) {
-    console.log(mensaje);
+    // console.log(mensaje);
     mostrarAlertaModal(mensaje, 'success', 'Éxito');
 }
 
@@ -666,7 +666,7 @@ window.abrirConversacion = abrirConversacion;
 window.eliminarConversacion = eliminarConversacion;
 window.confirmarAccion = confirmarAccion;
 
-console.log('mensajes.js cargado correctamente');
+// console.log('mensajes.js cargado correctamente');
 
 // ABRIR CONVERSACIÓN AUTOMÁTICAMENTE (desde publicacion.html)
 async function verificarConversacionPendiente() {
@@ -676,7 +676,7 @@ async function verificarConversacionPendiente() {
     
     try {
         const datos = JSON.parse(datosConversacion);
-        console.log('Conversación pendiente detectada:', datos);
+        // console.log('Conversación pendiente detectada:', datos);
         
         // Limpiar flag
         sessionStorage.removeItem('abrirConversacion');
@@ -690,11 +690,11 @@ async function verificarConversacionPendiente() {
             
             if (conversacionElemento) {
                 // La conversación existe, abrirla
-                console.log('Conversación encontrada, abriendo...');
+                // console.log('Conversación encontrada, abriendo...');
                 abrirConversacion(conversacionElemento);
             } else {
                 // La conversación no existe, necesitamos crearla
-                console.log('Conversación no existe, creando...');
+                // console.log('Conversación no existe, creando...');
                 await crearConversacionInicial(datos.otroUsuarioId, datos.publicacionId, datos.publicacionTitulo);
             }
         }, 1500);
@@ -705,7 +705,7 @@ async function verificarConversacionPendiente() {
 }
 
 async function crearConversacionInicial(receptorId, publicacionId, publicacionTitulo) {
-    console.log('Creando conversación inicial con:', { receptorId, publicacionId, publicacionTitulo });
+    // console.log('Creando conversación inicial con:', { receptorId, publicacionId, publicacionTitulo });
     
     try {
         // Enviar un mensaje inicial para establecer la conversación
@@ -736,7 +736,7 @@ async function crearConversacionInicial(receptorId, publicacionId, publicacionTi
             throw new Error(resultado.message || 'La API falló al crear la conversación');
         }
         
-        console.log('Conversación creada en el backend');
+        // console.log('Conversación creada en el backend');
         
         // Recargar la lista de conversaciones para que incluya la nueva
         await cargarConversaciones();
@@ -748,7 +748,7 @@ async function crearConversacionInicial(receptorId, publicacionId, publicacionTi
             );
             
             if (nuevoElemento) {
-                console.log('Abriendo la nueva conversación...');
+                // console.log('Abriendo la nueva conversación...');
                 abrirConversacion(nuevoElemento);
             } else {
                 console.error('No se encontró el elemento de la nueva conversación después de recargar.');

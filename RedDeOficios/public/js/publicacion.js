@@ -1,4 +1,4 @@
-console.log('publicacion.js cargado');
+// console.log('publicacion.js cargado');
 
 // Obtener el ID de la URL
 function obtenerIdDeURL() {
@@ -10,7 +10,7 @@ function obtenerIdDeURL() {
 async function cargarPublicacion() {
   const id = obtenerIdDeURL();
   
-  console.log(' ID de publicación:', id);
+  // console.log(' ID de publicación:', id);
   
   if (!id) {
     console.error(' No se proporcionó ID en la URL');
@@ -19,7 +19,7 @@ async function cargarPublicacion() {
   }
 
   try {
-    console.log(' Cargando publicación...');
+    // console.log(' Cargando publicación...');
     
     const res = await fetch('/publicacion?id=' + id, {
       method: 'GET',
@@ -28,7 +28,7 @@ async function cargarPublicacion() {
       }
     });
 
-    console.log(' Status respuesta:', res.status);
+    // console.log(' Status respuesta:', res.status);
 
     if (!res.ok) {
       if (res.status === 404) {
@@ -38,7 +38,7 @@ async function cargarPublicacion() {
     }
 
     const publicacion = await res.json();
-    console.log(' Publicación cargada:', publicacion);
+    // console.log(' Publicación cargada:', publicacion);
 
     // Rellenar datos en el HTML
     rellenarDatos(publicacion);
@@ -229,10 +229,10 @@ function rellenarDatos(pub) {
     }
   }
 
-  // 🆕 Configurar botón de contactar
+  //  Configurar botón de contactar
   configurarBotonContactar(pub.usuario_creador_id, pub.id);
 
-  console.log(' Datos rellenados en el HTML');
+  // console.log(' Datos rellenados en el HTML');
 }
 
 // Eliminar publicación
@@ -354,7 +354,7 @@ let HORAS_MINIMAS_PROVEEDOR = 1;
 
 // Evento: Al abrir el modal de reserva
 document.getElementById('modalReserva').addEventListener('show.bs.modal', function(e) {
-  console.log(' Abriendo modal de reserva');
+  // console.log(' Abriendo modal de reserva');
   
   // Verificar que el usuario esté logueado
   const sesion = obtenerSesion();
@@ -417,7 +417,7 @@ async function cargarCalendarioReservas() {
     if (!res.ok) throw new Error('Error al cargar fechas ocupadas');
 
     fechasOcupadasProveedor = await res.json();
-    console.log(' Fechas ocupadas cargadas:', fechasOcupadasProveedor);
+    // console.log(' Fechas ocupadas cargadas:', fechasOcupadasProveedor);
 
     renderizarCalendario();
 
@@ -624,7 +624,7 @@ function esDiaOcupado(fecha) {
 
 // Seleccionar un día en el calendario
 function seleccionarDia(fecha, elemento) {
-  console.log(' Día seleccionado:', fecha);
+  // console.log(' Día seleccionado:', fecha);
 
   // Si no hay fecha de inicio, establecerla
   if (!fechaInicioSeleccionada) {
@@ -738,7 +738,7 @@ function formatearFecha(fecha) {
 // Evento: Enviar formulario de reserva (MODIFICADO)
 document.getElementById('formReserva').addEventListener('submit', async function(e) {
   e.preventDefault();
-  console.log(' Enviando solicitud de reserva');
+  // console.log(' Enviando solicitud de reserva');
 
   const sesion = obtenerSesion();
   if (!sesion) {
@@ -829,7 +829,7 @@ document.getElementById('formReserva').addEventListener('submit', async function
     });
 
     const data = await res.json();
-    console.log(' Respuesta reserva:', data);
+    // console.log(' Respuesta reserva:', data);
 
     if (data.success) {
       estadoReserva.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> ' + data.message + '</div>';

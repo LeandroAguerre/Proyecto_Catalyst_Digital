@@ -1,4 +1,4 @@
-console.log('crear_publicacion.js cargado');
+// console.log('crear_publicacion.js cargado');
 
 // Función para mostrar alertas con modal
 function mostrarAlerta(mensaje, tipo = 'info', titulo = null) {
@@ -56,12 +56,12 @@ function obtenerSesion() {
 
 // VALIDACIÓN AL CARGAR LA PÁGINA
 document.addEventListener('DOMContentLoaded', function() {
-  console.log(' Validando permisos de acceso...');
+  // console.log(' Validando permisos de acceso...');
   
   const sesion = obtenerSesion();
   
   if (!sesion) {
-    console.log(' Usuario no autenticado');
+    // console.log(' Usuario no autenticado');
     mostrarAlerta('Debes iniciar sesión para crear publicaciones', 'warning');
     setTimeout(() => {
       window.location.href = 'index.html';
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   if (sesion.tipoUsuario !== 2) {
-    console.log(' Usuario no es proveedor');
+    // console.log(' Usuario no es proveedor');
     mostrarAlerta('Solo los proveedores pueden crear publicaciones', 'error');
     setTimeout(() => {
       window.location.href = 'index.html';
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  console.log(' Usuario autorizado:', sesion);
+  // console.log(' Usuario autorizado:', sesion);
 });
 
 // Preview de imágenes
@@ -140,7 +140,7 @@ document.getElementById('inputImagenes').addEventListener('change', function(e) 
 document.getElementById('formPublicacion').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-  console.log(' Enviando formulario de publicación...');
+  // console.log(' Enviando formulario de publicación...');
 
   const sesion = obtenerSesion();
   
@@ -196,7 +196,7 @@ document.getElementById('formPublicacion').addEventListener('submit', async func
     });
 
     const text = await response.text();
-    console.log(' Respuesta del servidor (raw):', text);
+    // console.log(' Respuesta del servidor (raw):', text);
 
     let result;
     try {

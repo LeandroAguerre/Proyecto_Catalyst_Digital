@@ -1,7 +1,7 @@
-console.log('script.js cargado correctamente');
+// console.log('script.js cargado correctamente');
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM cargado, iniciando script');
+  // console.log('DOM cargado, iniciando script');
   
   const estadoRegistro = document.getElementById('estadoRegistro');
   const estadoLogin = document.getElementById('estadoLogin');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para guardar sesión del usuario
   function guardarSesion(usuario) {
-    console.log(' Guardando sesión:', usuario);
+    // console.log(' Guardando sesión:', usuario);
     sessionStorage.setItem('usuarioId', usuario.id);
     sessionStorage.setItem('tipoUsuario', usuario.tipoUsuario);
     sessionStorage.setItem('nombreCompleto', usuario.nombreCompleto);
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para limpiar sesión
   function limpiarSesion() {
-    console.log(' Limpiando sesión');
+    // console.log(' Limpiando sesión');
     sessionStorage.removeItem('usuarioId');
     sessionStorage.removeItem('tipoUsuario');
     sessionStorage.removeItem('nombreCompleto');
@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const data = await response.json();
 
-      if (data.debug) {
-        console.groupCollapsed('Debug Reservas Pendientes');
+      // if (data.debug) {
+      //   console.groupCollapsed('Debug Reservas Pendientes');
         
-        console.groupEnd();
-      }
+      //   console.groupEnd();
+      // }
 
       const badge = document.getElementById('reservasPendientes');
       
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para mostrar usuario logueado
   function mostrarUsuarioLogueado(usuario) {
-    console.log(' Mostrando usuario logueado:', usuario);
+    // console.log(' Mostrando usuario logueado:', usuario);
     if (authButtons) authButtons.style.display = 'none';
     if (username) username.textContent = usuario.nombreCompleto || usuario.correoElectronico;
     if (welcomeMessage) welcomeMessage.style.display = 'block';
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para mostrar estado de no logueado
   function mostrarUsuarioDeslogueado() {
-    console.log(' Mostrando estado deslogueado');
+    // console.log(' Mostrando estado deslogueado');
     if (authButtons) authButtons.style.display = '';
     if (welcomeMessage) welcomeMessage.style.display = 'none';
     if (username) username.textContent = '';
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Evento: Botón Salir
   if (btnSalir) {
     btnSalir.addEventListener('click', () => {
-      console.log(' Cerrando sesión...');
+      // console.log(' Cerrando sesión...');
       mostrarUsuarioDeslogueado();
       
       // Recargar página para limpiar estado
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formRegistro) {
     formRegistro.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log(' Formulario de registro enviado');
+      // console.log(' Formulario de registro enviado');
 
       const tipoUsuario = document.getElementById('tipoUsuario').value;
       const nombreCompleto = document.getElementById('nombre').value.trim();
@@ -327,10 +327,10 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify(payload)
         });
 
-        console.log(' Respuesta registro:', res.status);
+        // console.log(' Respuesta registro:', res.status);
 
         const data = await res.json();
-        console.log(' Data registro:', data);
+        // console.log(' Data registro:', data);
 
         if (data.exito && data.usuario) {
           estadoRegistro.innerHTML = '<div class="alert alert-success">' + data.mensaje + '</div>';
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log(' Formulario de login enviado');
+      // console.log(' Formulario de login enviado');
 
       const correoElectronico = document.getElementById('loginEmail').value.trim();
       const contrasena = document.getElementById('loginPassword').value.trim();
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const data = await res.json();
-        console.log(' Data login:', data);
+        // console.log(' Data login:', data);
 
         if (data.exito && data.usuario) {
           guardarSesion(data.usuario);
@@ -420,14 +420,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // INICIALIZACIÓN: Verificar sesión guardada al cargar la página
   const sesionActual = obtenerSesion();
   if (sesionActual) {
-    console.log(' Sesión encontrada al cargar página:', sesionActual);
+    // console.log(' Sesión encontrada al cargar página:', sesionActual);
     mostrarUsuarioLogueado(sesionActual);
   } else {
-    console.log(' No hay sesión guardada');
+    // console.log(' No hay sesión guardada');
     mostrarUsuarioDeslogueado();
   }
 
-  console.log(' Script inicializado completamente');
+  // console.log(' Script inicializado completamente');
 
   // Funcionalidad Menu Hamburguesa
   const hamburgerButton = document.getElementById('hamburgerMenuButton');
@@ -454,12 +454,12 @@ document.addEventListener('DOMContentLoaded', () => {
 async function cargarTarjetas() {
   // Si estamos en la página de búsqueda, no hacer nada. La búsqueda es manual.
   if (window.location.pathname.includes('todas.html')) {
-    console.log(' Carga inicial de tarjetas omitida en todas.html');
+    // console.log(' Carga inicial de tarjetas omitida en todas.html');
     return;
   }
 
   try {
-    console.log(' Cargando publicaciones...');
+    // console.log(' Cargando publicaciones...');
     
     const res = await fetch('/publicacion', {
       method: 'GET',
@@ -468,7 +468,7 @@ async function cargarTarjetas() {
       }
     });
 
-    console.log(' Status respuesta publicaciones:', res.status);
+    // console.log(' Status respuesta publicaciones:', res.status);
     
     if (!res.ok) {
       throw new Error('HTTP error! status: ' + res.status);
@@ -482,7 +482,7 @@ async function cargarTarjetas() {
     }
 
     const publicaciones = await res.json();
-    console.log(' Publicaciones cargadas:', publicaciones);
+    // console.log(' Publicaciones cargadas:', publicaciones);
 
     const contenedor2 = document.getElementById('grid-servicios');
     
@@ -502,7 +502,7 @@ async function cargarTarjetas() {
     // INTEGRACIÓN CON SISTEMA DE BÚSQUEDA
     if (typeof window.cargarPublicacionesParaBusqueda === 'function') {
       window.cargarPublicacionesParaBusqueda(publicaciones);
-      console.log(' Publicaciones enviadas al sistema de búsqueda');
+      // console.log(' Publicaciones enviadas al sistema de búsqueda');
       // NO renderizar aquí, el buscador lo hará
       return;
     }

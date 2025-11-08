@@ -1,0 +1,131 @@
+:root {
+  --bg: #ffffff;
+  --fg: #0b0b0b;
+  --muted: #5a5a5a;
+  --line:  #ffffff;
+  --accent: #0d0d0d;
+  --radius: 12px;
+  --shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Noto Sans", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; }
+.brand-text { font-family: "Space Mono", monospace; font-size: 16px; }
+.nav { display: flex; gap: 22px; align-items: center; }
+.nav a { color: var(--muted); font-weight: 600; }
+.nav a:hover { color: var(--fg); }
+
+.logo { color: var(--fg); }
+
+.hero { padding: 96px 24px 56px; border-bottom: 1px solid var(--line); }
+.hero-inner { max-width: 1080px; margin: 0 auto; }
+.headline { font-size: clamp(32px, 5vw, 58px); line-height: 1.05; letter-spacing: -0.5px; margin: 0 0 16px; }
+.headline-accent { font-family: "Space Mono", monospace; background: #000; color: #fff; padding: 4px 10px; border-radius: 8px; }
+.subhead { color: var(--muted); font-size: clamp(16px, 2.2vw, 20px); max-width: 720px; margin: 8px 0 22px; }
+
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
+  font-weight: 700; transition: transform .06s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+.btn--primary { background: #0b0b0b; color: #fff; border-color: #0b0b0b; }
+.btn--primary:hover { background: #111; }
+.btn--ghost { background: transparent; color: var(--fg); }
+.btn--ghost:hover { background: #f5f5f5; }
+
+.badges { list-style: none; padding: 0; margin: 22px 0 0; display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+.badges li { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+
+.section { padding: 72px 24px; }
+.section-head { max-width: 1080px; margin: 0 auto 28px; }
+.section-title { font-size: clamp(24px, 3.2vw, 36px); margin: 0 0 6px; }
+.section-desc { color: var(--muted); margin: 0; }
+
+.cards { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+.card {
+  padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow);
+}
+.card h3 { margin: 0 0 6px; font-size: 20px; }
+.card p { color: var(--muted); margin: 0 0 12px; }
+.list { margin: 0; padding-left: 18px; color: var(--fg); }
+.list li { margin: 6px 0; }
+
+.grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+.tile { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: #fff; box-shadow: var(--shadow); }
+.tile img { width: 100%; height: 240px; object-fit: cover; transform: scale(1.02); transition: transform .5s ease; }
+.tile:hover img { transform: scale(1.08); }
+.tile-meta { position: absolute; left: 12px; bottom: 12px; right: 12px; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); }
+.kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.tile-meta h3 { margin: 4px 0 0; font-size: 16px; }
+
+.steps { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; counter-reset: step; }
+.step {
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: #fff; box-shadow: var(--shadow);
+}
+.step h3 { margin: 6px 0 8px; font-size: 18px; }
+.step p { margin: 0; color: var(--muted); }
+.step-num { font-family: "Space Mono", monospace; font-weight: 700; color: var(--muted); }
+
+.quotes { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.quote { border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; font-size: 18px; background: #fff; box-shadow: var(--shadow); }
+.quote cite { display: block; margin-top: 8px; font-size: 14px; color: var(--muted); font-style: normal; }
+
+.cta { padding: 80px 24px; text-align: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #fafafa; }
+.cta h2 { margin: 0 0 8px; font-size: clamp(22px, 3vw, 32px); }
+.cta p { margin: 0 0 18px; color: var(--muted); }
+
+.site-footer { padding: 36px 24px; }
+.footer-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.brand-footer { display: inline-flex; gap: 10px; align-items: center; font-weight: 700; }
+.footer-nav { display: flex; gap: 16px; }
+.footer-nav a { color: var(--muted); }
+.footer-nav a:hover { color: var(--fg); }
+.legal { grid-column: 1 / -1; color: var(--muted); margin: 0; font-size: 14px; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .steps { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .cards { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 640px) {
+  .nav { display: none; }
+  .grid { grid-template-columns: 1fr; }
+  .steps, .cards, .quotes { grid-template-columns: 1fr; }
+  .hero { padding-top: 72px; }
+}
+
+/* Motion primitives */
+[data-animate] { will-change: transform, opacity; }
+
+/* 🔹 Ajustes para el logo del átomo */
+.brand-logo {
+  height: 52px;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.brand-footer .brand-logo {
+  height: 36px;
+  margin-right: 6px;
+}

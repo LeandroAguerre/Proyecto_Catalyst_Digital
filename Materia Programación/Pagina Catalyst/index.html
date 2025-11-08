@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Catalyst Digital — Diseño y desarrollo web</title>
+  <meta name="description" content="Catalyst Digital: Creamos sitios web modernos, rápidos y elegantes para empresas que quieren crecer." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo-atom.png">
+
+  <!-- Fuentes y estilos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Librerías JS -->
+  <script type="importmap">
+  {
+    "imports": {
+      "gsap": "https://esm.sh/gsap@3.12.5?bundle",
+      "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger?bundle"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" data-animate="fade-up">
+    <a class="brand" href="#top" aria-label="Inicio">
+      <img src="logo-atom.png" alt="Logo Catalyst Digital" class="brand-logo">
+      <span class="brand-text">Catalyst Digital</span>
+    </a>
+    <nav class="nav">
+      <a href="#servicios">Servicios</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#contacto" class="btn btn--primary">Empezar</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <h1 class="headline" data-animate="stagger">
+          Construimos sitios web
+          <span class="headline-accent">modernos</span>,
+          rápidos y elegantes.
+        </h1>
+        <p class="subhead" data-animate="fade-up">
+          Somos tu equipo de diseño y desarrollo web. Convertimos ideas en experiencias digitales que generan resultados.
+        </p>
+        <div class="cta-row" data-animate="fade-up">
+          <a href="#contacto" class="btn btn--primary">Cuéntanos tu proyecto</a>
+          <a href="#proyectos" class="btn btn--ghost">Ver portafolio</a>
+        </div>
+        <ul class="badges" aria-label="Características" data-animate="fade-up">
+          <li>Diseño a medida</li>
+          <li>SEO técnico</li>
+          <li>Performance A+</li>
+          <li>Accesibilidad</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="servicios" class="section">
+      <div class="section-head" data-animate="fade-up">
+        <h2 class="section-title">Servicios</h2>
+        <p class="section-desc">Soluciones completas para tu presencia digital.</p>
+      </div>
+      <div class="cards">
+        <article class="card" data-animate="card">
+          <h3>Web a medida</h3>
+          <p>Desarrollo de sitios rápidos, seguros y mantenibles con tecnologías modernas.</p>
+          <ul class="list">
+            <li>Landing pages y sitios corporativos</li>
+            <li>Headless CMS</li>
+            <li>Optimización de Core Web Vitals</li>
+          </ul>
+        </article>
+        <article class="card" data-animate="card">
+          <h3>E-commerce</h3>
+          <p>Tiendas online enfocadas en conversión, escalables y fáciles de gestionar.</p>
+          <ul class="list">
+            <li>Checkout optimizado</li>
+            <li>Integraciones de pago</li>
+            <li>Analítica y tracking</li>
+          </ul>
+        </article>
+        <article class="card" data-animate="card">
+          <h3>Branding & UI</h3>
+          <p>Identidad visual, sistemas de diseño y prototipos de alta fidelidad.</p>
+          <ul class="list">
+            <li>Design systems</li>
+            <li>Guías de estilo</li>
+            <li>Prototipado interactivo</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Proyectos -->
+    <section id="proyectos" class="section">
+      <div class="section-head" data-animate="fade-up">
+        <h2 class="section-title">Proyectos</h2>
+        <p class="section-desc">Una muestra de nuestro trabajo reciente.</p>
+      </div>
+      <div class="grid">
+        <a class="tile" href="#" aria-label="Proyecto 1" data-animate="tile">
+          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1400&auto=format&fit=crop" alt="Proyecto 1 — interfaz limpia en escritorio" />
+          <div class="tile-meta">
+            <span class="kicker">Fintech</span>
+            <h3>Panel de control con datos en tiempo real</h3>
+          </div>
+        </a>
+        <a class="tile" href="#" aria-label="Proyecto 2" data-animate="tile">
+          <img src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?q=80&w=1400&auto=format&fit=crop" alt="Proyecto 2 — tienda online moderna" />
+          <div class="tile-meta">
+            <span class="kicker">E-commerce</span>
+            <h3>Tienda con UX enfocada en conversión</h3>
+          </div>
+        </a>
+        <a class="tile" href="#" aria-label="Proyecto 3" data-animate="tile">
+          <img src="https://images.unsplash.com/photo-1555421689-43cad7100751?q=80&w=1400&auto=format&fit=crop" alt="Proyecto 3 — sitio corporativo minimalista" />
+          <div class="tile-meta">
+            <span class="kicker">B2B</span>
+            <h3>Sitio corporativo minimalista</h3>
+          </div>
+        </a>
+        <a class="tile" href="#" aria-label="Proyecto 4" data-animate="tile">
+          <img src="https://images.unsplash.com/photo-1508830524289-0adcbe822b40?q=80&w=1400&auto=format&fit=crop" alt="Proyecto 4 — aplicación web colaborativa" />
+          <div class="tile-meta">
+            <span class="kicker">SaaS</span>
+            <h3>App web colaborativa</h3>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Proceso -->
+    <section id="proceso" class="section">
+      <div class="section-head" data-animate="fade-up">
+        <h2 class="section-title">Nuestro proceso</h2>
+        <p class="section-desc">Transparente, ágil y centrado en resultados.</p>
+      </div>
+      <ol class="steps">
+        <li class="step" data-animate="step">
+          <span class="step-num">01</span>
+          <h3>Descubrimiento</h3>
+          <p>Analizamos objetivos, audiencia y ventajas competitivas.</p>
+        </li>
+        <li class="step" data-animate="step">
+          <span class="step-num">02</span>
+          <h3>Diseño</h3>
+          <p>Arquitectura de información, wireframes y UI de alto nivel.</p>
+        </li>
+        <li class="step" data-animate="step">
+          <span class="step-num">03</span>
+          <h3>Desarrollo</h3>
+          <p>Implementación optimizada con buenas prácticas y QA riguroso.</p>
+        </li>
+        <li class="step" data-animate="step">
+          <span class="step-num">04</span>
+          <h3>Lanzamiento & crecimiento</h3>
+          <p>Medición, mejoras continuas y acompañamiento.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="section">
+      <div class="section-head" data-animate="fade-up">
+        <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+      </div>
+      <div class="quotes">
+        <blockquote class="quote" data-animate="card">
+          “Catalyst Digital elevó nuestra marca. El nuevo sitio cargó 3× más rápido y las conversiones subieron un 28%.”
+          <cite>— Laura Gómez, Directora de Marketing</cite>
+        </blockquote>
+        <blockquote class="quote" data-animate="card">
+          “Comunicación clara y entrega impecable. Un socio tecnológico de confianza.”
+          <cite>— Martín Pérez, CEO</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="contacto" class="cta" data-animate="fade-up">
+      <h2>¿Listo para acelerar tu presencia digital?</h2>
+      <p>Reservemos una llamada de 20 minutos para entender tu proyecto.</p>
+      <div class="cta-row">
+        <a class="btn btn--primary" href="mailto:hola@catalyst.digital?subject=Quiero%20crear%20un%20sitio%20web">Escríbenos</a>
+        <a class="btn btn--ghost" href="https://cal.com/" target="_blank" rel="noopener">Agendar llamada</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="brand-footer">
+        <img src="logo-atom.png" alt="Logo Catalyst Digital" class="brand-logo" width="22" height="22">
+        <span>Catalyst Digital</span>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="#servicios">Servicios</a>
+        <a href="#proyectos">Proyectos</a>
+        <a href="#proceso">Proceso</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <p class="legal">© <span id="year"></span> Catalyst Digital. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
